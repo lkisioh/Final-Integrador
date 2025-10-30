@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from './infra/database/database.module';
-import { UserModule } from './modules/user/user.module';
-import { AddressOrmEntity } from './infra/typeorm/entities/adress.orm-entity';
+import { UsersModule } from './modules/users/user.module';
+import { AddressOrmEntity } from './modules/users/infra/databases/address.orm-entity';
 
 @Module({
-  imports: [DatabaseModule, UserModule, AddressOrmEntity],
+  imports: [DatabaseModule, UsersModule, AddressOrmEntity],
 })
 export class AppModule {}

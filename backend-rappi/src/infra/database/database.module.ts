@@ -1,20 +1,16 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserOrmEntity } from '../typeorm/entities/user.orm-entity';
-import { DataSource } from 'typeorm';
-import { AddressOrmEntity } from '../typeorm/entities/adress.orm-entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'sqlite',
-      database: 'data/rappi.sqlite',
-      entities: [UserOrmEntity, AddressOrmEntity],
+      database: 'db.sqlite',
+      entities: [__dirname + '/../../**/*.orm-entity{.ts,.js}'],
       synchronize: true,
     }),
-    
   ],
-  
 })
-
 export class DatabaseModule {}
