@@ -29,7 +29,7 @@ export class UserRepositoryImpl implements IUserRepository {
       name: user.name,
       email: user.email,
       password: user.password,
-      addresses: addressEntities, 
+      addresses: addressEntities,
     });
 
     const saved = await this.userRepo.save(ormUser);
