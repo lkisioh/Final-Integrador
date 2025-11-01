@@ -18,7 +18,8 @@ import { IProductRepository } from './domain/repositories/product.repository.int
     },
     {
       provide: CreateProductUseCase,
-      useFactory: (productRepo: IProductRepository) => new CreateProductUseCase(productRepo),
+      useFactory: (productRepo: IProductRepository) =>
+        new CreateProductUseCase(productRepo),
       inject: ['IProductRepository'],
     },
   ],

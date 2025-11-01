@@ -1,5 +1,13 @@
-import {Entity,PrimaryGeneratedColumn,Column,CreateDateColumn,OneToMany} from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  OneToMany,
+  OneToOne,
+} from 'typeorm';
 import { AddressOrmEntity } from './address.orm-entity';
+import { DriverOrmEntity } from 'src/modules/drivers/infra/databases/driver.orm-entity';
 
 @Entity({ name: 'users' })
 export class UserOrmEntity {
@@ -26,4 +34,7 @@ export class UserOrmEntity {
 
   @OneToMany(() => AddressOrmEntity, address => address.user, { cascade: true, eager: true })
   addresses: AddressOrmEntity[];
+
+  @OneToOne(() => DriverOrmEntity, driver => driver.user_id, { cascade: true, eager: true })
+  driver: DriverOrmEntity;
 }

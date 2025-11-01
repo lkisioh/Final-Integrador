@@ -3,6 +3,8 @@ import { Type } from 'class-transformer';
 import { AddressDto } from './address.dto';
 export class CreateUserDto {
   @IsString()
+  uuid?: string;
+  @IsString()
   name: string;
   @IsEmail()
   email: string;

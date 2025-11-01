@@ -1,6 +1,7 @@
-import { Controller, Post, Body, Get, Inject } from '@nestjs/common';
+import { Controller, Post, Body, Get, Inject, Patch, Delete, Param } from '@nestjs/common';
 import { CreateUserUseCase } from '../../application/use-cases/create-user.usecase';
 import { CreateUserDto } from '../../application/dtos/create-user.dto';
+import { UpdateUserDto } from '../../application/dtos/update-user.dto';
 import type { IUserRepository } from '../../domain/repositories/user.repository.interface';
 
 @Controller('users')
@@ -19,5 +20,21 @@ export class UserController {
   async findAll() {
     const users = await this.userRepository.findAll();
     return users;
+  }
+  @Get('by-uuid/:uuid')
+  async findByUuid(@Body('uuid') uuid: string) {
+    const user = await this.userRepository.findByUuid(uuid);
+    return user;
+  }
+  @Patch(':uuid')
+  async update(@Param('uuid') uuid: string, @Body() dto: UpdateUserDto) {
+    const user = await this.userRepository.update({ ...dto }, uuid);
+    return user;
+  }
+  
+  @Delete(':uuid')
+  async delete(@Body('uuid') uuid: string) {
+    await this.userRepository.delete(uuid);
+    return { message: 'User deleted successfully' };
   }
 }
