@@ -1,6 +1,6 @@
 import { IsString, IsOptional, IsNumber } from 'class-validator';
 
-export class AddressDto {
+export class CreateAddressVendorDto {
   @IsString()
   street: string;
 
@@ -9,6 +9,5 @@ export class AddressDto {
   number?: number;
 
   @IsString()
-  @IsOptional()
-  apartment?: string;
+  vendorUuid: string;
 }

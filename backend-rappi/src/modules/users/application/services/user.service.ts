@@ -13,7 +13,11 @@ export class UserService {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  create(createUserDto){
+  create(createUserDto) {
     return this.createUserUseCase.execute(createUserDto);
+  }
+
+  getAllUsers() {
+    return this.userRepository.findAll();
   }
 }

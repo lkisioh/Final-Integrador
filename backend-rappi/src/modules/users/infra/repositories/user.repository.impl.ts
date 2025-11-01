@@ -72,4 +72,25 @@ export class UserRepositoryImpl implements IUserRepository {
 
     return userFind;
   }
+
+  // devuelve la lista pero con el created at igual en todos
+  async findAll(): Promise<UserEntity[]> {
+    const entities = await this.userRepo.find({ relations: ['addresses'] });
+    return entities.map(entity => {
+      const user = new UserEntity();
+      Object.assign(user, {
+        id: entity.id,
+        uuid: entity.uuid,
+        name: entity.name,
+        email: entity.email,
+        password: entity.password,
+        addresses: entity.addresses.map(addr => {
+          const address = new AddressEntity();
+          Object.assign(address, addr);
+          return address;
+        }),
+      });
+      return user;
+    });
+  }
 }
