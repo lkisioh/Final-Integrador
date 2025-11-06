@@ -2,7 +2,7 @@
 // Si querés usar reactive o ref:
 import { ref } from 'vue'
 
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterLink } from 'vue-router'
 
 // Ejemplo de datos del formulario
 const email = ref('')
@@ -27,9 +27,9 @@ function login() {
         <label>Contraseña:</label>
         <input v-model="password" type="password" />
       </div>
-      
+
       <p>¿No tienes una cuenta?</p>
-      <RouterLink to="/newUser">Crea una cuenta</RouterLink>
+      <RouterLink to="/SelectUser">Crea una cuenta</RouterLink>
       <br>
       <button type="submit">Entrar</button>
     </form>

@@ -43,7 +43,7 @@ user.value = {
 
 <template>
   <div class="form">
-    <h2>Crear Usuario</h2>
+    <h2>Comprador</h2>
     <form @submit.prevent="nuevoUsuario">
         <div>
         <label>Nombre:</label>
@@ -55,14 +55,14 @@ user.value = {
 
         <label>Calle:</label>
         <input v-model="street" type="text" />
-      
+
         <label>Número:</label>
         <input v-model="streetNumber" type="number" />
 
         <label>Dpto:</label>
         <input v-model="apartment" type="text" />
       </div>
-      
+
 
       <div>
         <label>Email:</label>
@@ -73,7 +73,7 @@ user.value = {
         <label>Contraseña:</label>
         <input v-model="password" type="password" />
       </div>
-      
+
       <button type="submit">Crear</button>
     </form>
   </div>

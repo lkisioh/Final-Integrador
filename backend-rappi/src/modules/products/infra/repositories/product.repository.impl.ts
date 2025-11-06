@@ -40,6 +40,22 @@ export class ProductRepositoryImpl implements IProductRepository {
 
     return domainProduct;
   }
+  async findAll(): Promise<ProductEntity[]> {
+    const entities = await this.productRepo.find();
+    return entities.map(entity => {
+      const product = new ProductEntity();
+      Object.assign(product, {
+        id: entity.id,
+        uuid: entity.uuid,
+        name: entity.name,
+        description: entity.description,
+        price: entity.price,
+        photo: entity.photo,
+        available: entity.available,
+      });
+      return product;
+    });
+  }
 
   async findById(id: number): Promise<ProductEntity | null> {
     const entity = await this.productRepo.findOne({ where: { id } });
