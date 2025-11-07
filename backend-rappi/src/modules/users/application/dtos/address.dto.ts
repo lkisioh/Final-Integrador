@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsOptional, IsNumber, Min } from 'class-validator';
 
 export class AddressDto {
   @IsString()
@@ -6,6 +6,7 @@ export class AddressDto {
 
   @IsNumber()
   @IsOptional()
+  @Min(1)
   number?: number;
 
   @IsString()

@@ -6,6 +6,8 @@ import FormVendorView from '../views/vendor/FormVendorView.vue'
 import FormDriverView from '../views/driver/FormDriverView.vue'
 
 import UserView from '@/views/user/UserView.vue'
+import DriverView from '@/views/driver/DriverView.vue'
+import VendorView from '@/views/vendor/VendorView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -47,7 +49,20 @@ const router = createRouter({
       path: '/user/products',
       name: 'user-products',
       component: UserView,
+    },
+    {
+      path: '/orders',
+      name: 'orders',
+      component: DriverView
+    },
+    {
+      path: '/vendors/:id',
+      name: 'vendor-details',
+      component: VendorView
     }
+
+
+
   ],
 })
 

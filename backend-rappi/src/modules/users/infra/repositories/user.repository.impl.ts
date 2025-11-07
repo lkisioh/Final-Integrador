@@ -138,6 +138,7 @@ export class UserRepositoryImpl implements IUserRepository {
       name: saved.name,
       email: saved.email,
       password: saved.password,
+      role: saved.role,
       addresses: saved.addresses.map(addr => ({
         street: addr.street,
         number: addr.number,

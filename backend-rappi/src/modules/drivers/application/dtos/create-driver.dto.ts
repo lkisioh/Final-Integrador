@@ -1,8 +1,13 @@
-import { IsString, IsNumber, IsBoolean } from 'class-validator';
+import { IsString, IsNumber, IsBoolean, IsEmail } from 'class-validator';
 
 export class CreateDriverDto {
   @IsString()
-  userUuid: string;
+  name: string;
+  @IsString()
+  @IsEmail()
+  email: string;
+  @IsString()
+  password: string;
 
   @IsNumber()
   phone: number;
@@ -14,5 +19,5 @@ export class CreateDriverDto {
   location: string;
 
   @IsBoolean()
-  available: boolean;
+  available: boolean = true;
 }

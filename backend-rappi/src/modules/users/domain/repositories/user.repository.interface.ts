@@ -1,5 +1,4 @@
 import { UserEntity } from '../entities/user.entity';
-import { CreateUserDto } from '../../application/dtos/create-user.dto';
 import { UpdateUserDto } from '../../application/dtos/update-user.dto';
 
 export interface IUserRepository {

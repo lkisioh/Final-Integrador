@@ -8,7 +8,6 @@ export class UserEntity {
   public name: string;
   public email: string;
   public password: string;
-  public role: string = 'user';
-  public readonly createdAt: Date = new Date();
+  public role: string = 'final-user';
   public addresses: AddressEntity[] = [];
 }

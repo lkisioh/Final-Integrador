@@ -1,67 +1,70 @@
 <script setup>
 // Si querés usar reactive o ref:
 import { ref } from 'vue'
+import { createVendor } from '@/composables/vendor/createVendor'
 
+const {vendor,cargando,error,createVendorAPI} = createVendor()
+
+import router from '@/router'
 
 // Ejemplo de datos del formulario
-
-const marketname = ref('')
+const name = ref('')
 const category = ref('')
-const daysOpen = ref('')
+const initDay = ref('')
+const endDay = ref('')
 const time = ref('')
 const phone = ref(0)
 const email = ref('')
-const street = ref('')
-const streetNumber = ref('')
 const password = ref('')
+const street = ref('')
+const number = ref(0)
 
-const initDay = ref('')
-const endDay = ref('')
 
-const vendor = ref ({})
+async function nuevoVendor() {
+  console.log('Creando vendedor:'+vendor.value)
 
-// Función para crear el usuario (podés adaptarla a tu lógica)
-function nuevoVendedor() {
-  console.log('Creando vendor:'+{marketname})
-
-  crearVendedor(marketname,category, daysOpen, time, phone, email, street, streetNumber, password)
+  mapearVendor(name,category,initDay,endDay,time,phone,email,password,street,number)
   //lamada api
-
-
-  console.log(vendor.value)
+  const ok = await createVendorAPI('http://localhost:3000/vendors', vendor.value)
+if (ok) {
+    alert('Vendedor creado con éxito')
+    router.push('/vendors/' + ok.id)  // Redirige a la vista del vendedor después de crear
+  } else {
+    console.log('Error al cambiar página')
+  }
   console.log('JSON plano:', JSON.stringify(vendor.value))
 }
 
 
-function crearVendedor(marketname,category, daysOpen, time, phone, email, street, streetNumber, password){
-
-
-
+function mapearVendor(name,category,initDay,endDay,time,phone,email,password,street,number){
 vendor.value = {
-    marketname: marketname.value,
-    category: category.value,
-    daysOpen: [initDay.value + ' a ' + endDay.value],
-    time: time.value,
-    phone: phone.value,
-     email: email.value,
-    address: {
-      street: street.value,
-      streetNumber: streetNumber.value,
-    },
-  password: password.value
+  name: name.value,
+  category: category.value,
+  daysOpen: ''+initDay.value + ' a ' + endDay.value+'',
+  time: time.value,
+  email: email.value,
+
+  password: password.value,
+  address: {
+    street: street.value,
+    number: number.value
+  },
+  phone: phone.value
 }
 }
+
+
 
 let currentChecked = null;
   function handleCheckChange(event) {
     const selectedValue = event.target.value;
 
     if (selectedValue === '24hs') {
-      time.value = ['24hs'];
+      time.value = '24hs';
       currentChecked = '24hs';
     } else {
       if (currentChecked === '24hs') {
-        time.value = [];
+        time.value = '';
         currentChecked = null;
       }
 
@@ -78,10 +81,10 @@ let currentChecked = null;
 <template>
   <div class="form">
     <h2>Vendedor</h2>
-    <form @submit.prevent="nuevoVendedor">
+    <form @submit.prevent="nuevoVendor">
         <div>
         <label>Nombre local:</label>
-        <input v-model="marketname" type="text" />
+        <input v-model="name" type="text" />
       </div>
 
       <div>
@@ -91,7 +94,7 @@ let currentChecked = null;
         <input v-model="street" type="text" />
 
         <label>Número:</label>
-        <input v-model="streetNumber" type="number" />
+        <input v-model="number" type="number" />
 
       </div>
 

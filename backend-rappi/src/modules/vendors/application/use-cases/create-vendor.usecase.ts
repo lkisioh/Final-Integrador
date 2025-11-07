@@ -9,7 +9,7 @@ export class CreateVendorUseCase {
 
   async execute(dto: CreateVendorDto): Promise<VendorEntity> {
     const vendor = new VendorEntity();
-    vendor.marketName = dto.marketName;
+    vendor.name = dto.name;
     vendor.category = dto.category;
     vendor.daysOpen = dto.daysOpen;
     vendor.time = dto.time;
@@ -21,6 +21,7 @@ export class CreateVendorUseCase {
       number: dto.address?.number,
       vendorUuid: vendor.uuid,
     };
+    vendor.password = dto.password;
 
     return await this.vendorRepo.save(vendor);
   }

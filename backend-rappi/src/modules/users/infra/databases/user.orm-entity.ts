@@ -4,10 +4,8 @@ import {
   Column,
   CreateDateColumn,
   OneToMany,
-  OneToOne,
 } from 'typeorm';
 import { AddressOrmEntity } from './address.orm-entity';
-import { DriverOrmEntity } from 'src/modules/drivers/infra/databases/driver.orm-entity';
 
 @Entity({ name: 'users' })
 export class UserOrmEntity {
@@ -17,10 +15,10 @@ export class UserOrmEntity {
   @Column({ unique: true })
   uuid: string;
 
-  @Column()
+  @Column({ nullable: true })
   name: string;
 
-  @Column({ unique: true })
+  @Column()
   email: string;
 
   @Column()
@@ -34,7 +32,4 @@ export class UserOrmEntity {
 
   @OneToMany(() => AddressOrmEntity, address => address.user, { cascade: true, eager: true })
   addresses: AddressOrmEntity[];
-
-  @OneToOne(() => DriverOrmEntity, driver => driver.user_id, { cascade: true, eager: true })
-  driver: DriverOrmEntity;
 }

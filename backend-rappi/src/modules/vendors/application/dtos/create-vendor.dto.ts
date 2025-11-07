@@ -11,9 +11,7 @@ import { CreateProductDto } from 'src/modules/products/application/dtos/create-p
 
 export class CreateVendorDto {
   @IsString()
-  userUuid: string;
-  @IsString()
-  marketName: string;
+  name: string;
   @IsString()
   category: string;
   //horario
@@ -36,5 +34,8 @@ export class CreateVendorDto {
   @Type(() => CreateAddressVendorDto)
   @IsOptional()
   address?: CreateAddressVendorDto;
+
+  @IsString()
+  password: string;
   // Faltaría calificaciones y reseñas
 }

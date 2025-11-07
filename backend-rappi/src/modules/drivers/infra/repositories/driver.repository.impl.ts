@@ -18,6 +18,9 @@ export class DriverRepositoryImpl implements IDriverRepository {
   async save(driver: DriverEntity): Promise<DriverEntity> {
     const ormDriver = this.driverRepo.create({
       uuid: driver.uuid ?? uuidv4(),
+      name: driver.name,
+      email: driver.email,
+      password: driver.password,
       phone: driver.phone,
       vehicle: driver.vehicle,
       location: driver.location,
@@ -31,6 +34,9 @@ export class DriverRepositoryImpl implements IDriverRepository {
     Object.assign(domainDriver, {
       id: saved.id,
       uuid: saved.uuid,
+      name: saved.name,
+      email: saved.email,
+      password: saved.password,
       phone: saved.phone,
       vehicle: saved.vehicle,
       location: saved.location,

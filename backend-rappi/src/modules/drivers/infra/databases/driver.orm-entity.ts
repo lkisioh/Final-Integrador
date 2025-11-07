@@ -2,10 +2,8 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToOne,
-  JoinColumn,
 } from 'typeorm';
-import { UserOrmEntity } from 'src/modules/users/infra/databases/user.orm-entity';
+
 
 @Entity({ name: 'drivers' })
 export class DriverOrmEntity {
@@ -14,6 +12,15 @@ export class DriverOrmEntity {
 
   @Column({ unique: true })
   uuid: string;
+
+  @Column()
+  name: string;
+
+  @Column()
+  email: string;
+
+  @Column()
+  password: string;
 
   @Column()
   phone: number;
@@ -27,7 +34,4 @@ export class DriverOrmEntity {
   @Column()
   available: boolean;
 
-  @OneToOne(() => UserOrmEntity, user => user.driver, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_Uuid' })
-  user_id: UserOrmEntity;
 }

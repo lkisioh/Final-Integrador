@@ -1,38 +1,44 @@
 <script setup>
-// Si querés usar reactive o ref:
 import { ref } from 'vue'
+import { createDriver } from '@/composables/driver/createDriver'
+
+const {driver,cargando,error,createDriverAPI} = createDriver()
+
+import router from '@/router'
 
 // Ejemplo de datos del formulario
 const name = ref('')
 const location = ref('')
 const phone = ref(0)
-const vehicle = ref('')
+const vehicle = ref('moto')
 const email = ref('')
 const password = ref('')
 
-const user = ref ({})
 
-// Función para crear el usuario (podés adaptarla a tu lógica)
-function nuevoDriver() {
-  console.log('Creando driver:'+{name})
+async function nuevoDriver() {
+  console.log('Creando conductor:'+driver.value)
 
-  crearDriver(name,location,phone,vehicle,email,password)
+  mapearDriver(name,location,phone,vehicle,email,password)
   //lamada api
-
-
-  console.log(user.value)
-  console.log('JSON plano:', JSON.stringify(user.value))
+  const ok = await createDriverAPI('http://localhost:3000/drivers', driver.value)
+if (ok) {
+    alert('Conductor creado con éxito')
+    router.push('/orders')  // Redirige a la vista de órdenes después de crear
+  } else {
+    console.log('Error al cambiar página')
+  }
+  console.log('JSON plano:', JSON.stringify(driver.value))
 }
 
 
-function crearDriver(name,location,phone,vehicle,email,password){
-user.value = {
-    name: name.value,
-    location: location.value,
-    phone: phone.value,
-    vehicle: vehicle.value,
-    email: email.value,
-    password: password.value
+function mapearDriver(name,location,phone,vehicle,email,password){
+driver.value = {
+  name: name.value,
+  email: email.value,
+  password: password.value,
+  location: location.value,
+  phone: phone.value,
+  vehicle: vehicle.value
 }
 }
 </script>

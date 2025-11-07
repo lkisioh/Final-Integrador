@@ -7,7 +7,4 @@ export class CreateAddressVendorDto {
   @IsNumber()
   @IsOptional()
   number?: number;
-
-  @IsString()
-  vendorUuid: string;
 }

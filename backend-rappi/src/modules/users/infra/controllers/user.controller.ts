@@ -31,7 +31,6 @@ export class UserController {
     const user = await this.userRepository.update({ ...dto }, uuid);
     return user;
   }
-  
   @Delete(':uuid')
   async delete(@Body('uuid') uuid: string) {
     await this.userRepository.delete(uuid);

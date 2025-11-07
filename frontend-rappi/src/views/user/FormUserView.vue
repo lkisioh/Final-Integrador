@@ -1,42 +1,50 @@
 <script setup>
 // Si querés usar reactive o ref:
 import { ref } from 'vue'
+import { createUser } from '@/composables/user/createUser.js'
 
-import { RouterLink, RouterView } from 'vue-router'
+const {usuario,cargando,error,createUserAPI} = createUser()
+
+import router from '@/router'
 
 // Ejemplo de datos del formulario
 const name = ref('')
 const street = ref('')
-const streetNumber = ref('')
+const number = ref(0)
 const apartment = ref('')
 const email = ref('')
 const password = ref('')
 
-const user = ref ({})
 
 // Función para crear el usuario (podés adaptarla a tu lógica)
-function nuevoUsuario() {
-  console.log('Creando usuario:'+{name})
+async function nuevoUsuario() {
+  console.log('Creando usuario:'+usuario.value)
 
-  crearUsuario(name,street,streetNumber,apartment,email,password)
+  mapearUser(name,street,number,apartment,email,password)
   //lamada api
-
-
-  console.log(user.value)
-  console.log('JSON plano:', JSON.stringify(user.value))
+  const ok = await createUserAPI('http://localhost:3000/users', usuario.value)
+if (ok) {
+    alert('Usuario creado con éxito')
+    router.push('/user/products')  // Redirige a la vista de productos para comprar después de crear
+  } else {
+    console.log('Error al cambiar página')
+  }
+  console.log('JSON plano:', JSON.stringify(usuario.value))
 }
 
 
-function crearUsuario(name,street,streetNumber,apartment,email,password){
-user.value = {
-    name: name.value,
-     address: {
-    street: street.value,
-    streetNumber: streetNumber.value,
-    apartment: apartment.value
-  },
+function mapearUser(name,street,number,apartment,email,password){
+usuario.value = {
+  name: name.value,
   email: email.value,
-  password: password.value
+  password: password.value,
+  addresses: [
+    {
+      street: street.value,
+      number: number.value,
+      apartment: apartment.value
+    }
+  ]
 }
 }
 </script>
@@ -57,7 +65,7 @@ user.value = {
         <input v-model="street" type="text" />
 
         <label>Número:</label>
-        <input v-model="streetNumber" type="number" />
+        <input v-model="number" type="number" />
 
         <label>Dpto:</label>
         <input v-model="apartment" type="text" />
@@ -77,6 +85,10 @@ user.value = {
       <button type="submit">Crear</button>
     </form>
   </div>
+
+
+  <h3 color="red">{{ error }}</h3>
+  <h3>{{ cargando }}</h3>
 </template>
 
 <style scoped>

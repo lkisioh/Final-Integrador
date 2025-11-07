@@ -6,9 +6,7 @@ import { CreateUserUseCase } from '../use-cases/create-user.usecase';
 @Injectable()
 export class UserService {
   constructor(
-    
     private readonly createUserUseCase: CreateUserUseCase,
-    
     @Inject('IUserRepository')
     private readonly userRepository: IUserRepository,
   ) {}

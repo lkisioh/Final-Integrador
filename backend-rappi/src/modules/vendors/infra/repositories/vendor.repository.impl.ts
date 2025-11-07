@@ -75,17 +75,14 @@ export class VendorRepositoryImpl implements IVendorRepository {
   async save(vendor: VendorEntity): Promise<VendorEntity> {
     console.log('Vendor recibido:', vendor);
     console.log('Address dentro de vendor:', vendor.address);
-    // 🧩 Crear la entidad Address (solo si hay dirección)
     let addressVendor: AddressVendorOrmEntity | undefined = undefined;
 
     if (vendor.address) {
       addressVendor = new AddressVendorOrmEntity();
       addressVendor.street = vendor.address.street;
       addressVendor.number = vendor.address.number;
-      // no le pongas vendorUuid directamente, TypeORM se encarga por la relación
     }
 
-    // 🧩 Crear las entidades Product
     const productsEntities = (vendor.products ?? []).map((p) => {
       const pr = new ProductOrmEntity();
       pr.name = p.name;
@@ -96,40 +93,33 @@ export class VendorRepositoryImpl implements IVendorRepository {
       return pr;
     });
 
-    // 🧩 Crear el vendor ORM listo para guardar
     const ormVendorData: DeepPartial<VendorOrmEntity> = {
       uuid: vendor.uuid ?? uuidv4(),
-      marketName: vendor.marketName,
+      name: vendor.name,
       category: vendor.category,
       daysOpen: vendor.daysOpen,
       time: vendor.time,
       email: vendor.email,
       phone: vendor.phone,
       products: productsEntities,
-      address: addressVendor ?? undefined, // ✅ ahora address tiene valores reales o undefined
+      address: addressVendor ?? undefined,
+      password: vendor.password,
     };
 
     const ormVendor = this.vendorRepo.create(ormVendorData);
 
-    //ver error
     console.log('ORM Vendor:', ormVendor);
-    // 🧩 Guardar en la base de datos (TypeORM hace cascade con address y products)
     const savedResult = (await this.vendorRepo.save(ormVendor)) as
       | VendorOrmEntity
       | VendorOrmEntity[];
-
-    // TypeORM.save can return the entity or an array when saving multiple items.
-    // Normalize to a single entity to keep TypeScript happy.
     const savedEntity: VendorOrmEntity = Array.isArray(savedResult)
       ? (savedResult[0] as VendorOrmEntity)
       : (savedResult as VendorOrmEntity);
-
-    // 🧩 Volver al dominio
     const domainVendor = new VendorEntity();
     Object.assign(domainVendor, {
       id: savedEntity.id,
       uuid: savedEntity.uuid,
-      marketName: savedEntity.marketName,
+      name: savedEntity.name,
       category: savedEntity.category,
       daysOpen: savedEntity.daysOpen,
       time: savedEntity.time,
@@ -143,6 +133,7 @@ export class VendorRepositoryImpl implements IVendorRepository {
         available: produ.available,
       })),
       address: savedEntity.address,
+      password: savedEntity.password,
     });
 
     return domainVendor;
@@ -156,7 +147,7 @@ export class VendorRepositoryImpl implements IVendorRepository {
     Object.assign(vendorFind, {
       id: entity.id,
       uuid: entity.uuid,
-      marketName: entity.marketName,
+      name: entity.name,
     });
 
     return vendorFind;
@@ -169,7 +160,7 @@ export class VendorRepositoryImpl implements IVendorRepository {
     Object.assign(vendorFind, {
       id: entity.id,
       uuid: entity.uuid,
-      marketName: entity.marketName,
+      name: entity.name,
     });
 
     return vendorFind;
