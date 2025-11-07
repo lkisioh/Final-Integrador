@@ -1,26 +1,26 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserOrmEntity } from './infra/databases/vendor.orm-entity';
-import { AddressOrmEntity } from './infra/databases/addressVendor.orm-entity';
-import { UserRepositoryImpl } from './infra/repositories/user.repository.impl';
-import { CreateUserUseCase } from './application/use-cases/create-user.usecase';
-import { UserController } from './infra/controllers/user.controller';
-import { IUserRepository } from './domain/repositories/user.repository.interface';
-
+import { VendorOrmEntity } from './infra/databases/vendor.orm-entity';
+import { AddressVendorOrmEntity } from './infra/databases/addressVendor.orm-entity';
+import { VendorRepositoryImpl } from './infra/repositories/vendor.repository.impl';
+import { CreateVendorUseCase } from './application/use-cases/create-vendor.usecase';
+import { VendorController } from './infra/contollers/vendor.controller';
+import { IVendorRepository } from './domain/repositories/vendor.repository.interface';
 @Module({
-  imports: [TypeOrmModule.forFeature([UserOrmEntity, AddressOrmEntity])],
-  controllers: [UserController],
+  imports: [TypeOrmModule.forFeature([VendorOrmEntity, AddressVendorOrmEntity])],
+  controllers: [VendorController],
   providers: [
     {
       provide: 'IVendorRepository',
-      useClass: UserRepositoryImpl,
+      useClass: VendorRepositoryImpl,
     },
     {
-      provide: CreateUserUseCase,
-      useFactory: (userRepo: IUserRepository) => new CreateUserUseCase(userRepo),
-      inject: ['IUserRepository'],
+      provide: CreateVendorUseCase,
+      useFactory: (vendorRepo: IVendorRepository) =>
+        new CreateVendorUseCase(vendorRepo),
+      inject: ['IVendorRepository'],
     },
   ],
-  exports: ['IUserRepository'],
+  exports: ['IVendorRepository'],
 })
-export class UsersModule {}
+export class VendorsModule {}

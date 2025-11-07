@@ -1,6 +1,6 @@
-import { IsString, IsOptional, IsNumber, IsBoolean } from 'class-validator';
+import { IsString, IsNumber, IsBoolean } from 'class-validator';
 
-export class ProductDto {
+export class CreateProductDto {
   @IsString()
   productName: string;
 
@@ -8,8 +8,7 @@ export class ProductDto {
   description: string;
 
   @IsNumber()
-  @IsOptional()
-  price?: number;
+  price: number;
 
   @IsString() //Direccion de la img si hubiera en bbdd
   photo: string;

@@ -1,16 +1,15 @@
 import {
   IsEmail,
- IsNumber,
- IsOptional,
+  IsNumber,
+  IsOptional,
   IsString,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { AddressDto } from './address.dto';
-import { ProductDto } from 'src/modules/products/application/dtos/product.dto';
+import { CreateAddressVendorDto } from './address.dto';
+import { CreateProductDto } from 'src/modules/products/application/dtos/create-product.dto';
 
 export class CreateVendorDto {
-
   @IsString()
   userUuid: string;
   @IsString()
@@ -29,13 +28,13 @@ export class CreateVendorDto {
   phone: number;
 
   @ValidateNested({ each: true })
-  @Type(() => ProductDto)
+  @Type(() => CreateProductDto)
   @IsOptional()
-  products?: ProductDto[];
+  products?: CreateProductDto[];
 
   @ValidateNested({ each: true })
-  @Type(() => AddressDto)
+  @Type(() => CreateAddressVendorDto)
   @IsOptional()
-  address?: AddressDto;
+  address?: CreateAddressVendorDto;
   // Faltaría calificaciones y reseñas
 }

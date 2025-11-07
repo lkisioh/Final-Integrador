@@ -1,4 +1,10 @@
-import {Entity,PrimaryGeneratedColumn,Column,CreateDateColumn, OneToOne, OneToMany} from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 import { VendorOrmEntity } from 'src/modules/vendors/infra/databases/vendor.orm-entity';
 
 @Entity({ name: 'products' })
@@ -26,5 +32,5 @@ export class ProductOrmEntity {
 
   @ManyToOne(() => VendorOrmEntity, vendor => vendor.products, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'vendor_id' })
-  vendor: VendorOrmEntity;
+  vendor_id: VendorOrmEntity;
 }

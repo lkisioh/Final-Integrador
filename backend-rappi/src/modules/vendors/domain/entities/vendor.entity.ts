@@ -1,10 +1,10 @@
 import { ProductEntity } from 'src/modules/products/domain/entities/product.entity';
-import { AddressEntity } from './addressVendor.entity';
+import { AddressVendorEntity } from './addressVendor.entity';
 
 export class VendorEntity {
   public readonly id: number;
   public readonly uuid: string;
-  public readonly userId: number;
+  public readonly userUuid: string;
   public marketName: string;
   public category: string;
   public daysOpen: string;
@@ -12,5 +12,5 @@ export class VendorEntity {
   public email: string;
   public phone: number;
   public products: ProductEntity[] = [];
-  public address: AddressEntity;
+  public address: AddressVendorEntity;
 }

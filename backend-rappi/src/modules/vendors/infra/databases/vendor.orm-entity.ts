@@ -31,9 +31,15 @@ export class VendorOrmEntity {
   @CreateDateColumn()
   createdAt: Date;
 
-  @OneToMany(() => ProductOrmEntity, product => product.vendor_id, { cascade: true, eager: true })
+  @OneToMany(() => ProductOrmEntity, product => product.vendor_id,{
+    cascade: true,
+    eager: true,
+  })
   products: ProductOrmEntity[];
 
-  @OneToOne(() => AddressVendorOrmEntity, address => address.vendor, { cascade: true, eager: true })
-  address: AddressVendorOrmEntity[];
+  @OneToOne(() => AddressVendorOrmEntity, address => address.vendor,{ 
+    cascade: true,
+    eager: true,
+  })
+  address: AddressVendorOrmEntity;
 }

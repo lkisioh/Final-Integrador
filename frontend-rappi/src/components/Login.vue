@@ -1,35 +1,37 @@
 <script setup>
+// Si querés usar reactive o ref:
 import { ref } from 'vue'
+
 import { RouterLink } from 'vue-router'
 
+// Ejemplo de datos del formulario
 const email = ref('')
 const password = ref('')
 
+// Función para crear el usuario (podés adaptarla a tu lógica)
 function login() {
   console.log('Usuario logeado:', { email: email.value, password: password.value })
 }
 </script>
 
 <template>
-  <div class="login-box">
+  <div class="login">
     <h2>Iniciar Sesión</h2>
     <form @submit.prevent="login">
-      <div class="input-group">
-        <label>Email</label>
+      <div>
+        <label>Email:</label>
         <input v-model="email" type="text" />
       </div>
 
-      <div class="input-group">
-        <label>Contraseña</label>
+      <div>
+        <label>Contraseña:</label>
         <input v-model="password" type="password" />
       </div>
 
+      <p>¿No tienes una cuenta?</p>
+      <RouterLink to="/SelectUser">Crea una cuenta</RouterLink>
+      <br>
       <button type="submit">Entrar</button>
-
-      <p class="register-text">
-        ¿No tienes una cuenta?
-        <RouterLink to="/newUser">Crea una cuenta</RouterLink>
-      </p>
     </form>
   </div>
 </template>

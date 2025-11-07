@@ -16,10 +16,11 @@ export class AddressOrmEntity {
   street: string;
 
   @Column()
-  number: number;
+  @Column({ nullable: true })
+  number?: number;
 
-  @Column()
-  apartment: string;
+  @Column({ nullable: true })
+  apartment?: string;
 
   @ManyToOne(() => UserOrmEntity, user => user.addresses, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
