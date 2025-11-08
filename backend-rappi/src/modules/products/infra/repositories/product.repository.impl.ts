@@ -74,4 +74,20 @@ export class ProductRepositoryImpl implements IProductRepository {
 
     return productFind;
   }
+  async findByVendorUuid(uuid: string): Promise<ProductEntity[]> {
+    const entities = await this.productRepo.find({ where: { vendor_uuid: { uuid } }, relations: ['vendor_uuid'] });
+    return entities.map(entity => {
+      const product = new ProductEntity();
+      Object.assign(product, {
+        id: entity.id,
+        uuid: entity.uuid,
+        name: entity.name,
+        description: entity.description,
+        price: entity.price,
+        photo: entity.photo,
+        available: entity.available,
+      });
+      return product;
+    });
+  }
 }

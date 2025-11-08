@@ -9,7 +9,8 @@ export class CreateProductUseCase {
 
   async execute(dto: CreateProductDto): Promise<ProductEntity> {
     const product = new ProductEntity();
-    product.name = dto.productName;
+    product.vendorUuid = dto.vendorUuid;
+    product.name = dto.name;
     product.description = dto.description;
     product.price = dto.price;
     product.photo = dto.photo;

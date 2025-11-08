@@ -2,7 +2,9 @@
 // Si querés usar reactive o ref:
 import { ref } from 'vue'
 import { createVendor } from '@/composables/vendor/createVendor'
+import { userUuid } from '@/stores/user/userUuid'
 
+const {setUuid} = userUuid()
 const {vendor,cargando,error,createVendorAPI} = createVendor()
 
 import router from '@/router'
@@ -28,7 +30,9 @@ async function nuevoVendor() {
   const ok = await createVendorAPI('http://localhost:3000/vendors', vendor.value)
 if (ok) {
     alert('Vendedor creado con éxito')
-    router.push('/vendors/' + ok.id)  // Redirige a la vista del vendedor después de crear
+    setUuid(ok.uuid)
+    router.push('/vendors/' + ok.uuid)  // Redirige a la vista del vendedor después de crear
+
   } else {
     console.log('Error al cambiar página')
   }

@@ -15,6 +15,11 @@ export class DriverRepositoryImpl implements IDriverRepository {
     private readonly driverRepo: Repository<DriverOrmEntity>,
   ) {}
 
+  async findByEmail(email: string, password: string): Promise<{ uuid: string } | null> {
+    const driver = await this.driverRepo.findOne({ where: { email, password } });
+    if (!driver) return null;
+    return { uuid: driver.uuid };
+  }
   async save(driver: DriverEntity): Promise<DriverEntity> {
     const ormDriver = this.driverRepo.create({
       uuid: driver.uuid ?? uuidv4(),

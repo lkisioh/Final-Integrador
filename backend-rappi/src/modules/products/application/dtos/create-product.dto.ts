@@ -2,7 +2,10 @@ import { IsString, IsNumber, IsBoolean } from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
-  productName: string;
+  vendorUuid: string;
+
+  @IsString()
+  name: string;
 
   @IsString()
   description: string;
@@ -11,8 +14,8 @@ export class CreateProductDto {
   price: number;
 
   @IsString() //Direccion de la img si hubiera en bbdd
-  photo: string;
+  photo: string = 'photourl';
 
   @IsBoolean()
-  available: boolean;
+  available: boolean = true;
 }

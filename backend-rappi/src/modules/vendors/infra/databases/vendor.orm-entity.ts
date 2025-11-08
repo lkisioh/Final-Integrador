@@ -28,7 +28,7 @@ export class VendorOrmEntity {
   @Column()
   phone: number;
 
-  @OneToMany(() => ProductOrmEntity, product => product.vendor_id,{
+  @OneToMany(() => ProductOrmEntity, product => product.vendor_uuid,{
     cascade: true,
     eager: true,
   })
@@ -42,4 +42,5 @@ export class VendorOrmEntity {
 
   @Column()
   password: string;
+  
 }

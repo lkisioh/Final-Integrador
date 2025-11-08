@@ -11,6 +11,7 @@ export const traerProductos = ()=> {
   try{
     cargando.value=true
     const res = await axios.get(url)
+    
     productos.value= res.data
   }catch (error){
     console.error(`Error al buscar los productos: ${error.message}`)

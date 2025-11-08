@@ -7,7 +7,8 @@ import { Inject } from '@nestjs/common';
 
 @Controller('products')
 export class ProductController {
-  constructor(private readonly createProductUseCase: CreateProductUseCase,
+  constructor(
+    private readonly createProductUseCase: CreateProductUseCase,
     @Inject('IProductRepository')
     private readonly productRepository: IProductRepository,
   ) {}
@@ -19,6 +20,11 @@ export class ProductController {
   @Get()
   async findAll() {
     const products = await this.productRepository.findAll();
+    return products;
+  }
+  @Get(':vendorUuid')
+  async findByVendorUuid(@Body('vendorUuid') vendorUuid: string) {
+    const products = await this.productRepository.findByVendorUuid(vendorUuid);
     return products;
   }
 }

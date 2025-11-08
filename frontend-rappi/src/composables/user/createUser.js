@@ -1,9 +1,13 @@
 
 import axios from 'axios'
 import {ref} from 'vue'
+import { userUuid } from '@/stores/user/userUuid'
+
+
 
 export const createUser = () => {
 
+  const {setUuid} = userUuid()
   let usuario = ref({
     name: "",
     email: "",
@@ -24,6 +28,9 @@ export const createUser = () => {
     try {
       cargando.value = true
       const res = await axios.post(url, usuario.value)
+
+      setUuid(res.data.uuid)  // Guardar el UUID en el store
+
       return res.data
     } catch (error) {
       console.error(`Error al crear el usuario: ${error.message}`)

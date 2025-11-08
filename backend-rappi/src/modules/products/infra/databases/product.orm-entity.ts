@@ -32,5 +32,5 @@ export class ProductOrmEntity {
 
   @ManyToOne(() => VendorOrmEntity, vendor => vendor.products, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'vendor_id' })
-  vendor_id: VendorOrmEntity;
+  vendor_uuid: VendorOrmEntity;
 }

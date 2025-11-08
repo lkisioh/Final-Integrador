@@ -25,7 +25,7 @@ async function nuevoUsuario() {
   const ok = await createUserAPI('http://localhost:3000/users', usuario.value)
 if (ok) {
     alert('Usuario creado con éxito')
-    router.push('/user/products')  // Redirige a la vista de productos para comprar después de crear
+    router.push('/user/' + usuario.value.uuid)  // Redirige a la vista de usuario después de crearlo
   } else {
     console.log('Error al cambiar página')
   }

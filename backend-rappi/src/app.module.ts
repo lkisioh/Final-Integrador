@@ -6,9 +6,11 @@ import { AddressOrmEntity } from './modules/users/infra/databases/address.orm-en
 import { VendorsModule } from './modules/vendors/vendor.module';
 import { ProductsModule } from './modules/products/product.module';
 import { DriversModule } from './modules/drivers/driver.module';
+import { LoginModule } from './shared/login/login.module';
 
 @Module({
   imports: [
+    LoginModule,
     DatabaseModule,
     UsersModule,
     DriversModule,

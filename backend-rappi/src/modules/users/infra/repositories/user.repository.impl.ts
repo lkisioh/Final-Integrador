@@ -17,6 +17,12 @@ export class UserRepositoryImpl implements IUserRepository {
     private readonly userRepo: Repository<UserOrmEntity>,
   ) {}
 
+  async findByEmail(email: string, password: string): Promise<{ uuid: string } | null> {
+    const user = await this.userRepo.findOne({ where: { email, password } });
+    if (!user) return null;
+    return { uuid: user.uuid };
+  }
+
   async save(user: UserEntity): Promise<UserEntity> {
     const addressEntities = (user.addresses ?? []).map(a => {
       const addr = new AddressOrmEntity();

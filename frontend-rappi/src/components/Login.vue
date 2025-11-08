@@ -1,16 +1,30 @@
 <script setup>
-// Si querés usar reactive o ref:
-import { ref } from 'vue'
-
+import { ref,} from 'vue'
 import { RouterLink } from 'vue-router'
+import { openSesion } from '@/composables/login/openSesion'
+import router from '@/router'
 
-// Ejemplo de datos del formulario
 const email = ref('')
-const password = ref('')
+const password= ref('')
 
-// Función para crear el usuario (podés adaptarla a tu lógica)
-function login() {
-  console.log('Usuario logeado:', { email: email.value, password: password.value })
+const { answer, cargando, error, openSesionAPI } = openSesion()
+const login = async () => {
+  try {
+    const data = await openSesionAPI('http://localhost:3000/login', {
+      email: email.value,
+      password: password.value,
+    })
+
+    console.log('Respuesta login:', data)
+
+    if (data?.redirectTo) {
+      router.push(data.redirectTo)
+    } else {
+      console.warn('No vino redirectTo en la respuesta.')
+    }
+  } catch (e) {
+    console.log(e)
+  }
 }
 </script>
 

@@ -7,11 +7,15 @@ import { CreateUserUseCase } from './application/use-cases/create-user.usecase';
 import { UserController } from './infra/controllers/user.controller';
 import { IUserRepository } from './domain/repositories/user.repository.interface';
 import { UpdateUserUseCase } from './application/use-cases/update-user.usecase';
-
+import { USER_REPO } from 'src/shared/tokens/tokens';
 @Module({
   imports: [TypeOrmModule.forFeature([UserOrmEntity, AddressOrmEntity])],
   controllers: [UserController],
   providers: [
+    {
+      provide: USER_REPO,
+      useClass: UserRepositoryImpl,
+    },
     {
       provide: 'IUserRepository',
       useClass: UserRepositoryImpl,
@@ -27,6 +31,6 @@ import { UpdateUserUseCase } from './application/use-cases/update-user.usecase';
       inject: ['IUserRepository'],
     },
   ],
-  exports: ['IUserRepository'],
+  exports: [USER_REPO, 'IUserRepository'],
 })
 export class UsersModule {}

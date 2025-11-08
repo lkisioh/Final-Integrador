@@ -6,10 +6,16 @@ import { VendorRepositoryImpl } from './infra/repositories/vendor.repository.imp
 import { CreateVendorUseCase } from './application/use-cases/create-vendor.usecase';
 import { VendorController } from './infra/contollers/vendor.controller';
 import { IVendorRepository } from './domain/repositories/vendor.repository.interface';
+import { VENDOR_REPO } from 'src/shared/tokens/tokens';
+
 @Module({
   imports: [TypeOrmModule.forFeature([VendorOrmEntity, AddressVendorOrmEntity])],
   controllers: [VendorController],
   providers: [
+    {
+      provide: VENDOR_REPO,
+      useClass: VendorRepositoryImpl,
+    },
     {
       provide: 'IVendorRepository',
       useClass: VendorRepositoryImpl,
@@ -21,6 +27,6 @@ import { IVendorRepository } from './domain/repositories/vendor.repository.inter
       inject: ['IVendorRepository'],
     },
   ],
-  exports: ['IVendorRepository'],
+  exports: ['IVendorRepository', VENDOR_REPO],
 })
 export class VendorsModule {}

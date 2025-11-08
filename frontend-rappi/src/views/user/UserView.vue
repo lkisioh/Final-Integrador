@@ -1,38 +1,33 @@
 <script setup>
-import { onMounted } from 'vue'
+import { ref } from 'vue'
+import { userUuid } from '@/stores/user/userUuid'
+import router from '@/router'
 
-import { traerProductos } from '@/composables/products/traerProductos'
+const storeUserUuid = userUuid()
+const uuidLogin = ref(storeUserUuid.getUuid())
 
+function comprar(){
+  router.push('/products')
+}
 
-const {productos,cargando,error,llamarProductosAPI} = traerProductos()
-llamarProductosAPI('http://localhost:3000/products')
-
-onMounted(() => {
-  llamarProductosAPI('http://localhost:3000/products')
-})
 </script>
 
+
 <template>
-  <table>
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Descripción</th>
-        <th>Precio</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="producto in productos" :key="producto.id">
-        <td>{{ producto.name }}</td>
-        <td>{{ producto.description }}</td>
-        <td>{{ producto.price }}</td>
-      </tr>
-    </tbody>
+  <div>
+    <h1>MI CUENTA</h1>
+    <h2>Usuario</h2>
+    <p>UUID: {{ uuidLogin }}</p>
+  </div>
 
-    <h5>{{ error }}</h5>
-    <h5 v-if="cargando">Cargando...</h5>
+  <div>
+    <button @click="comprar">Comprar!</button>
+  </div>
 
-  </table>
 </template>
+
 <style>
+
 </style>
+
+

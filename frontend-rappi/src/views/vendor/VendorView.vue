@@ -1,10 +1,15 @@
 <script setup>
 
-const products = [
-  { id: 1, name: 'Producto 1', description: 'Descripción del producto 1', price: 30.5 },
-  { id: 2, name: 'Producto 2', description: 'Descripción del producto 2', price: 45.0 },
-  { id: 3, name: 'Producto 3', description: 'Descripción del producto 3', price: 25.75 },
-]
+import { traerProductos } from '@/composables/products/traerProductos'
+import router from '@/router'
+import { userUuid } from '@/stores/user/userUuid'
+const {productos,cargando,error,llamarProductosAPI} = traerProductos()
+const {setUuid,getUuid} = userUuid()
+setUuid(router.currentRoute.value.params.uuid)
+const uuid = getUuid()
+
+llamarProductosAPI('http://localhost:3000/products/' + uuid)
+
 </script>
 
 <template>
@@ -18,12 +23,14 @@ const products = [
       </tr>
     </thead>
     <tbody>
-      <tr v-for="product in products" :key="product.id">
+      <tr v-for="product in productos" :key="product.id">
         <td>{{ product.name }}</td>
         <td>{{ product.description }}</td>
         <td>{{ product.price }}</td>
       </tr>
     </tbody>
+
+    <router-link :to="'/products/' + uuid">Agregar producto</router-link>
 
     <h5>{{ error }}</h5>
     <h5 v-if="cargando">Cargando...</h5>
