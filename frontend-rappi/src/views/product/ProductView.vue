@@ -4,6 +4,7 @@
 import router from '@/router'
 import { ref } from 'vue'
 import { onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 // const {productos,cargando,error,llamarProductosAPI} = traerProductos()
 // llamarProductosAPI('http://localhost:3000/products')
 
@@ -65,27 +66,32 @@ function ordenar(productUuid){
 </script>
 
 <template>
-  <table>
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Descripción</th>
-        <th>Precio</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>{{ toBuy.name }}</td>
-        <td>{{ toBuy.description }}</td>
-        <td>{{ toBuy.price }}</td>
-      </tr>
-    </tbody>
+  <div class="product-view-container">
+    <nav class="nav-links">
+      <RouterLink to="/">Home</RouterLink>
+      <RouterLink to="/about">About</RouterLink>
 
-    <h5>{{ error }}</h5>
-    <h5 v-if="cargando">Cargando...</h5>
-    <button @click="ordenar(productUuid)">FINALIZAR COMPRA</button>
-  </table>
+    </nav>
 
+    <div class="product-box">
+      <h1 class="pv-title">{{ toBuy.name }}</h1>
+      <p class="pv-desc">{{ toBuy.description }}</p>
+      <div class="pv-meta">
+        <span class="pv-price">$ {{ toBuy.price }}</span>
+        <span class="pv-vendor">Vendedor: {{ toBuy.vendorUuid }}</span>
+        <span class="pv-available">{{ toBuy.available ? 'El producto está disponible' : 'El producto no está disponible' }}</span>
+      </div>
+
+      <div class="pv-actions">
+        <button @click="ordenar(productUuid)" class="primary">FINALIZAR COMPRA</button>
+        <RouterLink to="/shop" class="secondary">Seguir comprando</RouterLink>
+      </div>
+
+      <h5 v-if="error" class="error">{{ error }}</h5>
+      <h5 v-if="cargando" class="loading">Cargando...</h5>
+    </div>
+  </div>
 </template>
-<style>
+
+<style scoped>
 </style>

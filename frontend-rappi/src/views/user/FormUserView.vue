@@ -7,6 +7,9 @@ import { createUser } from '@/composables/user/createUser.js'
 const {usuario,cargando,error,createUserAPI} = createUser()
 
 import router from '@/router'
+const rawUuid = router.currentRoute.value.params.uuid
+const uuidUser = rawUuid
+const isEdit = rawUuid !== undefined && rawUuid !== null && rawUuid !== '' && rawUuid !== 'undefined'
 
 const name = ref('Usuario 1')
 const street = ref('Calle falsa')
@@ -44,6 +47,9 @@ const password = ref('123456')
 //   ]
 // }
 // }
+function editar(){
+  alert('Usuario editado con éxito')
+}
 </script>
 
 <template>
@@ -85,7 +91,8 @@ const password = ref('123456')
           <input v-model="password" type="password" />
         </div>
 
-        <button type="submit">Crear</button>
+        <button type="button" v-if="isEdit" @click="editar">Editar</button>
+        <button v-else type="submit">Crear</button>
       </form>
       <h3 v-if="error" class="error">{{ error }}</h3>
       <h3 v-if="cargando" class="loading">Cargando...</h3>

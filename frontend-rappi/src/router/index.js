@@ -4,12 +4,16 @@ import SelectUserView from '../components/SelectUser.Vue'
 import FormUserView from '../views/user/FormUserView.vue'
 import FormVendorView from '../views/vendor/FormVendorView.vue'
 import FormDriverView from '../views/driver/FormDriverView.vue'
+import FormProductView from '@/views/product/FormProductView.vue'
 
 import UserView from '@/views/user/UserView.vue'
 import DriverView from '@/views/driver/DriverView.vue'
 import VendorView from '@/views/vendor/VendorView.vue'
 import ShopView from '@/views/user/ShopView.vue'
-
+import CartView from '@/views/user/CartView.vue'
+import PaymentView from '@/views/user/PaymentView.vue'
+import VentasView from '@/views/vendor/VentasView.vue'
+import HistorialPedidosView from '@/views/driver/HistorialPedidosView.vue'
 import ProductView from '@/views/product/ProductView.vue'
 
 const router = createRouter({
@@ -23,9 +27,6 @@ const router = createRouter({
     {
       path: '/about',
       name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue'),
     },
     {
@@ -47,6 +48,11 @@ const router = createRouter({
       path: '/edit/vendor/:uuid',
       name: 'edit-vendor',
       component: FormVendorView,
+    },
+    {
+      path: '/edit/user/:uuid',
+      name: 'edit-user',
+      component: FormUserView,
     },
     {
       path: '/newDriver',
@@ -84,9 +90,32 @@ const router = createRouter({
       component: ShopView
     },
     {
+      path: '/cart',
+      name: 'cart',
+      component: CartView
+    },
+    {
       path: '/product/:uuid',
       name: 'buy-product',
       component: ProductView
+    },
+    {path:'/user/payment',
+      name: 'payment',
+      component: PaymentView
+    },{
+      path:'/vendor/ventas/:uuid',
+      name: 'ventas',
+      component: VentasView
+    },
+    {
+      path:'/driver/historial/:uuid',
+      name: 'historial-pedidos',
+      component: HistorialPedidosView
+    },
+    {
+      path : '/products/:uuid',
+      name : 'form-product',
+      component : FormProductView
     }
 
   ],

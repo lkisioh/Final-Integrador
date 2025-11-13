@@ -6,7 +6,7 @@ import { createDriver } from '@/composables/driver/createDriver'
 const {driver,cargando,error,createDriverAPI} = createDriver()
 
 import router from '@/router'
-
+const uuidDriver = router.currentRoute.value.params.uuid
 // Ejemplo de datos del formulario
 const name = ref('Driver 3')
 const location = ref('25 de mayo 3345')
@@ -49,7 +49,7 @@ const password = ref('123456')
     <nav class="nav-links">
       <RouterLink to="/">Home</RouterLink>
       <RouterLink to="/about">About</RouterLink>
-      <RouterLink to="/SelectUser">← Volver atrás</RouterLink>
+      <RouterLink to="/orders/3">← Volver atrás</RouterLink>
     </nav>
     <div class="form-box">
       <h2>Driver</h2>
@@ -89,7 +89,7 @@ const password = ref('123456')
         </div>
 
         <button v-if="uuidDriver>=0"> Editar</button>
-        <button type="submit">Crear</button>
+        <button v-else type="submit">Crear</button>
       </form>
       <h3 v-if="error" class="error">{{ error }}</h3>
       <h3 v-if="cargando" class="loading">Cargando...</h3>

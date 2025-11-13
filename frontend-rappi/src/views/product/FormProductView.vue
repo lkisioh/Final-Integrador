@@ -1,25 +1,34 @@
 <template>
-  <h1>Agregando un nuevo producto</h1>
+  <div class="add-product-container">
 
-  <form @submit.prevent="crearProducto">
-    <div>
-      <label>Nombre:</label>
-      <input v-model="name" type="text" />
+    <div class="add-product-box">
+
+      <h1>Agregando un nuevo producto</h1>
+
+      <form @submit.prevent="crearProducto">
+        <div class="input-group">
+          <label>Nombre:</label>
+          <input v-model="name" type="text" />
+        </div>
+
+        <div class="input-group">
+          <label>Descripción:</label>
+          <input v-model="description" type="text" />
+        </div>
+
+        <div class="input-group">
+          <label>Precio: $ARS</label>
+          <input v-model="price" type="number" />
+        </div>
+
+        <button class="btn-submit" type="submit">Agregar Producto</button>
+      </form>
+
     </div>
 
-    <div>
-      <label>Descripción:</label>
-      <input v-model="description" type="text" />
-    </div>
-
-    <div>
-      <label>Precio: $ARS</label>
-      <input v-model="price" type="number" />
-    </div>
-
-    <button type="submit">Agregar Producto</button>
-  </form>
+  </div>
 </template>
+
 <script setup>
   import { ref } from 'vue'
 import { createProduct } from '@/composables/products/createProduct'
