@@ -8,42 +8,42 @@ const {usuario,cargando,error,createUserAPI} = createUser()
 
 import router from '@/router'
 
-const name = ref('')
-const street = ref('')
-const number = ref(0)
+const name = ref('Usuario 1')
+const street = ref('Calle falsa')
+const number = ref(555)
 const apartment = ref('')
-const email = ref('')
-const password = ref('')
+const email = ref('userprueba@gmail.com')
+const password = ref('123456')
 
-async function nuevoUsuario() {
-  console.log('Creando usuario:'+usuario.value)
+// async function nuevoUsuario() {
+//   console.log('Creando usuario:'+usuario.value)
 
-  mapearUser(name,street,number,apartment,email,password)
+//   mapearUser(name,street,number,apartment,email,password)
 
-  const ok = await createUserAPI('http://localhost:3000/users', usuario.value)
-if (ok) {
-    alert('Usuario creado con éxito')
-    router.push('/user/' + usuario.value.uuid)  // Redirige a la vista de usuario después de crearlo
-  } else {
-    console.log('Error al cambiar página')
-  }
-  console.log('JSON plano:', JSON.stringify(usuario.value))
-}
+//   const ok = await createUserAPI('http://localhost:3000/users', usuario.value)
+// if (ok) {
+//     alert('Usuario creado con éxito')
+//     router.push('/user/' + usuario.value.uuid)  // Redirige a la vista de usuario después de crearlo
+//   } else {
+//     console.log('Error al cambiar página')
+//   }
+//   console.log('JSON plano:', JSON.stringify(usuario.value))
+// }
 
-function mapearUser(name,street,number,apartment,email,password){
-usuario.value = {
-  name: name.value,
-  email: email.value,
-  password: password.value,
-  addresses: [
-    {
-      street: street.value,
-      number: number.value,
-      apartment: apartment.value
-    }
-  ]
-}
-}
+// function mapearUser(name,street,number,apartment,email,password){
+// usuario.value = {
+//   name: name.value,
+//   email: email.value,
+//   password: password.value,
+//   addresses: [
+//     {
+//       street: street.value,
+//       number: number.value,
+//       apartment: apartment.value
+//     }
+//   ]
+// }
+// }
 </script>
 
 <template>
