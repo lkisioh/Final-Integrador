@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+import { RouterLink } from 'vue-router'
 import { createDriver } from '@/composables/driver/createDriver'
 
 const {driver,cargando,error,createDriverAPI} = createDriver()
@@ -44,47 +45,54 @@ driver.value = {
 </script>
 
 <template>
-  <div class="form">
-    <h2>Driver</h2>
-    <form @submit.prevent="nuevoDriver">
+  <div class="form-driver-container">
+    <nav class="nav-links">
+      <RouterLink to="/">Home</RouterLink>
+      <RouterLink to="/about">About</RouterLink>
+      <RouterLink to="/SelectUser">← Volver atrás</RouterLink>
+    </nav>
+    <div class="form-box">
+      <h2>Driver</h2>
+      <form @submit.prevent="nuevoDriver">
         <div>
-        <label>Nombre:</label>
-        <input v-model="name" type="text" />
-      </div>
+          <label>Nombre:</label>
+          <input v-model="name" type="text" />
+        </div>
 
-      <div>
-        <label>Ubicación:</label>
+        <div>
+          <label>Ubicación (GPS):</label>
+          <input v-model="location" type="text" />
+        </div>
 
-        <label>Gps:</label>
-        <input v-model="location" type="text" />
-      </div>
+        <div>
+          <label>Teléfono:</label>
+          <input v-model="phone" type="number" />
+        </div>
 
-      <div>
-        <label>Teléfono:</label>
-        <input v-model="phone" type="number" />
-      </div>
+        <div>
+          <label>Vehículo:</label>
+          <select name="vehicle"  v-model="vehicle">
+            <option value="moto">Moto</option>
+            <option value="auto">Auto</option>
+            <option value="bicicleta">Bicicleta</option>
+          </select>
+        </div>
 
-      <div>
-        <label>Vehículo:</label>
-        <select name="vehicle"  v-model="vehicle">
-          <option value="moto">Moto</option>
-          <option value="auto">Auto</option>
-          <option value="bicicleta">Bicicleta</option>
-        </select>
-      </div>
+        <div>
+          <label>Email:</label>
+          <input v-model="email" type="text" />
+        </div>
 
-      <div>
-        <label>Email:</label>
-        <input v-model="email" type="text" />
-      </div>
+        <div>
+          <label>Contraseña:</label>
+          <input v-model="password" type="password" />
+        </div>
 
-      <div>
-        <label>Contraseña:</label>
-        <input v-model="password" type="password" />
-      </div>
-
-      <button type="submit">Crear</button>
-    </form>
+        <button type="submit">Crear</button>
+      </form>
+      <h3 v-if="error" class="error">{{ error }}</h3>
+      <h3 v-if="cargando" class="loading">Cargando...</h3>
+    </div>
   </div>
 </template>
 
