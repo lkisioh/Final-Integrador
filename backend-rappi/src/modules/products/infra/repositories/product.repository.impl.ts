@@ -6,6 +6,7 @@ import { ProductOrmEntity } from '../databases/product.orm-entity';
 
 import { IProductRepository } from '../../domain/repositories/product.repository.interface';
 import { ProductEntity } from '../../domain/entities/product.entity';
+import { VendorOrmEntity } from 'src/modules/vendors/infra/databases/vendor.orm-entity';
 
 @Injectable()
 export class ProductRepositoryImpl implements IProductRepository {
@@ -15,10 +16,17 @@ export class ProductRepositoryImpl implements IProductRepository {
   ) {}
 
   async save(product: ProductEntity): Promise<ProductEntity> {
+    let vendorRel: VendorOrmEntity | undefined = undefined;
+    if (product.vendorUuid) {
+      vendorRel = new VendorOrmEntity();
+      vendorRel.uuid = product.vendorUuid;
+    }
+
     const ormProduct = this.productRepo.create({
       uuid: product.uuid ?? uuidv4(),
       name: product.name,
       description: product.description,
+      vendor_uuid: vendorRel,
       price: product.price,
       photo: product.photo,
       available: product.available,
@@ -36,19 +44,26 @@ export class ProductRepositoryImpl implements IProductRepository {
       price: saved.price,
       photo: saved.photo,
       available: saved.available,
+      vendorUuid: saved.vendor_uuid ?? VendorOrmEntity,
     });
 
     return domainProduct;
   }
   async findAll(): Promise<ProductEntity[]> {
     const entities = await this.productRepo.find();
+
+    let vendorRel: VendorOrmEntity | undefined = undefined;
     return entities.map(entity => {
       const product = new ProductEntity();
+      if(product.vendorUuid){
+        vendorRel = new VendorOrmEntity();
+        vendorRel.uuid = product.vendorUuid;
+      }
       Object.assign(product, {
-        id: entity.id,
         uuid: entity.uuid,
         name: entity.name,
         description: entity.description,
+        vendorUuid: vendorRel,
         price: entity.price,
         photo: entity.photo,
         available: entity.available,

@@ -2,82 +2,94 @@
 import { RouterLink } from 'vue-router'
 // Si querés usar reactive o ref:
 import { ref } from 'vue'
-import { createVendor } from '@/composables/vendor/createVendor'
-import { userUuid } from '@/stores/user/userUuid'
-
-const {setUuid} = userUuid()
-const {vendor,cargando,error,createVendorAPI} = createVendor()
-
+// import { createVendor } from '@/composables/vendor/createVendor'
+// import { userUuid } from '@/stores/user/userUuid'
 import router from '@/router'
 
-// Ejemplo de datos del formulario
-const name = ref('')
-const category = ref('')
-const initDay = ref('')
-const endDay = ref('')
-const time = ref('')
-const phone = ref(0)
-const email = ref('')
-const password = ref('')
-const street = ref('')
-const number = ref(0)
+
+ const vendorUuid = router.currentRoute.value.params.uuid
+
+// const {setUuid} = userUuid()
+// const {vendor,cargando,error,createVendorAPI} = createVendor()
 
 
-async function nuevoVendor() {
-  console.log('Creando vendedor:'+vendor.value)
 
-  mapearVendor(name,category,initDay,endDay,time,phone,email,password,street,number)
-  //lamada api
-  const ok = await createVendorAPI('http://localhost:3000/vendors', vendor.value)
-if (ok) {
-    alert('Vendedor creado con éxito')
-    setUuid(ok.uuid)
-    router.push('/vendors/' + ok.uuid)  // Redirige a la vista del vendedor después de crear
+// // Ejemplo de datos del formulario
+const name = ref('Vendor 2')
+const category = ref('Fast food')
+const initDay = ref('lunes')
+const endDay = ref('martes')
+const time = ref('24hs')
+const phone = ref(3564111111)
+const email = ref('vendorprueba@gmail.com')
+const password = ref('123456')
+const street = ref('Calle falsa 3')
+const number = ref(1234)
 
-  } else {
-    console.log('Error al cambiar página')
-  }
-  console.log('JSON plano:', JSON.stringify(vendor.value))
+
+// async function nuevoVendor() {
+//   console.log('Creando vendedor:'+vendor.value)
+
+//   mapearVendor(name,category,initDay,endDay,time,phone,email,password,street,number)
+//   //lamada api
+//   const ok = await createVendorAPI('http://localhost:3000/vendors', vendor.value)
+// if (ok) {
+//     alert('Vendedor creado con éxito')
+//     setUuid(ok.uuid)
+//     router.push('/vendors/' + ok.uuid)  // Redirige a la vista del vendedor después de crear
+
+//   } else {
+//     console.log('Error al cambiar página')
+//   }
+//   console.log('JSON plano:', JSON.stringify(vendor.value))
+// }
+
+
+// function mapearVendor(name,category,initDay,endDay,time,phone,email,password,street,number){
+// vendor.value = {
+//   name: name.value,
+//   category: category.value,
+//   daysOpen: ''+initDay.value + ' a ' + endDay.value+'',
+//   time: time.value,
+//   email: email.value,
+
+//   password: password.value,
+//   address: {
+//     street: street.value,
+//     number: number.value
+//   },
+//   phone: phone.value
+// }
+// }
+
+
+
+// let currentChecked = null;
+//   function handleCheckChange(event) {
+//     const selectedValue = event.target.value;
+
+//     if (selectedValue === '24hs') {
+//       time.value = '24hs';
+//       currentChecked = '24hs';
+//     } else {
+//       if (currentChecked === '24hs') {
+//         time.value = '';
+//         currentChecked = null;
+//       }
+
+//       const index = time.value.indexOf(selectedValue);
+//       if (index > -1) {
+//         time.value.splice(index, 1);
+//       } else {
+//         time.value.push(selectedValue);
+//       }
+//     }
+//   }
+
+function editar(){
+  alert('Vendedor editado con éxito')
 }
 
-function mapearVendor(name,category,initDay,endDay,time,phone,email,password,street,number){
-vendor.value = {
-  name: name.value,
-  category: category.value,
-  daysOpen: ''+initDay.value + ' a ' + endDay.value+'',
-  time: time.value,
-  email: email.value,
-
-  password: password.value,
-  address: {
-    street: street.value,
-    number: number.value
-  },
-  phone: phone.value
-}
-}
-
-let currentChecked = null;
-  function handleCheckChange(event) {
-    const selectedValue = event.target.value;
-
-    if (selectedValue === '24hs') {
-      time.value = '24hs';
-      currentChecked = '24hs';
-    } else {
-      if (currentChecked === '24hs') {
-        time.value = '';
-        currentChecked = null;
-      }
-
-      const index = time.value.indexOf(selectedValue);
-      if (index > -1) {
-        time.value.splice(index, 1);
-      } else {
-        time.value.push(selectedValue);
-      }
-    }
-  }
 </script>
 
 <template>
@@ -179,10 +191,17 @@ let currentChecked = null;
           <input v-model="password" type="password" />
         </div>
 
-        <button type="submit">Crear</button>
-      </form>
+        <div>
+          <button v-if="vendorUuid>=0" @click="editar">Editar</button>
+          <button v-else type="submit">Crear</button>
+      </div>
+
+    </form>
+      
     </div>
+    
   </div>
+
 </template>
 
 <style scoped>

@@ -26,8 +26,7 @@ import { createProduct } from '@/composables/products/createProduct'
 
 import { userUuid } from '@/stores/user/userUuid'
 
-const {getUuid} = userUuid()
-const uuid = getUuid()
+const {uuid} = userUuid()
 
 const {product,cargando,error,createProductAPI} = createProduct()
 
@@ -48,7 +47,8 @@ async function crearProducto() {
   const ok = await createProductAPI('http://localhost:3000/products', product.value)
 if (ok) {
     alert('Producto creado con éxito')
-    router.push('/vendor/' + uuid)  // Redirige a la vista de producto después de crearlo
+    console.log('uuid routa ' +product.value.vendorUuid)
+    router.push('/vendors/' + uuid)  // Redirige a la vista de producto después de crearlo
   } else {
     console.log('Error al cambiar página')
   }
