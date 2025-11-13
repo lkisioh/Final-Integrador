@@ -8,7 +8,9 @@ import FormDriverView from '../views/driver/FormDriverView.vue'
 import UserView from '@/views/user/UserView.vue'
 import DriverView from '@/views/driver/DriverView.vue'
 import VendorView from '@/views/vendor/VendorView.vue'
-import FormProductView from '@/views/product/FormProductView.vue'
+import ShopView from '@/views/user/ShopView.vue'
+
+import ProductView from '@/views/product/ProductView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -42,8 +44,18 @@ const router = createRouter({
       component: FormVendorView,
     },
     {
+      path: '/edit/vendor/:uuid',
+      name: 'edit-vendor',
+      component: FormVendorView,
+    },
+    {
       path: '/newDriver',
       name: 'new-driver',
+      component: FormDriverView,
+    },
+    {
+      path: '/edit/driver/:uuid',
+      name: 'edit-driver',
       component: FormDriverView,
     },
     {
@@ -52,12 +64,12 @@ const router = createRouter({
       component: UserView,
     },
     {
-      path: '/orders',
+      path: '/orders/:uuid',
       name: 'orders',
       component: DriverView
     },
     {
-      path: '/vendors/:id',
+      path: '/vendor/:uuid',
       name: 'vendor-details',
       component: VendorView
     },
@@ -67,13 +79,15 @@ const router = createRouter({
       component: UserView
     },
     {
-      path: '/products/:uuid',
-      name: 'new-product',
-      component: FormProductView
+      path: '/shop',
+      name: 'shop',
+      component: ShopView
+    },
+    {
+      path: '/product/:uuid',
+      name: 'buy-product',
+      component: ProductView
     }
-
-
-
 
   ],
 })

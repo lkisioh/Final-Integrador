@@ -21,4 +21,5 @@ export class VendorController {
     const vendors = await this.vendorRepository.findAll();
     return vendors;
   }
+
 }

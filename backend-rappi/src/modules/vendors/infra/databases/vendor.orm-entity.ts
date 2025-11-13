@@ -1,4 +1,4 @@
-import {Entity,PrimaryGeneratedColumn,Column,CreateDateColumn, OneToOne, OneToMany} from 'typeorm';
+import {Entity,PrimaryGeneratedColumn,Column, OneToOne, OneToMany} from 'typeorm';
 import { AddressVendorOrmEntity } from './addressVendor.orm-entity';
 import { ProductOrmEntity } from 'src/modules/products/infra/databases/product.orm-entity';
 
@@ -42,5 +42,4 @@ export class VendorOrmEntity {
 
   @Column()
   password: string;
-  
 }
