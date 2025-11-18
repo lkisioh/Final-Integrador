@@ -9,7 +9,7 @@ const uuid = ref(storeUserUuid.getUuid())
 function comprar(){
   router.push('/shop')
 }
-function editar(){ 
+function editar(){
   router.push('/edit/user/' + uuid.value)
 }
 function verCarrito(){
@@ -18,25 +18,27 @@ function verCarrito(){
 </script>
 
 <template>
+  <NavBar></NavBar>
+    <router-view></router-view>
   <div class="user-view-container">
     <nav class="nav-links">
       <RouterLink to="/">Home</RouterLink>
       <RouterLink to="/about">About</RouterLink>
-     
+
     </nav>
 
     <div class="profile-box">
       <h1 class="uv-title">MI CUENTA</h1>
       <h2 class="uv-sub">Usuario</h2>
       <p><strong>UUID:</strong> {{ uuid}}</p>
-      <p><strong>Mail:</strong> userprueba@gmail.com</p>
-      <p><strong>Nombre:</strong> Nombre user 1</p>
+      <p><strong>Mail:</strong> </p>
+      <p><strong>Nombre:</strong></p>
 
       <div class="section">
         <h3>Direcciones</h3>
         <ul>
-          <li>Calle falsa 1 - 789</li>
-          <li>Calle falsa 2 - 357</li>
+          <li></li>
+          <li></li>
         </ul>
         <button class="primary" @click="agregarDireccion">Nueva dirección!</button>
       </div>
@@ -44,8 +46,8 @@ function verCarrito(){
       <div class="section">
         <h3>Locales Favoritos</h3>
         <ul>
-          <li>Vendor 1</li>
-          <li>Vendor 2</li>
+          <li></li>
+          <li></li>
         </ul>
       </div>
 

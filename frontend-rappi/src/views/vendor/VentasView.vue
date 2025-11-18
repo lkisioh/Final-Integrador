@@ -1,12 +1,11 @@
 <script setup>
 import router from '@/router'
-import { RouterLink } from 'vue-router'
+import { traerOrdenes } from '@/composables/orders/traerOrders'
 
-const ordenes = [
-  { uuid: 1, name: 'Orden 1', products:[{uuid:222, name: 'Pebete Jamon', cantidad:1},{uuid:111, name: 'Pebete Milan', cantidad: 2}], cliente: 'User 1', total: 5652},
-  { uuid: 2, name: 'Orden 2', products:[{uuid:333, name: 'Coca Cola', cantidad: 1}], cliente: 'User 2', total: 52},
-  { uuid: 3, name: 'Orden 3', products:[{uuid:111, name: 'Pebete Milan', cantidad: 2}, {uuid:333, name: 'Coca Cola', cantidad: 2}], cliente: 'User 3', total: 561352}
-]
+// HACER
+const {ordenes,cargando,error,llamarOrdenesAPI} = traerOrdenes()
+
+llamarOrdenesAPI('http://localhost:3000/orders/')
 
 let totalVentas = 0
 for (let i = 0; i < ordenes.length; i++) {

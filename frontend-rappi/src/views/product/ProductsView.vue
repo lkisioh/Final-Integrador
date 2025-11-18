@@ -1,15 +1,15 @@
 <script setup>
 import { onMounted } from 'vue'
 
-// import { traerProductos } from '@/composables/products/traerProductos'
+import { traerProductos } from '@/composables/products/traerProductos'
 
 
-// const {productos,cargando,error,llamarProductosAPI} = traerProductos()
-// llamarProductosAPI('http://localhost:3000/products')
+const {productos,cargando,error,llamarProductosAPI} = traerProductos()
+llamarProductosAPI('http://localhost:3000/products')
 
-// onMounted(() => {
-//   llamarProductosAPI('http://localhost:3000/products')
-// })
+onMounted(() => {
+  llamarProductosAPI('http://localhost:3000/products')
+})
 
 
 </script>

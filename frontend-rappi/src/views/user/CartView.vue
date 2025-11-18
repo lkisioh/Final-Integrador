@@ -1,11 +1,11 @@
 <script setup>
 import { ref } from 'vue'
 import router from '@/router';
-const cart = ref([
-  { uuid: 1, product:[{uuid:222, name: 'Pebete Jamon', cantidad:1}], vendedor: 'Vendor 65',total: 5652},
-  { uuid: 2, product:[{uuid:333, name: 'Coca Cola', cantidad: 1}], vendedor: 'Vendor 1', total: 52,},
-  { uuid: 3, product:[{uuid:111, name: 'Pebete Milan', cantidad: 3}], vendedor: 'Vendor 2', total: 561352}
-])
+
+
+
+// ARRAY DE PRODUCTOS Y CANTIDADESSSSSSS
+const cart = ref([])
 
 import { RouterLink } from 'vue-router'
 

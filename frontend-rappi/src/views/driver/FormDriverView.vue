@@ -7,41 +7,41 @@ const {driver,cargando,error,createDriverAPI} = createDriver()
 
 import router from '@/router'
 const uuidDriver = router.currentRoute.value.params.uuid
-// Ejemplo de datos del formulario
-const name = ref('Driver 3')
-const location = ref('25 de mayo 3345')
-const phone = ref(3564233223)
-const vehicle = ref('moto')
-const email = ref('driverprueba@gmail.com')
-const password = ref('123456')
+
+const name = ref('')
+const location = ref('')
+const phone = ref(0)
+const vehicle = ref('')
+const email = ref('')
+const password = ref('')
 
 
-// async function nuevoDriver() {
-//   console.log('Creando conductor:'+driver.value)
+async function nuevoDriver() {
+  console.log('Creando conductor:'+driver.value)
 
-//   mapearDriver(name,location,phone,vehicle,email,password)
-//   //lamada api
-//   const ok = await createDriverAPI('http://localhost:3000/drivers', driver.value)
-// if (ok) {
-//     alert('Conductor creado con éxito')
-//     router.push('/orders')  // Redirige a la vista de órdenes después de crear
-//   } else {
-//     console.log('Error al cambiar página')
-//   }
-//   console.log('JSON plano:', JSON.stringify(driver.value))
-// }
+  mapearDriver(name,location,phone,vehicle,email,password)
+
+  const ok = await createDriverAPI('http://localhost:3000/drivers', driver.value)
+if (ok) {
+    alert('Conductor creado con éxito')
+    router.push('/orders')
+  } else {
+    console.log('Error al cambiar página')
+  }
+  console.log('JSON plano:', JSON.stringify(driver.value))
+}
 
 
-// function mapearDriver(name,location,phone,vehicle,email,password){
-// driver.value = {
-//   name: name.value,
-//   email: email.value,
-//   password: password.value,
-//   location: location.value,
-//   phone: phone.value,
-//   vehicle: vehicle.value
-// }
-// }
+function mapearDriver(name,location,phone,vehicle,email,password){
+driver.value = {
+  name: name.value,
+  email: email.value,
+  password: password.value,
+  location: location.value,
+  phone: phone.value,
+  vehicle: vehicle.value
+}
+}
 </script>
 
 <template>

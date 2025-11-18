@@ -1,46 +1,17 @@
 <script setup>
 
-// import { traerProductos } from '@/composables/products/traerProductos'
-// import router from '@/router'
-
-// import { userUuid } from '@/stores/user/userUuid'
-// const {productos,cargando,error,llamarProductosAPI} = traerProductos()
-// const {setUuid,getUuid} = userUuid()
-// setUuid(router.currentRoute.value.params.uuid)
-// const uuid = getUuid()
-
-// llamarProductosAPI('http://localhost:3000/products/' + uuid)
-
-import router from '@/router';
+import { traerProductos } from '@/composables/products/traerProductos'
+import router from '@/router'
 import { RouterLink } from 'vue-router';
 
+import { userUuid } from '@/stores/user/userUuid'
+const {productos,cargando,error,llamarProductosAPI} = traerProductos()
+const {setUuid,getUuid} = userUuid()
+setUuid(router.currentRoute.value.params.uuid)
+const uuid = getUuid()
+llamarProductosAPI('http://localhost:3000/products/' + uuid)
 const vendorUuid = router.currentRoute.value.params.uuid
-const products = [
-  {
-    uuid: '111',
-    name: 'Pebete Milan',
-    description: 'Milan - pan - mayonesa',
-    price: 1800,
-    vendorUuid: 2,
-    photo: 'pebeteMilna.img',
-    available: true
-  },
-  {
-    uuid: '333',
-    name: 'COCA COLA 500ml',
-    description: 'Coca Cola 500 mililitros',
-    price: 1300,
-    vendorUuid: 2,
-    photo: 'coca500ml.img',
-    available: true
-  }
-]
-function ventas(){
-  router.push('/vendor/ventas/' + vendorUuid)
-}
-function editarProducto(prod){
-  router.push('product/' + prod)
-}
+
 </script>
 
 <template>
@@ -61,7 +32,7 @@ function editarProducto(prod){
           </tr>
         </thead>
         <tbody>
-          <tr v-for="product in products" :key="product.id">
+          <tr v-for="product in productos" :key="product.id">
             <td>{{ product.name }}</td>
             <td>{{ product.description }}</td>
             <td>${{ product.price }}</td>

@@ -1,19 +1,9 @@
 <script setup>
 import router from '@/router'
 
-const pedidos = [
-  { uuid: 1, name: 'Pedido 1', cliente: 'User 1', total: 5652, estado: 'Entregado' },
-  { uuid: 2, name: 'Pedido 2', cliente: 'User 2', total: 52, estado: 'Entregado' },
-  { uuid: 3, name: 'Pedido 3', cliente: 'User 3', total: 561352, estado: 'Entregado' }
-]
-
 function volver(){
   router.push('/orders/' + router.currentRoute.value.params.uuid)
 }
-var totalHoy = 0;
-for (let i = 0; i < pedidos.length; i++) {
-    totalHoy += pedidos[i].total;
-    }
 </script>
 
 <template>

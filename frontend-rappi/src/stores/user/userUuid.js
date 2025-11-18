@@ -3,17 +3,22 @@ import { defineStore } from 'pinia'
 
 export const userUuid = defineStore('userUuid', () => {
   const uuid = ref(null)
+  const userType = ref(null)
 
   function setUuid(newUuid) {
     uuid.value = newUuid
   }
 
+  function setUserType(userTypeApi){
+    userType.value = userTypeApi
+  }
   function getUuid() {
     return uuid.value
   }
-  function clearUuid() {
-    uuid.value = null
+  function getUserType() {
+    return userType.value
   }
-  return { uuid, setUuid, clearUuid, getUuid }
+
+  return { uuid, setUuid, setUserType, getUuid, getUserType }
 })
 

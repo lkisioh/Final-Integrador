@@ -1,67 +1,51 @@
 <script setup>
-// import { traerProductos } from '@/composables/products/traerProductos'
-
+import { crearOrder } from '@/composables/orders/createOrder'
+import { traerProductos } from '@/composables/products/traerProductos'
 import router from '@/router'
 import { ref } from 'vue'
 import { onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
-// const {productos,cargando,error,llamarProductosAPI} = traerProductos()
-// llamarProductosAPI('http://localhost:3000/products')
 
-// onMounted(() => {
-//   llamarProductosAPI('http://localhost:3000/products')
-// })
+// HACERRRRRR
+const {order,createOrderAPI} = createOrder()
+
+
+const productUuid = router.currentRoute.value.params.uuid
+const {productos,llamarProductosAPI} = traerProductos()
+
+const product= ref({})
+onMounted(() => {
+  llamarProductosAPI('http://localhost:3000/products/'+ productUuid)
+  product.value = productos[0].value
+})
 
 let toBuy =ref({})
-const productUuid = router.currentRoute.value.params.uuid
 
-function definirProduct(){
-if(productUuid === '111'){
-  toBuy.value= products[0]
-}
-else if(productUuid === '222'){
-  toBuy.value = products[1]
-}
-else {
-  toBuy.value = products[2]
-}
-}
 
-onMounted(definirProduct)
+async function ordenar() {
+  console.log('Creando orden:' )
 
-const products = [
-  {
-    uuid: '111',
-    name: 'Pebete Milan',
-    description: 'Milan - pan - mayonesa',
-    price: 1800,
-    vendorUuid: 2,
-    photo: 'pebeteMilna.img',
-    available: true
-  },
-  {
-    uuid: '222',
-    name: 'Pebete Jamón',
-    description: 'JyQ - pan - mayonesa',
-    price: 1600,
-    vendorUuid: 4,
-    photo: 'pebeteJamon.img',
-    available: true
-  },
-  {
-    uuid: '333',
-    name: 'COCA COLA 500ml',
-    description: 'Coca Cola 500 mililitros',
-    price: 1300,
-    vendorUuid: 2,
-    photo: 'coca500ml.img',
-    available: true
+  mapearOrden(productUuid, clientUuid, price, cantidad)
+  //lamada api
+  const ok = await createOrderAPI('http://localhost:3000/orders', product.value)
+if (ok) {
+    alert('Orden creado con éxito')
+    console.log('uuid routa ' +order.value.OrderUuid)
+    router.push('/vendors/' + uuid)  // Redirige a la vista de ordenes del comprador
+  } else {
+    console.log('Error al cambiar página')
   }
-]
+  console.log('JSON plano:', JSON.stringify(order.value))
+}
 
-function ordenar(productUuid){
-  
-  alert('La compra de '+toBuy.value.name+' se realizo con éxito')
+function mapearOrden(name, description, price){
+order.value = {
+  productUuid: name.value,
+  clientUuid: clientUuid.value,
+  vendorUuid: router.currentRoute.value.params.uuid,
+   price: price.value,
+   cantidad: cantidad.value
+}
 }
 </script>
 
