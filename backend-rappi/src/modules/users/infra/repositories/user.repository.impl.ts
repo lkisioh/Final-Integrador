@@ -108,6 +108,7 @@ export class UserRepositoryImpl implements IUserRepository {
     Object.assign(userFind, {
       uuid: entity.uuid,
       name: entity.name,
+      email: entity.email,
       addresses: entity.addresses.map(addr => {
         const address = new AddressEntity();
         Object.assign(address, addr);

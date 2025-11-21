@@ -48,8 +48,7 @@ driver.value = {
   <div class="form-driver-container">
     <nav class="nav-links">
       <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/about">About</RouterLink>
-      <RouterLink to="/orders/3">← Volver atrás</RouterLink>
+      <RouterLink to="/SelectUser">← Volver atrás</RouterLink>
     </nav>
     <div class="form-box">
       <h2>Driver</h2>

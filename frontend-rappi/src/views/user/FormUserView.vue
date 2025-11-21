@@ -56,7 +56,6 @@ function editar(){
   <div class="form-user-container">
     <nav class="nav-links">
       <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/about">About</RouterLink>
       <RouterLink to="/SelectUser">← Volver atrás</RouterLink>
     </nav>
     <div class="form-box">

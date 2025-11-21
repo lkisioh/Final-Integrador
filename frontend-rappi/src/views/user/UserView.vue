@@ -1,8 +1,11 @@
 <script setup>
 import { ref } from 'vue'
 import { userUuid } from '@/stores/user/userUuid'
+
+import { traerUser } from '@/composables/user/traerUser'
 import router from '@/router'
 
+const {user,llamarUserAPI} = traerUser()
 const storeUserUuid = userUuid()
 
 const uuid = ref(storeUserUuid.getUuid())
@@ -15,6 +18,10 @@ function editar(){
 function verCarrito(){
   router.push('/cart')
 }
+
+llamarUserAPI('http://localhost:3000/users/by-uuid/' + uuid.value )
+
+
 </script>
 
 <template>
@@ -23,7 +30,6 @@ function verCarrito(){
   <div class="user-view-container">
     <nav class="nav-links">
       <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/about">About</RouterLink>
 
     </nav>
 
@@ -31,14 +37,13 @@ function verCarrito(){
       <h1 class="uv-title">MI CUENTA</h1>
       <h2 class="uv-sub">Usuario</h2>
       <p><strong>UUID:</strong> {{ uuid}}</p>
-      <p><strong>Mail:</strong> </p>
-      <p><strong>Nombre:</strong></p>
+      <p><strong>Email: {{ user.email }}</strong> </p>
+      <p><strong>Nombre: {{ user.name }}</strong></p>
 
       <div class="section">
         <h3>Direcciones</h3>
-        <ul>
-          <li></li>
-          <li></li>
+        <ul v-for="adress in user.adresses" :key="adress">
+          <li> {{ adress.street  }} - {{ adress.number }}</li>
         </ul>
         <button class="primary" @click="agregarDireccion">Nueva dirección!</button>
       </div>

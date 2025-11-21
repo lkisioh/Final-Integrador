@@ -1,9 +1,9 @@
 <script setup>
 import router from '@/router'
-import { traerOrdenes } from '@/composables/orders/traerOrders'
+import { traerOrders } from '@/composables/order/traerOrders'
 
 // HACER
-const {ordenes,cargando,error,llamarOrdenesAPI} = traerOrdenes()
+const {ordenes,cargando,error,llamarOrdenesAPI} = traerOrders()
 
 llamarOrdenesAPI('http://localhost:3000/orders/')
 

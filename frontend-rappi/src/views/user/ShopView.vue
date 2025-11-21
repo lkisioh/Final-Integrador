@@ -6,9 +6,10 @@ import router from '@/router'
 import NavBar from '@/components/user/NavBar.vue'
 import { traerProductos } from '@/composables/products/traerProductos'
 
-const storeUserUuid = userUuid()
-const uuid = ref(storeUserUuid.getUuid())
+const {getUuid} = userUuid()
+const uuid = getUuid()
 
+console.log('Lo que trae el storeUuid es '+uuid)
 function comprar(uuidProduct){
   router.push('/product/' + uuidProduct)
 }
@@ -36,6 +37,8 @@ llamarProductosAPI('http://localhost:3000/products/')
       <!-- VER SI TRAE BIEN EL USER FINAL!!!1aaaaA -->
         <h2>Usuario comprador</h2>
         <p>UUID: {{ uuid }}</p>
+        <h2>Cantidad en el carrito</h2>
+        <p>{{ productos.length }}</p>
       </div>
 
       <!-- HACER QUE EL PRODUCTS TRAIGA SOLO LOS AVAILABLES Y TRAER EL NOMBRE DEL LOCAL-->

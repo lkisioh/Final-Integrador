@@ -1,10 +1,14 @@
 <script setup>
-import { crearOrder } from '@/composables/orders/createOrder'
+import { createOrder } from '@/composables/order/createOrders'
 import { traerProductos } from '@/composables/products/traerProductos'
 import router from '@/router'
 import { ref } from 'vue'
 import { onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
+
+import { userUuid } from '@/stores/user/userUuid'
+const storeUserUuid = userUuid()
+const uuid = ref(storeUserUuid.getUuid())
 
 // HACERRRRRR
 const {order,createOrderAPI} = createOrder()
@@ -20,7 +24,9 @@ onMounted(() => {
 })
 
 let toBuy =ref({})
-
+const clientUuid = uuid
+const price = product.value.price
+const cantidad = 1
 
 async function ordenar() {
   console.log('Creando orden:' )
@@ -31,7 +37,7 @@ async function ordenar() {
 if (ok) {
     alert('Orden creado con éxito')
     console.log('uuid routa ' +order.value.OrderUuid)
-    router.push('/vendors/' + uuid)  // Redirige a la vista de ordenes del comprador
+    router.push('/vendors/' + uuid.value)  // Redirige a la vista de ordenes del comprador
   } else {
     console.log('Error al cambiar página')
   }

@@ -1,7 +1,6 @@
 <script setup>
 import router from '@/router';
 import { ref } from 'vue';
-import { RouterLink } from 'vue-router';
 
 const ordenes = ref([])
 
@@ -18,8 +17,6 @@ function historial(){
 <template>
   <div class="driver-view-container">
     <nav class="nav-links">
-      <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/about">About</RouterLink>
 
     </nav>
     <div class="driver-box">

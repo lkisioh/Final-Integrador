@@ -22,7 +22,7 @@ const login = async () => {
     })
 
     console.log('Respuesta login:', data)
-    setUuid(data.userUuid)
+    setUuid(data.uuid)
     setUserType(data.role)
 
     const userRole = getUserType()
@@ -31,15 +31,15 @@ const login = async () => {
     if (userRole === 'final-user') {
       router.push('/shop')
     }
-    if (userRole === 'user-vendor'){
+    else if (userRole === 'user-vendor'){
       router.push('/vendor/'+ userUuid)
     }
-    if (userRole === 'user-driver'){
+    else if (userRole === 'user-driver'){
       router.push('/driver/'+ userUuid)
     }
      else {
       console.log('Lo que envió la Api fue: '+ answer)
-      console.warn('Fallo al iniciar sesion.'+error)
+
     }
   } catch (e) {
     console.log(e)
