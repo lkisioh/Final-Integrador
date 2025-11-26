@@ -10,6 +10,7 @@ import { UpdateVendorDto } from '../../application/dtos/update-vendor.dto';
 
 //import { ProductEntity } from 'src/modules/products/domain/entities/product.entity';
 import { ProductOrmEntity } from 'src/modules/products/infra/databases/product.orm-entity';
+import { CreateVendorDto } from '../../application/dtos/create-vendor.dto';
 
 @Injectable()
 export class VendorRepositoryImpl implements IVendorRepository {
@@ -87,7 +88,7 @@ export class VendorRepositoryImpl implements IVendorRepository {
     return domainVendor;
   }*/
 
-  async save(vendor: VendorEntity): Promise<VendorEntity> {
+  async createVendor(vendor: CreateVendorDto): Promise<VendorEntity> {
     console.log('Vendor recibido:', vendor);
     console.log('Address dentro de vendor:', vendor.address);
     let addressVendor: AddressVendorOrmEntity | undefined = undefined;
@@ -95,7 +96,7 @@ export class VendorRepositoryImpl implements IVendorRepository {
     if (vendor.address) {
       addressVendor = new AddressVendorOrmEntity();
       addressVendor.street = vendor.address.street;
-      addressVendor.number = vendor.address.number;
+      addressVendor.number = vendor.address.number ?? -1;
     }
 
     const productsEntities = (vendor.products ?? []).map((p) => {
@@ -109,7 +110,7 @@ export class VendorRepositoryImpl implements IVendorRepository {
     });
 
     const ormVendorData: DeepPartial<VendorOrmEntity> = {
-      uuid: vendor.uuid ?? uuidv4(),
+      
       name: vendor.name,
       category: vendor.category,
       daysOpen: vendor.daysOpen,
@@ -133,7 +134,7 @@ export class VendorRepositoryImpl implements IVendorRepository {
     const domainVendor = new VendorEntity();
     Object.assign(domainVendor, {
       id: savedEntity.id,
-      uuid: savedEntity.uuid,
+      uuid: savedEntity.uuid ?? uuidv4(),
       name: savedEntity.name,
       category: savedEntity.category,
       daysOpen: savedEntity.daysOpen,
@@ -180,6 +181,26 @@ export class VendorRepositoryImpl implements IVendorRepository {
 
     return vendorFind;
   }
-}
+  async delete(uuid: string): Promise<string> {
+    const entity = await this.vendorRepo.findOne({ where: { uuid } });
+    if (!entity) return 'No se encontro Vendor con uuid: ' + uuid;
+    return 'vendor eliminado correctamente';
+  }
+  async update(
+    uuid: string,
+    vendor: UpdateVendorDto,
+  ): Promise<VendorEntity | string> {
+    const entity = await this.vendorRepo.findOne({ where: { uuid } });
+    if (!entity)
+      return 'No se encontro Vendor con uuid: ' + uuid + ' para editar';
+    const vendorFind = new VendorEntity();
+    Object.assign(vendorFind, {
+      id: entity.id,
+      uuid: entity.uuid,
+      name: vendor.name,
+    });
 
-//async update(uuid: string, vendor: UpdateVendorDto): Promise<VendorEntity> 
+    return vendorFind;
+
+  }
+}

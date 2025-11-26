@@ -29,7 +29,7 @@ export class UserRepositoryImpl implements IUserRepository {
       uuid: uuidv4(),
       name: dto.name,
       email: dto.email,
-      password: dto.password, // acá normalmente la encriptarías
+      password: dto.password,
       addresses: (dto.addresses ?? []).map((addr) => {
         const address = new AddressOrmEntity();
         address.uuid = uuidv4();
@@ -68,29 +68,26 @@ export class UserRepositoryImpl implements IUserRepository {
   }
 
   async findAll(): Promise<UserEntity[]> {
-    const entities = await this.userRepo.find({ relations: ['address'] });
-    return entities.map(entity => {
+    const entities = await this.userRepo.find();
+    return entities.map((entity) => {
       const user = new UserEntity();
       Object.assign(user, {
         uuid: entity.uuid,
         name: entity.name,
         email: entity.email,
-        addresses: entity.addresses.map(addr => {
-          const address = new AddressEntity();
-          Object.assign(address, addr);
-          return address;
-        }),
+        addresses:
+          entity.addresses?.map((addr) => {
+            const address = new AddressEntity();
+            Object.assign(address, addr);
+            return address;
+          }) ?? [],
       });
       return user;
     });
   }
 
-  async findByUuid(uuid: string): Promise<UserOrmEntity | null> {
-    return this.userRepo.findOne({ where: { uuid } });
-  }
-
-  /* async findByUuid(uuid: string): Promise<UserEntity | null> {
-    const entity = await this.userRepo.findOne({ where: { uuid }, relations: ['addresses'] });
+  async findByUuid(uuid: string): Promise<UserEntity | null> {
+    const entity = await this.userRepo.findOne({ where: { uuid } });
     if (!entity) return null;
 
     const userFind = new UserEntity();
@@ -98,18 +95,19 @@ export class UserRepositoryImpl implements IUserRepository {
       uuid: entity.uuid,
       name: entity.name,
       email: entity.email,
-      addresses: entity.addresses.map(addr => {
-        const address = new AddressEntity();
-        Object.assign(address, addr);
-        return address;
-      }),
+      addresses:
+        entity.addresses?.map((addr) => {
+          const address = new AddressEntity();
+          Object.assign(address, addr);
+          return address;
+        }) ?? [],
     });
 
     return userFind;
-  }*/
+  }
 
   async update(user: UpdateUserDto, uuid: string): Promise<UserEntity> {
-    const ormUser = await this.userRepo.findOne({ where: { uuid }, relations: ['addresses'] });
+    const ormUser = await this.userRepo.findOne({ where: { uuid } });
     if (!ormUser) throw new Error('User not found');
 
     ormUser.name = user.name;

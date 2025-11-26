@@ -1,25 +1,44 @@
-import { Controller,Inject, Post, Body, Get } from '@nestjs/common';
-//import { CreateVendorUseCase } from '../../application/use-cases/create-vendor.usecase';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Patch,
+  Delete,
+} from '@nestjs/common';
+import { VendorService } from '../../application/services/vendor.service';
 import { CreateVendorDto } from '../../application/dtos/create-vendor.dto';
-import type { IVendorRepository } from '../../domain/repositories/vendor.repository.interface';
+import { UpdateVendorDto } from '../../application/dtos/update-vendor.dto';
 
 @Controller('vendors')
 export class VendorController {
   constructor(
-    private readonly createVendorDto: CreateVendorDto,
-    @Inject('IVendorRepository')
-    private readonly vendorRepository: IVendorRepository,
+    private readonly vendorService: VendorService, // 👈 solo una clase concreta
   ) {}
 
   @Post()
   async create(@Body() dto: CreateVendorDto) {
-    return await this.vendorRepository.save(dto);
+    return this.vendorService.create(dto);
   }
 
   @Get()
   async findAll() {
-    const vendors = await this.vendorRepository.findAll();
-    return vendors;
+    return this.vendorService.findAll();
   }
 
+  @Get(':uuid')
+  async findByUuid(@Param('uuid') uuid: string) {
+    return this.vendorService.findByUuid(uuid);
+  }
+
+  @Patch(':uuid')
+  async update(@Param('uuid') uuid: string, @Body() dto: UpdateVendorDto) {
+    return this.vendorService.update(uuid, dto);
+  }
+
+  @Delete(':uuid')
+  async delete(@Param('uuid') uuid: string) {
+    return this.vendorService.delete(uuid);
+  }
 }
