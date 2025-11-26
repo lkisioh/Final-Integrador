@@ -3,12 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { UserOrmEntity } from '../databases/user.orm-entity';
+
 import { AddressOrmEntity } from '../databases/address.orm-entity';
 import { IUserRepository } from '../../domain/repositories/user.repository.interface';
 import { UserEntity } from '../../domain/entities/user.entity';
 import { AddressEntity } from '../../domain/entities/address.entity';
-import { CreateUserDto } from '../../application/dtos/create-user.dto';
 import { UpdateUserDto } from '../../application/dtos/update-user.dto';
+
+import { CreateUserDto } from '../../application/dtos/create-user.dto';
 
 @Injectable()
 export class UserRepositoryImpl implements IUserRepository {
@@ -22,68 +24,51 @@ export class UserRepositoryImpl implements IUserRepository {
     if (!user) return null;
     return { uuid: user.uuid };
   }
-
-  async save(user: UserEntity): Promise<UserEntity> {
-    const addressEntities = (user.addresses ?? []).map(a => {
-      const addr = new AddressOrmEntity();
-      addr.street = a.street;
-      addr.number = a.number;
-      addr.apartment = a.apartment;
-      return addr;
+  async createUser(dto: CreateUserDto): Promise<UserEntity> {
+    const user = this.userRepo.create({
+      uuid: uuidv4(),
+      name: dto.name,
+      email: dto.email,
+      password: dto.password, // acá normalmente la encriptarías
+      addresses: (dto.addresses ?? []).map((addr) => {
+        const address = new AddressOrmEntity();
+        address.uuid = uuidv4();
+        address.street = addr.street;
+        address.number = addr.number;
+        address.apartment = addr.apartment;
+        return address;
+      }),
     });
 
-    const ormUser = this.userRepo.create({
-      uuid: user.uuid ?? uuidv4(),
-      name: user.name,
-      email: user.email,
-      password: user.password,
-      addresses: addressEntities,
-    });
+    const saved = await this.userRepo.save(user);
 
-    const saved = await this.userRepo.save(ormUser);
-
-    // Devolvemos al dominio
     const domainUser = new UserEntity();
     Object.assign(domainUser, {
       id: saved.id,
       uuid: saved.uuid,
       name: saved.name,
       email: saved.email,
-      password: saved.password,
-      addresses: saved.addresses.map(addr => ({
-        street: addr.street,
-        number: addr.number,
-        apartment: addr.apartment,
-      })),
+      role: saved.role,
+      addresses:
+        saved.addresses?.map((addr) => {
+          const domainAddr = new AddressEntity();
+          Object.assign(domainAddr, {
+            id: addr.id,
+            uuid: addr.uuid,
+            street: addr.street,
+            number: addr.number,
+            apartment: addr.apartment,
+            user_uuid: saved.uuid,
+          });
+          return domainAddr;
+        }) ?? [],
     });
 
     return domainUser;
   }
 
-  async findById(id: number): Promise<UserEntity | null> {
-    const entity = await this.userRepo.findOne({ where: { id } });
-    if (!entity) return null;
-
-    const userFind = new UserEntity();
-    Object.assign(userFind, {
-      id: entity.id,
-      uuid: entity.uuid,
-      name: entity.name,
-      email: entity.email,
-      password: entity.password,
-      addresses: entity.addresses.map(addr => {
-        const address = new AddressEntity();
-        Object.assign(address, addr);
-        return address;
-      }),
-    });
-
-    return userFind;
-  }
-
-  // devuelve la lista pero con el created at igual en todos
   async findAll(): Promise<UserEntity[]> {
-    const entities = await this.userRepo.find({ relations: ['addresses'] });
+    const entities = await this.userRepo.find({ relations: ['address'] });
     return entities.map(entity => {
       const user = new UserEntity();
       Object.assign(user, {
@@ -100,7 +85,11 @@ export class UserRepositoryImpl implements IUserRepository {
     });
   }
 
-  async findByUuid(uuid: string): Promise<UserEntity | null> {
+  async findByUuid(uuid: string): Promise<UserOrmEntity | null> {
+    return this.userRepo.findOne({ where: { uuid } });
+  }
+
+  /* async findByUuid(uuid: string): Promise<UserEntity | null> {
     const entity = await this.userRepo.findOne({ where: { uuid }, relations: ['addresses'] });
     if (!entity) return null;
 
@@ -117,7 +106,7 @@ export class UserRepositoryImpl implements IUserRepository {
     });
 
     return userFind;
-  }
+  }*/
 
   async update(user: UpdateUserDto, uuid: string): Promise<UserEntity> {
     const ormUser = await this.userRepo.findOne({ where: { uuid }, relations: ['addresses'] });

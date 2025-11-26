@@ -1,39 +1,47 @@
-import { Controller, Post, Body, Get, Inject, Patch, Delete, Param } from '@nestjs/common';
-import { CreateUserUseCase } from '../../application/use-cases/create-user.usecase';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Patch,
+  Delete,
+  Param,
+} from '@nestjs/common';
 import { CreateUserDto } from '../../application/dtos/create-user.dto';
 import { UpdateUserDto } from '../../application/dtos/update-user.dto';
-import type { IUserRepository } from '../../domain/repositories/user.repository.interface';
+import { UserService } from '../../application/services/user.service';
 
 @Controller('users')
 export class UserController {
-  constructor(
-    private readonly createUserUseCase: CreateUserUseCase,
-    @Inject('IUserRepository')
-    private readonly userRepository: IUserRepository, // ✅ se inyecta por token, no por clase
-  ) {}
+  constructor(private readonly userService: UserService) {}
 
   @Post()
   async create(@Body() dto: CreateUserDto) {
-    return await this.createUserUseCase.execute(dto);
+    const user = await this.userService.create(dto);
+    return user;
   }
+
+  @Get(':uuid')
+  async findByUuid(@Param('uuid') uuid: string) {
+    const user = await this.userService.getByUuid(uuid);
+    return user;
+  }
+
   @Get()
   async findAll() {
-    const users = await this.userRepository.findAll();
+    const users = await this.userService.getAllUsers();
     return users;
   }
-  @Get('by-uuid/:uuid')
-  async findByUuid(@Body('uuid') uuid: string) {
-    const user = await this.userRepository.findByUuid(uuid);
-    return user;
-  }
+
   @Patch(':uuid')
   async update(@Param('uuid') uuid: string, @Body() dto: UpdateUserDto) {
-    const user = await this.userRepository.update({ ...dto }, uuid);
+    const user = await this.userService.update(uuid, dto);
     return user;
   }
+
   @Delete(':uuid')
-  async delete(@Body('uuid') uuid: string) {
-    await this.userRepository.delete(uuid);
-    return { message: 'User deleted successfully' };
+  async delete(@Param('uuid') uuid: string) {
+    const result = await this.userService.delete(uuid);
+    return result;
   }
 }

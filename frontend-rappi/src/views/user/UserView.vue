@@ -22,6 +22,7 @@ function verCarrito(){
 llamarUserAPI('http://localhost:3000/users/by-uuid/' + uuid.value )
 
 
+console.log(user)
 </script>
 
 <template>

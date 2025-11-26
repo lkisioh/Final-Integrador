@@ -6,6 +6,7 @@ import { VendorOrmEntity } from '../databases/vendor.orm-entity';
 import { AddressVendorOrmEntity } from '../databases/addressVendor.orm-entity';
 import { IVendorRepository } from '../../domain/repositories/vendor.repository.interface';
 import { VendorEntity } from '../../domain/entities/vendor.entity';
+import { UpdateVendorDto } from '../../application/dtos/update-vendor.dto';
 
 //import { ProductEntity } from 'src/modules/products/domain/entities/product.entity';
 import { ProductOrmEntity } from 'src/modules/products/infra/databases/product.orm-entity';
@@ -180,3 +181,5 @@ export class VendorRepositoryImpl implements IVendorRepository {
     return vendorFind;
   }
 }
+
+//async update(uuid: string, vendor: UpdateVendorDto): Promise<VendorEntity> 

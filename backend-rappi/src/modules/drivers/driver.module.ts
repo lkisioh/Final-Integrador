@@ -6,7 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CreateDriverUseCase } from './application/use-cases/create-driver.usecase';
 import { DriverController } from './infra/controllers/driver.contoller';
 import { IDriverRepository } from './domain/repositories/driver.repository.interface';
-import { DRIVER_REPO } from 'src/shared/tokens/tokens';
+import { DRIVER_REPO } from './domain/repositories/driver.repository.interface';
 
 @Module({
   imports: [TypeOrmModule.forFeature([DriverOrmEntity])],

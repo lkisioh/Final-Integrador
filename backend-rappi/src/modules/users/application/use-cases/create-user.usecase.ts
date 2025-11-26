@@ -14,6 +14,6 @@ export class CreateUserUseCase {
     user.password = dto.password;
     user.addresses = user.addresses ?? [];
 
-    return await this.userRepo.save(user);
+    return await this.userRepo.createUser(user);
   }
 }

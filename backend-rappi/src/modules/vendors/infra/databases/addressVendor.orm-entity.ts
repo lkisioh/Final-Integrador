@@ -22,5 +22,4 @@ export class AddressVendorOrmEntity {
   @OneToOne(() => VendorOrmEntity, (vendor) => vendor.address, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'vendor_uuid', referencedColumnName: 'uuid' })
   vendor: VendorOrmEntity;
-
 }

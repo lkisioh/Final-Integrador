@@ -1,19 +1,44 @@
 import { Injectable, Inject } from '@nestjs/common';
 
+import { VENDOR_REPO } from '../../domain/repositories/vendor.repository.interface';
 import type { IVendorRepository } from '../../domain/repositories/vendor.repository.interface';
-import { CreateVendorUseCase } from '../use-cases/create-vendor.usecase';
+import { CreateVendorDto } from '../dtos/create-vendor.dto';
+import { UpdateVendorDto } from '../dtos/update-vendor.dto';
 
 @Injectable()
-export class UserService {
+export class VendorService {
   constructor(
-    
-    private readonly createVendorUseCase: CreateVendorUseCase,
-    
-    @Inject('IVendorRepository')
-    private readonly userRepository: IVendorRepository,
+    @Inject(VENDOR_REPO)
+    private readonly vendorRepository: IVendorRepository,
   ) {}
 
-  create(createVendorDto){
-    return this.createVendorUseCase.execute(createVendorDto);
+  create(createVendorDto: CreateVendorDto) {
+    return this.vendorRepository.save(createVendorDto);
+  }
+  //update(uuid: string, dto: UpdateVendorDto) {
+  //  return this.vendorRepository.update(uuid, dto);
+  //}
+}
+/** 
+
+@Injectable()
+
+
+  async getAllUsers() {
+    return this.userRepository.findAll();
+  }
+
+  async getByUuid(uuid: string) {
+    return this.userRepository.findByUuid(uuid);
+  }
+
+  async update(uuid: string, dto: UpdateUserDto) {
+    return this.userRepository.update(dto, uuid);
+  }
+
+  async delete(uuid: string) {
+    await this.userRepository.delete(uuid);
+    return { message: 'User deleted successfully' };
   }
 }
+ */

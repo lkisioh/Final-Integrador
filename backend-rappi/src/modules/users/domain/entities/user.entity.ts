@@ -1,5 +1,3 @@
-//Entidad de negocio
-
 import { AddressEntity } from './address.entity';
 
 export class UserEntity {

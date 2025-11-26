@@ -1,21 +1,30 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { USER_REPO, VENDOR_REPO, DRIVER_REPO } from 'src/shared/tokens/tokens';
-import type { IUserRepository } from 'src/modules/users/domain/repositories/user.repository.interface';
-import type { IVendorRepository } from 'src/modules/vendors/domain/repositories/vendor.repository.interface';
-import type { IDriverRepository } from 'src/modules/drivers/domain/repositories/driver.repository.interface';
-import { LoginDto } from '../dtos/loginDto';
+import { Inject, Injectable } from '@nestjs/common';
+import { LoginDto } from '../dtos/loginDto.js';
+import { USER_REPO } from '../../modules/users/domain/repositories/user.repository.interface.js';
+import { VENDOR_REPO } from '../../modules/vendors/domain/repositories/vendor.repository.interface';
+import { DRIVER_REPO } from '../../modules/drivers/domain/repositories/driver.repository.interface';
+
+import type { IUserRepository } from '../../modules/users/domain/repositories/user.repository.interface.js';
+import type { IVendorRepository } from '../../modules/vendors/domain/repositories/vendor.repository.interface';
+import type { IDriverRepository } from '../../modules/drivers/domain/repositories/driver.repository.interface';
+
 @Injectable()
 export class LoginService {
   constructor(
-    @Inject(USER_REPO) private readonly users: IUserRepository,
-    @Inject(VENDOR_REPO) private readonly vendors: IVendorRepository,
-    @Inject(DRIVER_REPO) private readonly drivers: IDriverRepository,
+    @Inject(USER_REPO)
+    private readonly userRepo: IUserRepository,
+
+    @Inject(VENDOR_REPO)
+    private readonly vendorRepo: IVendorRepository,
+
+    @Inject(DRIVER_REPO)
+    private readonly driverRepo: IDriverRepository,
   ) {}
 
   async login({ email, password }: LoginDto) {
-    const user = await this.users.findByEmail(email, password);
-    const vendor = await this.vendors.findByEmail(email, password);
-    const driver = await this.drivers.findByEmail(email, password);
+    const user = await this.userRepo.findByEmail(email, password);
+    const vendor = await this.vendorRepo.findByEmail(email, password);
+    const driver = await this.driverRepo.findByEmail(email, password);
 
     let role = '';
     let uuid = '';

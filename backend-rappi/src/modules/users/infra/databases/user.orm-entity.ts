@@ -27,9 +27,6 @@ export class UserOrmEntity {
   @Column({ default: 'user' })
   role: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
   @OneToMany(() => AddressOrmEntity, address => address.user, { cascade: true, eager: true })
   addresses: AddressOrmEntity[];
 }

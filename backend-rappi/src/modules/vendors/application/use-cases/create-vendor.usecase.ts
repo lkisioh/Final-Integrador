@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { IVendorRepository } from '../../domain/repositories/vendor.repository.interface';
 import { VendorEntity } from '../../domain/entities/vendor.entity';
-import { CreateVendorDto } from '../dtos/create-vendor.dto';
+/*import { CreateVendorDto } from '../dtos/create-vendor.dto';
 
 @Injectable()
 export class CreateVendorUseCase {
@@ -26,3 +26,4 @@ export class CreateVendorUseCase {
     return await this.vendorRepo.save(vendor);
   }
 }
+*/

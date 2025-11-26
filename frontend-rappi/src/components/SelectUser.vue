@@ -7,6 +7,7 @@ import { RouterLink } from 'vue-router'
   <div class="select-user-container">
     <nav class="nav-links">
       <RouterLink to="/">Home</RouterLink>
+      <RouterLink to="/">← Volver atrás</RouterLink>
     </nav>
     <div class="select-user-box">
       <h1 class="title">¿Qué tipo de cuenta deseas crear?</h1>
