@@ -10,4 +10,5 @@ export interface IUserRepository {
   findByUuid(uuid: string): Promise<UserOrmEntity | null>;
   update(user: UpdateUserDto, uuid: string): Promise<UserEntity>;
   delete(uuid: string): Promise<void>;
+  postAddress(addressDto: any, uuid: string): Promise<UserEntity>;
 }

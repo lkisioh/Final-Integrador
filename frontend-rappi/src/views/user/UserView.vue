@@ -19,10 +19,18 @@ function verCarrito(){
   router.push('/cart')
 }
 
-llamarUserAPI('http://localhost:3000/users/by-uuid/' + uuid.value )
+llamarUserAPI('http://localhost:3000/users/' + uuid.value )
 
+function agregarDireccion(){
+  router.push('/user/address/' + uuid.value)
+}
 
-console.log(user)
+function editarDireccion(uuidAddress){
+  // hacer
+}
+function eliminarDireccion(uuidAddress){
+  // hacerrr
+}
 </script>
 
 <template>
@@ -43,9 +51,14 @@ console.log(user)
 
       <div class="section">
         <h3>Direcciones</h3>
-        <ul v-for="adress in user.adresses" :key="adress">
-          <li> {{ adress.street  }} - {{ adress.number }}</li>
-        </ul>
+        <div>
+          <p v-if="user.addresses === 0">No tienes direcciones guardadas</p>
+          <ul v-for="address in user.addresses" :key="address.uuid">
+          <li> {{ address.street  }} - {{ address.number }}  <button  @click="editarDireccion(address.uuid)" >Editar</button> <button @click="eliminarDireccion(address.uuid)">Eliminar</button></li>
+         </ul>
+
+        </div>
+
         <button class="primary" @click="agregarDireccion">Nueva dirección!</button>
       </div>
 

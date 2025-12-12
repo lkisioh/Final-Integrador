@@ -31,4 +31,7 @@ export class UserService {
     await this.userRepository.delete(uuid);
     return { message: 'User deleted successfully' };
   }
+  async postAddress(uuid: string, dto: any) {
+    return this.userRepository.postAddress(dto, uuid);
+  }
 }

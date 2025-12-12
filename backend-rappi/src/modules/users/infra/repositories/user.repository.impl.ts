@@ -11,6 +11,7 @@ import { AddressEntity } from '../../domain/entities/address.entity';
 import { UpdateUserDto } from '../../application/dtos/update-user.dto';
 
 import { CreateUserDto } from '../../application/dtos/create-user.dto';
+import { AddressDto } from '../../application/dtos/address.dto';
 
 @Injectable()
 export class UserRepositoryImpl implements IUserRepository {
@@ -144,5 +145,32 @@ export class UserRepositoryImpl implements IUserRepository {
   }
   async delete(uuid: string): Promise<void> {
     await this.userRepo.delete({ uuid });
+  }
+
+  async postAddress(  addressDto: AddressDto, uuid: string ): Promise<UserEntity> {
+    const ormUser = await this.userRepo.findOne({ where: { uuid } });
+    if (!ormUser) throw new Error('User not found');
+    const newAddress = new AddressOrmEntity();
+    newAddress.uuid = uuidv4();
+    newAddress.street = addressDto.street;
+    newAddress.number = addressDto.number;
+    newAddress.apartment = addressDto.apartment;
+    ormUser.addresses.push(newAddress);
+    const saved = await this.userRepo.save(ormUser);
+    const domainUser = new UserEntity();
+    Object.assign(domainUser, {
+      id: saved.id,
+      uuid: saved.uuid,
+      name: saved.name,
+      email: saved.email,
+      password: saved.password,
+      role: saved.role,
+      addresses: saved.addresses.map(addr => ({
+        street: addr.street,
+        number: addr.number,
+        apartment: addr.apartment,
+      })),
+    });
+    return domainUser;
   }
 }

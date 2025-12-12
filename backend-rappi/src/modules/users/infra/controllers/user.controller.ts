@@ -10,6 +10,7 @@ import {
 import { CreateUserDto } from '../../application/dtos/create-user.dto';
 import { UpdateUserDto } from '../../application/dtos/update-user.dto';
 import { UserService } from '../../application/services/user.service';
+import { AddressDto } from '../../application/dtos/address.dto';
 
 @Controller('users')
 export class UserController {
@@ -39,6 +40,11 @@ export class UserController {
     return user;
   }
 
+  @Post(':uuid/addresses')
+  async postAddress(@Param('uuid') uuid: string, @Body() dto: AddressDto) {
+    const user = await this.userService.postAddress(uuid, dto);
+    return user;
+  }
   @Delete(':uuid')
   async delete(@Param('uuid') uuid: string) {
     const result = await this.userService.delete(uuid);

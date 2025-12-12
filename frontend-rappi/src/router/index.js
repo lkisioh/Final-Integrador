@@ -7,6 +7,7 @@ import FormDriverView from '../views/driver/FormDriverView.vue'
 import FormProductView from '@/views/product/FormProductView.vue'
 
 import UserView from '@/views/user/UserView.vue'
+import FormAddressView from '@/views/user/FormAddressView.vue'
 import DriverView from '@/views/driver/DriverView.vue'
 import VendorView from '@/views/vendor/VendorView.vue'
 import ShopView from '@/views/user/ShopView.vue'
@@ -111,7 +112,13 @@ const router = createRouter({
       path : '/products/:uuid',
       name : 'form-product',
       component : FormProductView
+    },
+    {
+      path : '/user/address/:uuid',
+      name : 'form-product',
+      component : FormAddressView
     }
+
 
   ],
 })
