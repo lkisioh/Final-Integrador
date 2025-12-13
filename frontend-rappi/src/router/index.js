@@ -8,6 +8,7 @@ import FormProductView from '@/views/product/FormProductView.vue'
 
 import UserView from '@/views/user/UserView.vue'
 import FormAddressView from '@/views/user/FormAddressView.vue'
+import EditAddressView from '@/views/user/EditAddressView.vue'
 import DriverView from '@/views/driver/DriverView.vue'
 import VendorView from '@/views/vendor/VendorView.vue'
 import ShopView from '@/views/user/ShopView.vue'
@@ -117,8 +118,12 @@ const router = createRouter({
       path : '/user/address/:uuid',
       name : 'form-product',
       component : FormAddressView
+    },
+    {
+      path: '/user/edit-address/:addressUuid', 
+      name: 'EditAddress',
+      component: EditAddressView
     }
-
 
   ],
 })

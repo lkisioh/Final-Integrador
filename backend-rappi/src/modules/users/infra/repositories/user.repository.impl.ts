@@ -173,4 +173,76 @@ export class UserRepositoryImpl implements IUserRepository {
     });
     return domainUser;
   }
+  async updateAddress(userUuid: string, addressUuid: string, dto: AddressDto): Promise<UserEntity> {
+  const ormUser = await this.userRepo.findOne({ where: { uuid: userUuid } }); 
+  if (!ormUser) throw new Error('Usuario no encontrado');
+  const addressToUpdate = ormUser.addresses.find(
+    (addr) => addr.uuid === addressUuid,
+  );
+  if (!addressToUpdate) throw new Error('Dirección no encontrada');  
+
+  addressToUpdate.street = dto.street ?? addressToUpdate.street;
+  addressToUpdate.number = dto.number ?? addressToUpdate.number;
+  addressToUpdate.apartment = dto.apartment ?? addressToUpdate.apartment;
+
+  const saved = await this.userRepo.save(ormUser);
+
+  const domainUser = new UserEntity();
+  Object.assign(domainUser, {
+    id: saved.id,
+    uuid: saved.uuid,
+    name: saved.name,
+    email: saved.email,
+    password: saved.password,
+    role: saved.role,
+    addresses: saved.addresses.map(addr => ({
+      uuid: addr.uuid, 
+      street: addr.street,
+      number: addr.number,
+      apartment: addr.apartment,
+    })),
+  });
+
+  return domainUser;
+}
+
+async deleteAddress(userUuid: string, addressUuid: string): Promise<UserEntity> {
+    
+    const ormUser = await this.userRepo.findOne({ 
+        where: { uuid: userUuid },
+        relations: ['addresses'] 
+    });
+    
+    if (!ormUser) throw new Error('Usuario no encontrado');
+    
+    const originalAddressesLength = ormUser.addresses.length;
+    
+    ormUser.addresses = ormUser.addresses.filter(
+        (addr) => addr.uuid !== addressUuid,
+    );
+    
+    if (ormUser.addresses.length === originalAddressesLength) {
+        throw new Error('Dirección no encontrada para este usuario');
+    }
+
+    const saved = await this.userRepo.save(ormUser);
+
+    const domainUser = new UserEntity();
+    Object.assign(domainUser, {
+        id: saved.id,
+        uuid: saved.uuid,
+        name: saved.name,
+        email: saved.email,
+        password: saved.password,
+        role: saved.role,
+        addresses: saved.addresses.map(addr => ({
+            uuid: addr.uuid,
+            street: addr.street,
+            number: addr.number,
+            apartment: addr.apartment,
+        })),
+    });
+    
+    return domainUser;
+}
 }

@@ -45,6 +45,19 @@ export class UserController {
     const user = await this.userService.postAddress(uuid, dto);
     return user;
   }
+
+  @Patch(':uuid/addresses/:addressUuid')
+async updateAddress(@Param('uuid') userUuid: string, @Param('addressUuid') addressUuid: string, @Body() dto: AddressDto) {
+  const user = await this.userService.updateAddress(userUuid, addressUuid, dto);
+  return user;
+  }
+
+  @Delete(':uuid/addresses/:addressUuid')
+  async deleteAddress(@Param('uuid') userUuid: string, @Param('addressUuid') addressUuid: string) {
+    const result = await this.userService.deleteAddress(userUuid, addressUuid);
+    return result;
+  }
+
   @Delete(':uuid')
   async delete(@Param('uuid') uuid: string) {
     const result = await this.userService.delete(uuid);

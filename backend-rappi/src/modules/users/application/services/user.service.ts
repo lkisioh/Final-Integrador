@@ -34,4 +34,10 @@ export class UserService {
   async postAddress(uuid: string, dto: any) {
     return this.userRepository.postAddress(dto, uuid);
   }
+  async updateAddress(userUuid: string, addressUuid: string, dto: any) {
+    return this.userRepository.updateAddress(userUuid, addressUuid, dto);
+  }
+  async deleteAddress(userUuid: string, addressUuid: string) {
+     return this.userRepository.deleteAddress(userUuid, addressUuid);
+  }
 }

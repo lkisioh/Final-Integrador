@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { userUuid } from '@/stores/user/userUuid'
-
+import axios from 'axios'
 import { traerUser } from '@/composables/user/traerUser'
 import router from '@/router'
 
@@ -26,10 +26,25 @@ function agregarDireccion(){
 }
 
 function editarDireccion(uuidAddress){
-  // hacer
+  router.push('/user/edit-address/' + uuidAddress) 
 }
-function eliminarDireccion(uuidAddress){
-  // hacerrr
+
+async function eliminarDireccion(uuidAddress){
+    if (!confirm('¿Estás seguro de que quieres eliminar esta dirección?')) {
+        return;
+    }
+
+    const userUuidValue = uuid.value; 
+  
+    try {
+        const apiUrl = `http://localhost:3000/users/${userUuidValue}/addresses/${uuidAddress}`;
+        await axios.delete(apiUrl);
+        alert('Dirección eliminada con éxito.');
+        llamarUserAPI('http://localhost:3000/users/' + userUuidValue);
+    } catch (error) {
+        console.error("Error al eliminar la dirección:", error.response?.data || error.message);
+        alert('Error al eliminar la dirección. Revisa la consola.');
+    }
 }
 </script>
 
