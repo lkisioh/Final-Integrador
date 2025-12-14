@@ -109,7 +109,11 @@ export class VendorRepositoryImpl implements IVendorRepository {
       return pr;
     });
 
+    const newVendorUuid = uuidv4();
+
     const ormVendorData: DeepPartial<VendorOrmEntity> = {
+
+      uuid: newVendorUuid,
       
       name: vendor.name,
       category: vendor.category,

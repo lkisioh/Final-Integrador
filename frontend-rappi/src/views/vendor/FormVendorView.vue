@@ -24,39 +24,39 @@ const street = ref('')
 const number = ref(0)
 
 
-async function nuevoVendor() {
-  console.log('Creando vendedor:'+vendor.value)
+function mapearVendor() { 
+  vendor.value = {
+    name: name.value,
+    category: category.value,
+    daysOpen: initDay.value + ' a ' + endDay.value, 
+    time: time.value,
+    email: email.value,
+    password: password.value,
+    phone: Number(phone.value),
+    
+    address: {
+      street: street.value,
+      number: number.value
+    },
+    products: [] 
+  }
+}
 
-  mapearVendor(name,category,initDay,endDay,time,phone,email,password,street,number)
-  //lamada api
+async function nuevoVendor() {
+  mapearVendor() 
+  
+  console.log('JSON de Vendedor a enviar:', JSON.stringify(vendor.value))
+  
   const ok = await createVendorAPI('http://localhost:3000/vendors', vendor.value)
-if (ok) {
+  
+  if (ok && ok.uuid) { 
     alert('Vendedor creado con éxito')
     setUuid(ok.uuid)
-    router.push('/vendors/' + ok.uuid)  // Redirige a la vista del vendedor después de crear
-
+    router.push('/vendors/' + ok.uuid)
   } else {
-    console.log('Error al cambiar página')
+    console.error('Error al crear vendedor o la respuesta es inválida.', ok)
+    alert('Error al registrar. Revisa la consola para detalles.')
   }
-  console.log('JSON plano:', JSON.stringify(vendor.value))
-}
-
-
-function mapearVendor(name,category,initDay,endDay,time,phone,email,password,street,number){
-vendor.value = {
-  name: name.value,
-  category: category.value,
-  daysOpen: ''+initDay.value + ' a ' + endDay.value+'',
-  time: time.value,
-  email: email.value,
-
-  password: password.value,
-  address: {
-    street: street.value,
-    number: number.value
-  },
-  phone: phone.value
-}
 }
 
 
@@ -174,7 +174,7 @@ function editar(){
 
         <div>
           <label>Teléfono:</label>
-          <input v-model="phone" type="number" />
+          <input v-model="phone" type="text" />
         </div>
 
         <div>

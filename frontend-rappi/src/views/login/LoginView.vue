@@ -31,7 +31,7 @@ const login = async () => {
     if (userRole === 'final-user') {
       router.push('/shop')
     }
-    else if (userRole === 'user-vendor'){
+    else if (userRole === 'vendor'){
       router.push('/vendor/'+ userUuid)
     }
     else if (userRole === 'user-driver'){
