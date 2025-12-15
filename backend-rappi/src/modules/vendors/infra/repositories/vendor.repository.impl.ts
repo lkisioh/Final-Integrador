@@ -19,14 +19,17 @@ export class VendorRepositoryImpl implements IVendorRepository {
     private readonly vendorRepo: Repository<VendorOrmEntity>,
   ) {}
 
-  async findByEmail(email: string, password: string): Promise<{ uuid: string } | null> {
+  async findByEmail(
+    email: string,
+    password: string,
+  ): Promise<{ uuid: string } | null> {
     const vendor = await this.vendorRepo.findOne({ where: { email, password } });
     if (!vendor) return null;
     return { uuid: vendor.uuid };
   }
   async findAll(): Promise<VendorEntity[]> {
     const vendors = await this.vendorRepo.find();
-    return vendors.map(vendor => {
+    return vendors.map((vendor) => {
       const domainVendor = new VendorEntity();
       Object.assign(domainVendor, vendor);
       return domainVendor;
@@ -87,76 +90,82 @@ export class VendorRepositoryImpl implements IVendorRepository {
 
     return domainVendor;
   }*/
-
-  async createVendor(vendor: CreateVendorDto): Promise<VendorEntity> {
-    console.log('Vendor recibido:', vendor);
-    console.log('Address dentro de vendor:', vendor.address);
-    let addressVendor: AddressVendorOrmEntity | undefined = undefined;
-
-    if (vendor.address) {
-      addressVendor = new AddressVendorOrmEntity();
-      addressVendor.street = vendor.address.street;
-      addressVendor.number = vendor.address.number ?? -1;
-    }
-
-    const productsEntities = (vendor.products ?? []).map((p) => {
-      const pr = new ProductOrmEntity();
-      pr.name = p.name;
-      pr.description = p.description;
-      pr.price = p.price;
-      pr.photo = p.photo;
-      pr.available = p.available;
-      return pr;
-    });
-
+  async createVendor(dto: CreateVendorDto): Promise<VendorEntity> {
     const newVendorUuid = uuidv4();
 
     const ormVendorData: DeepPartial<VendorOrmEntity> = {
-
       uuid: newVendorUuid,
-      
-      name: vendor.name,
-      category: vendor.category,
-      daysOpen: vendor.daysOpen,
-      time: vendor.time,
-      email: vendor.email,
-      phone: vendor.phone,
-      products: productsEntities,
-      address: addressVendor ?? undefined,
-      password: vendor.password,
+      name: dto.name,
+      category: dto.category,
+      daysOpen: dto.daysOpen,
+      time: dto.time,
+      email: dto.email,
+      phone: dto.phone,
+      password: dto.password,
+      products: (dto.products ?? []).map(p => {
+        const pr = new ProductOrmEntity();
+        pr.name = p.name;
+        pr.description = p.description;
+        pr.price = p.price;
+        pr.photo = p.photo;
+        pr.available = p.available;
+        return pr;
+      }),
     };
 
     const ormVendor = this.vendorRepo.create(ormVendorData);
 
-    console.log('ORM Vendor:', ormVendor);
-    const savedResult = (await this.vendorRepo.save(ormVendor)) as
-      | VendorOrmEntity
-      | VendorOrmEntity[];
-    const savedEntity: VendorOrmEntity = Array.isArray(savedResult)
-      ? (savedResult[0] as VendorOrmEntity)
-      : (savedResult as VendorOrmEntity);
-    const domainVendor = new VendorEntity();
-    Object.assign(domainVendor, {
-      id: savedEntity.id,
-      uuid: savedEntity.uuid ?? uuidv4(),
-      name: savedEntity.name,
-      category: savedEntity.category,
-      daysOpen: savedEntity.daysOpen,
-      time: savedEntity.time,
-      email: savedEntity.email,
-      phone: savedEntity.phone,
-      products: (savedEntity.products ?? []).map((produ) => ({
-        name: produ.name,
-        description: produ.description,
-        price: produ.price,
-        photo: produ.photo,
-        available: produ.available,
-      })),
-      address: savedEntity.address,
-      password: savedEntity.password,
+    if (dto.address) {
+      const addressVendor = new AddressVendorOrmEntity();
+      addressVendor.street = dto.address.street;
+      addressVendor.number = dto.address.number ?? -1;
+
+      // 🔥 ESTA ES LA CLAVE
+      addressVendor.vendor = ormVendor;
+      ormVendor.address = addressVendor;
+    }
+
+    console.log('DTO address:', dto.address);
+
+    const saved = await this.vendorRepo.save(ormVendor);
+
+    const check = await this.vendorRepo.findOne({
+      where: { uuid: saved.uuid },
+      relations: ['address'], // aunque sea eager, forzalo para test
     });
 
-    return domainVendor;
+    console.log('CHECK vendor:', check);
+    console.log('CHECK address:', check?.address);
+
+    // respuesta json
+    return {
+      uuid: saved.uuid,
+      name: saved.name,
+      category: saved.category,
+      daysOpen: saved.daysOpen,
+      time: saved.time,
+      email: saved.email,
+      phone: saved.phone,
+      products: (saved.products ?? []).map((p) => ({
+        name: p.name,
+        description: p.description,
+        price: p.price,
+        photo: p.photo,
+        available: p.available,
+      })),
+      address: saved.address
+        ? {
+            street: saved.address.street,
+            number: saved.address.number,
+          }
+        : null,
+    } as VendorEntity;
+
+    // respuesta básica - mapeada
+    //const domainVendor = new VendorEntity();
+    //Object.assign(domainVendor, saved);
+
+    //return domainVendor;
   }
 
   async findById(id: number): Promise<VendorEntity | null> {
@@ -173,17 +182,11 @@ export class VendorRepositoryImpl implements IVendorRepository {
     return vendorFind;
   }
   async findByUuid(uuid: string): Promise<VendorEntity | null> {
-    const entity = await this.vendorRepo.findOne({ where: { uuid } });
-    if (!entity) return null;
-
-    const vendorFind = new VendorEntity();
-    Object.assign(vendorFind, {
-      id: entity.id,
-      uuid: entity.uuid,
-      name: entity.name,
-    });
-
-    return vendorFind;
+    const vendor = await this.vendorRepo.findOne({ where: { uuid } });
+    if (!vendor) return null;
+    const domainVendor = new VendorEntity();
+    Object.assign(domainVendor, vendor);
+    return domainVendor;
   }
   async delete(uuid: string): Promise<string> {
     const entity = await this.vendorRepo.findOne({ where: { uuid } });
@@ -205,6 +208,5 @@ export class VendorRepositoryImpl implements IVendorRepository {
     });
 
     return vendorFind;
-
   }
 }

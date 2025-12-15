@@ -26,7 +26,7 @@ function agregarDireccion(){
 }
 
 function editarDireccion(uuidAddress){
-  router.push('/user/edit-address/' + uuidAddress) 
+  router.push('/user/edit-address/' + uuidAddress)
 }
 
 async function eliminarDireccion(uuidAddress){
@@ -34,8 +34,8 @@ async function eliminarDireccion(uuidAddress){
         return;
     }
 
-    const userUuidValue = uuid.value; 
-  
+    const userUuidValue = uuid.value;
+
     try {
         const apiUrl = `http://localhost:3000/users/${userUuidValue}/addresses/${uuidAddress}`;
         await axios.delete(apiUrl);
@@ -69,7 +69,7 @@ async function eliminarDireccion(uuidAddress){
         <div>
           <p v-if="user.addresses === 0">No tienes direcciones guardadas</p>
           <ul v-for="address in user.addresses" :key="address.uuid">
-          <li> {{ address.street  }} - {{ address.number }}  <button  @click="editarDireccion(address.uuid)" >Editar</button> <button @click="eliminarDireccion(address.uuid)">Eliminar</button></li>
+          <li> {{ address.street  }} - {{ address.number }} - {{ address.apartment}} <button  @click="editarDireccion(address.uuid)" >Editar</button> <button @click="eliminarDireccion(address.uuid)">Eliminar</button></li>
          </ul>
 
         </div>

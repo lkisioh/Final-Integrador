@@ -13,9 +13,7 @@ import { UpdateVendorDto } from '../../application/dtos/update-vendor.dto';
 
 @Controller('vendors')
 export class VendorController {
-  constructor(
-    private readonly vendorService: VendorService, // 👈 solo una clase concreta
-  ) {}
+  constructor(private readonly vendorService: VendorService) {}
 
   @Post()
   async create(@Body() dto: CreateVendorDto) {

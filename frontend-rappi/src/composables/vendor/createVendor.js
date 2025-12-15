@@ -28,9 +28,14 @@ export const createVendor = () => {
       cargando.value = true
       const res = await axios.post(url, vendor.value)
       return res.data
-    } catch (error) {
-      console.error(`Error al crear el vendedor: ${error.message}`)
-    } finally {
+    } catch (err) {
+    console.error('Error al crear vendedor:', {
+    message: err.message,
+    status: err.response?.status,
+    data: err.response?.data,
+  })
+    throw err
+  } finally {
       cargando.value = false
     }
   }

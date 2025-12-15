@@ -1,6 +1,7 @@
 <script setup>
 
 import { traerProductos } from '@/composables/products/traerProductos'
+import { traerVendor } from '@/composables/vendor/traerVendor'
 import router from '@/router'
 import { RouterLink } from 'vue-router';
 
@@ -12,15 +13,22 @@ const uuid = getUuid()
 llamarProductosAPI('http://localhost:3000/products/' + uuid)
 const vendorUuid = router.currentRoute.value.params.uuid
 
+const {vendor,llamarVendorAPI} = traerVendor()
+llamarVendorAPI('http://localhost:3000/vendors/' + vendorUuid)
 </script>
 
 <template>
   <div class="vendor-view-container">
     <nav class="nav-links">
       <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/about">About</RouterLink>
     </nav>
     <div class="vendor-box">
+      <h1>Local: {{ vendor.name }}</h1>
+      <h2>Horario: {{ vendor.time }}</h2>
+      <h2>Ubicación: </h2>
+      <h3>Calle: {{ vendor.address?.street }}</h3>
+      <h3>Número: {{ vendor.address?.number }}</h3>
+      <h2>Celular: {{ vendor.phone }}</h2>
       <h1>Mis productos</h1>
       <table>
         <thead>

@@ -24,35 +24,35 @@ const street = ref('')
 const number = ref(0)
 
 
-function mapearVendor() { 
+function mapearVendor() {
   vendor.value = {
     name: name.value,
     category: category.value,
-    daysOpen: initDay.value + ' a ' + endDay.value, 
+    daysOpen: initDay.value + ' a ' + endDay.value,
     time: time.value,
     email: email.value,
     password: password.value,
     phone: Number(phone.value),
-    
+
     address: {
       street: street.value,
       number: number.value
     },
-    products: [] 
+    products: []
   }
 }
 
 async function nuevoVendor() {
-  mapearVendor() 
-  
+  mapearVendor()
+
   console.log('JSON de Vendedor a enviar:', JSON.stringify(vendor.value))
-  
+
   const ok = await createVendorAPI('http://localhost:3000/vendors', vendor.value)
-  
-  if (ok && ok.uuid) { 
+
+  if (ok && ok.uuid) {
     alert('Vendedor creado con éxito')
     setUuid(ok.uuid)
-    router.push('/vendors/' + ok.uuid)
+    router.push('/vendor/' + ok.uuid)
   } else {
     console.error('Error al crear vendedor o la respuesta es inválida.', ok)
     alert('Error al registrar. Revisa la consola para detalles.')
