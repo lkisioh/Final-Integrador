@@ -28,11 +28,11 @@ export class VendorOrmEntity {
   @Column()
   phone: number;
 
-  @OneToMany(() => ProductOrmEntity, product => product.vendor_uuid,{
-    cascade: true,
-    eager: true,
-  })
-  products: ProductOrmEntity[];
+  @OneToMany(() => ProductOrmEntity, product => product.vendor, {
+    cascade: true, 
+    nullable: true,
+})
+products: ProductOrmEntity[];
 
   @OneToOne(() => AddressVendorOrmEntity, address => address.vendor,{
     cascade: true,

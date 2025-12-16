@@ -1,5 +1,4 @@
 import { Injectable, Inject } from '@nestjs/common';
-
 import type { IProductRepository } from '../../domain/repositories/product.repository.interface';
 import { CreateProductUseCase } from '../use-cases/create-product.usecase';
 
@@ -11,7 +10,7 @@ export class ProductService {
     private readonly productRepository: IProductRepository,
   ) {}
 
-  create(createProductDto) {
-    return this.createProductUseCase.execute(createProductDto);
+  create(createProductDto, vendorUuid: string) {
+    return this.createProductUseCase.execute(createProductDto, vendorUuid);
   }
 }

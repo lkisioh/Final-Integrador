@@ -21,16 +21,22 @@ export class ProductOrmEntity {
   @Column()
   description: string;
 
-  @Column()
+  @Column({type: 'float'})
   price: number;
 
-  @Column()
+  @Column({nullable : true})
   photo: string;
 
   @Column()
   available: boolean;
 
-  @ManyToOne(() => VendorOrmEntity, vendor => vendor.products, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'vendor_uuid' })
-  vendor_uuid: VendorOrmEntity;
+  @Column({ type: 'uuid', name: 'vendor_uuid' })
+  vendorUuid: string; 
+
+  @ManyToOne(() => VendorOrmEntity, vendor => vendor.products, { 
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'vendor_uuid', referencedColumnName: 'uuid' }) 
+  vendor: VendorOrmEntity;
+
 }

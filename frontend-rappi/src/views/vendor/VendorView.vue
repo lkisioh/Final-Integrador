@@ -1,20 +1,89 @@
 <script setup>
-
+import { onMounted } from 'vue'; 
 import { traerProductos } from '@/composables/products/traerProductos'
 import { traerVendor } from '@/composables/vendor/traerVendor'
-import router from '@/router'
-import { RouterLink } from 'vue-router';
-
+import { useRouter } from 'vue-router'
 import { userUuid } from '@/stores/user/userUuid'
-const {productos,cargando,error,llamarProductosAPI} = traerProductos()
-const {setUuid,getUuid} = userUuid()
-setUuid(router.currentRoute.value.params.uuid)
-const uuid = getUuid()
-llamarProductosAPI('http://localhost:3000/products/' + uuid)
-const vendorUuid = router.currentRoute.value.params.uuid
+import axios from 'axios';
+import { ref } from 'vue';
 
-const {vendor,llamarVendorAPI} = traerVendor()
-llamarVendorAPI('http://localhost:3000/vendors/' + vendorUuid)
+const router = useRouter();
+const vendorUuid = router.currentRoute.value.params.uuid;
+const deleteLoading = ref(false);
+
+const {getUuid} = userUuid();
+const userLoginUuid = getUuid(); 
+
+const { productos, cargando, error, llamarProductosAPI } = traerProductos();
+
+const {vendor, llamarVendorAPI} = traerVendor();
+
+const toggleAvailability = async (productUuid, currentStatus) => {
+    const newStatus = !currentStatus;
+    
+    const confirmation = newStatus 
+        ? "¿Estás seguro de que quieres poner el producto como DISPONIBLE?"
+        : "¿Estás seguro de que quieres poner el producto como NO DISPONIBLE?";
+
+    if (!confirm(confirmation)) {
+        return;
+    }
+
+    try {
+        const url = `http://localhost:3000/vendors/${vendorUuid}/products/${productUuid}`;
+        
+        await axios.patch(url, { available: newStatus }); 
+        
+        alert(`Disponibilidad de producto actualizada a: ${newStatus ? 'Disponible' : 'No Disponible'}`);
+
+        const reloadUrl = `http://localhost:3000/vendors/${vendorUuid}/products`; 
+        llamarProductosAPI(reloadUrl); 
+
+    } catch (e) {
+        console.error("Error al cambiar disponibilidad:", e);
+        alert(`Error al actualizar disponibilidad: ${e.response?.data?.message || 'Error desconocido'}`);
+    }
+};
+
+const deleteProduct = async (productUuid) => {
+    if (!confirm("¿Estás seguro de que quieres eliminar este producto?")) {
+        return;
+    }
+    deleteLoading.value = true;
+    try {
+        const url = `http://localhost:3000/vendors/${vendorUuid}/products/${productUuid}`;
+        
+        await axios.delete(url); 
+        
+        alert("Producto eliminado con éxito.");
+
+        const reloadUrl = `http://localhost:3000/vendors/${vendorUuid}/products`; 
+        llamarProductosAPI(reloadUrl); 
+
+    } catch (e) {
+        console.error("Error al eliminar el producto:", e);
+        alert(`Error al eliminar el producto: ${e.response?.data?.message || 'Error desconocido'}`);
+    } finally {
+        deleteLoading.value = false;
+    }
+};
+
+const goToEditView = (productUuid) => {
+    router.push({ 
+        name: 'ProductEdit', 
+        params: { vendorUuid: vendorUuid, productUuid: productUuid} 
+    });
+};
+
+onMounted(() => {
+  console.log('Cargando productos para el Vendedor UUID:', vendorUuid);
+  const productosUrl = `http://localhost:3000/vendors/${vendorUuid}/products`;   
+  llamarProductosAPI(productosUrl); 
+    
+    console.log('Cargando datos del Vendedor:', vendorUuid);
+    const vendorUrl = `http://localhost:3000/vendors/${vendorUuid}`;
+    llamarVendorAPI(vendorUrl);
+});
 </script>
 
 <template>
@@ -45,9 +114,13 @@ llamarVendorAPI('http://localhost:3000/vendors/' + vendorUuid)
             <td>{{ product.description }}</td>
             <td>${{ product.price }}</td>
             <td>
-              <button>Editar</button>
-              <button>Disponibilidad</button>
-              <button>Eliminar</button>
+              <button @click="goToEditView(product.uuid)">Editar</button> 
+               <button @click="toggleAvailability(product.uuid, product.available)">
+                    {{ product.available ? ' Producto disponible (Cambiar a NO)' : 'Producto no disponible (Cambiar a SÍ)' }}
+                </button>
+               <button @click="deleteProduct(product.uuid)" :disabled="deleteLoading"                >
+                    {{ deleteLoading ? 'Eliminando...' : 'Eliminar' }}
+                </button>
             </td>
           </tr>
         </tbody>

@@ -17,6 +17,7 @@ import PaymentView from '@/views/user/PaymentView.vue'
 import VentasView from '@/views/vendor/VentasView.vue'
 import HistorialPedidosView from '@/views/driver/HistorialPedidosView.vue'
 import ProductView from '@/views/product/ProductView.vue'
+import EditProductView from '@/views/product/EditProductView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -60,6 +61,11 @@ const router = createRouter({
       path: '/edit/driver/:uuid',
       name: 'edit-driver',
       component: FormDriverView,
+    },
+    {
+      path : '/products/:vendorUuid',
+      name : 'form-products',
+      component : FormProductView
     },
     {
       path: '/user/products',
@@ -110,11 +116,6 @@ const router = createRouter({
       component: HistorialPedidosView
     },
     {
-      path : '/products/:uuid',
-      name : 'form-product',
-      component : FormProductView
-    },
-    {
       path : '/user/address/:uuid',
       name : 'form-product',
       component : FormAddressView
@@ -123,6 +124,11 @@ const router = createRouter({
       path: '/user/edit-address/:addressUuid', 
       name: 'EditAddress',
       component: EditAddressView
+    },
+    {
+      path: '/vendors/:vendorUuid/products/edit/:productUuid', 
+        name: 'ProductEdit', 
+        component: EditProductView,
     }
 
   ],

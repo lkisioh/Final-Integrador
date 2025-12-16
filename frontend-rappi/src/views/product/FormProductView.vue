@@ -1,78 +1,85 @@
-<template>
-  <div class="add-product-container">
-
-    <div class="add-product-box">
-
-      <h1>Agregando un nuevo producto</h1>
-
-      <form @submit.prevent="crearProducto">
-        <div class="input-group">
-          <label>Nombre:</label>
-          <input v-model="name" type="text" />
-        </div>
-
-        <div class="input-group">
-          <label>Descripción:</label>
-          <input v-model="description" type="text" />
-        </div>
-
-        <div class="input-group">
-          <label>Precio: $ARS</label>
-          <input v-model="price" type="number" />
-        </div>
-
-        <button class="btn-submit" type="submit">Agregar Producto</button>
-      </form>
-
-    </div>
-
-  </div>
-</template>
-
 <script setup>
-  import { ref } from 'vue'
-import { createProduct } from '@/composables/products/createProduct'
+import { ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router'; 
+import axios from 'axios';
+const route = useRoute();
+const router = useRouter();
 
-import { userUuid } from '@/stores/user/userUuid'
+const vendorUuid = route.params.vendorUuid;
+console.log('UUID capturado en Formulario:', vendorUuid);
+const newProduct = ref({
+    name: '',
+    description: '',
+    price: 0, 
+    photo: '', 
+    available: true
+});
+const creationError = ref(null);
+const creationLoading = ref(false); 
 
-const {uuid} = userUuid()
+const crearProducto = async () => {
+    creationLoading.value = true;
+    creationError.value = null;
 
-const {product,cargando,error,createProductAPI} = createProduct()
+    try {
+        if (newProduct.value.price <= 0) {
+            throw new Error('El precio debe ser mayor a cero.');
+        }
 
-import router from '@/router'
+        const url = `http://localhost:3000/vendors/${vendorUuid}/products`; 
+        
+        await axios.post(url, newProduct.value);
+        
+        alert(`¡Producto "${newProduct.value.name}" creado con éxito!`);
+        
+        router.push({ path: `/vendor/${vendorUuid}` });
 
-// Ejemplo de datos del formulario
-const name = ref('')
-const description = ref('')
-const price = ref(0)
+    } catch (error) {
+        console.error("Error al crear producto:", error);
+        creationError.value = error.response?.data?.message || error.message || 'Error desconocido al crear.';
+    } finally {
+        creationLoading.value = false;
+    }
+};
 
-
-// Función para crear el producto (podés adaptarla a tu lógica)
-async function crearProducto() {
-  console.log('Creando producto:' + product.value)
-
-  mapearProduct(name, description, price)
-  //lamada api
-  const ok = await createProductAPI('http://localhost:3000/products', product.value)
-if (ok) {
-    alert('Producto creado con éxito')
-    console.log('uuid routa ' +product.value.vendorUuid)
-    router.push('/vendors/' + uuid)  // Redirige a la vista de producto después de crearlo
-  } else {
-    console.log('Error al cambiar página')
-  }
-  console.log('JSON plano:', JSON.stringify(product.value))
-}
-
-
-function mapearProduct(name, description, price){
-product.value = {
-  name: name.value,
-  description: description.value,
-  price: price.value,
-  vendorUuid: router.currentRoute.value.params.uuid
-}
-}
+const goBack = () => {
+    router.push({ path: `/vendors/${vendorUuid}` });
+};
 </script>
-<style>
-</style>
+
+<template>
+    <div class="product-create-view">
+        <h2>Agregar Nuevo Producto</h2>
+        <p>Vendedor UUID: {{ vendorUuid }}</p>
+        <button @click="goBack" style="margin-bottom: 20px;">← Volver al Perfil</button>
+        
+        <form @submit.prevent="crearProducto" class="creation-form">
+            <div style="margin-bottom: 10px;">
+                <label>Nombre:</label>
+                <input type="text" v-model="newProduct.name" required>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label>Descripción:</label>
+                <textarea v-model="newProduct.description" required></textarea>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label>Precio ($):</label>
+                <input type="number" v-model.number="newProduct.price" min="0.01" step="0.01" required>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label>Foto URL:</label>
+                <input type="text" v-model="newProduct.photo">
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label>Disponible:</label>
+                <input type="checkbox" v-model="newProduct.available">
+            </div>
+
+            <button type="submit" :disabled="creationLoading">
+                {{ creationLoading ? 'Guardando...' : 'Agregar Producto' }}
+            </button>
+
+            <p v-if="creationError" style="color: red; margin-top: 10px;">Error: {{ creationError }}</p>
+        </form>
+    </div>
+</template>
