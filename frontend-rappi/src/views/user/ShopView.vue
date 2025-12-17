@@ -61,12 +61,12 @@ function irAlVendedor(uuidVendor){
           <p> Local: {{ vendor.name }}</p>
           <button @click="irAlVendedor(vendor.uuid)">Ver Vendedor</button>
           <p>Productos</p>
-          <!-- <ul>
+          <ul>
             <li v-for="product in vendor.products" :key="product.uuid">
               {{ product.name }} - ${{ product.price }}
             </li>
             <button @click="agregarCarrito(product.uuid)">Agregar al carrito</button>
-          </ul> -->
+          </ul>
 
         </div>
 

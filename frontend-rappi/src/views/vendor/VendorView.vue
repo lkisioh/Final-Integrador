@@ -126,11 +126,19 @@ onMounted(() => {
         </tbody>
       </table>
 
-      <div style="margin-top: 20px;">
-        <RouterLink :to="'/products/' + vendorUuid">Agregar producto</RouterLink>
-        <RouterLink :to="'/edit/vendor/' + vendorUuid">Editar perfil</RouterLink>
-        <RouterLink :to="'/orders/vendor' + vendorUuid">Mis ventas</RouterLink>
-      </div>
+      <div style="margin-top: 40px; display: block; clear: both; position: relative;">
+  <hr> <RouterLink :to="'/products/' + vendorUuid" style="margin-right: 15px; display: inline-block;">
+    Agregar producto
+  </RouterLink>
+  
+  <RouterLink :to="'/edit/vendor/' + vendorUuid" style="margin-right: 15px; display: inline-block;">
+    Editar perfil
+  </RouterLink>
+  
+  <RouterLink :to="'/orders/vendor/' + vendorUuid" style="display: inline-block;">
+    Mis ventas
+  </RouterLink>
+</div>
 
       <h5 v-if="error">{{ error }}</h5>
       <h5 v-if="cargando">Cargando...</h5>
@@ -139,4 +147,5 @@ onMounted(() => {
 </template>
 
 <style scoped>
+
 </style>

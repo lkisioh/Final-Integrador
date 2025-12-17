@@ -28,10 +28,20 @@ export class VendorRepositoryImpl implements IVendorRepository {
     return { uuid: vendor.uuid };
   }
   async findAll(): Promise<VendorEntity[]> {
-    const vendors = await this.vendorRepo.find();
+    const vendors = await this.vendorRepo.find({relations: ['products']});
     return vendors.map((vendor) => {
       const domainVendor = new VendorEntity();
       Object.assign(domainVendor, vendor);
+      domainVendor.products = (vendor.products ?? []).map(p => ({
+                id: p.id,
+                uuid: p.uuid,
+                name: p.name,
+                description: p.description,
+                vendorUuid: p.vendorUuid, 
+                price: p.price,
+                photo: p.photo,
+                available: p.available,
+            }));
       return domainVendor;
     });
   }
