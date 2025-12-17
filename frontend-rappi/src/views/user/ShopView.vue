@@ -2,24 +2,26 @@
 import { ref } from 'vue'
 import { userUuid } from '@/stores/user/userUuid'
 import router from '@/router'
-
 import NavBar from '@/components/user/NavBar.vue'
 //import { traerProductos } from '@/composables/products/traerProductos'
 import { traerVendor } from '@/composables/vendor/traerVendor'
+import { useCartStore } from '@/stores/user/cartStore'
 
 const {getUuid} = userUuid()
 const uuid = getUuid()
-
+const cartStore = useCartStore()
 console.log('Lo que trae el storeUuid es '+uuid)
 function comprar(uuidProduct){
   router.push('/product/' + uuidProduct)
 }
 const productsCarrito = ref([])
 
-function agregarCarrito(uuidProduct){
-  alert('Se agrego producto: '+uuidProduct)
-productsCarrito.value.push(uuidProduct)
-console.log(productsCarrito.value)
+function agregarCarrito(product) {
+  cartStore.addToCart({
+    uuid: product.uuid,
+    name: product.name,
+    price: product.price,
+  })
 }
 
 //const {productos,cargando,error,llamarProductosAPI} = traerProductos()
@@ -50,7 +52,7 @@ function irAlVendedor(uuidVendor){
         <h2>Usuario comprador</h2>
         <p>UUID: {{ uuid }}</p>
         <h2>Cantidad en el carrito</h2>
-        <p>{{ productsCarrito.value }}</p>
+        <p>{{ cartStore.totalItems }}</p>
       </div>
 
       <div>
@@ -63,9 +65,9 @@ function irAlVendedor(uuidVendor){
           <p>Productos</p>
           <ul>
             <li v-for="product in vendor.products" :key="product.uuid">
-              {{ product.name }} - ${{ product.price }}
+              {{ product.name }} - ${{ product.price }} <button @click="agregarCarrito(product)">Agregar al carrito</button>
             </li>
-            <button @click="agregarCarrito(product.uuid)">Agregar al carrito</button>
+            
           </ul>
 
         </div>

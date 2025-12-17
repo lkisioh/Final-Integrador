@@ -67,9 +67,27 @@ async function eliminarDireccion(uuidAddress){
       <div class="section">
         <h3>Direcciones</h3>
         <div>
-          <p v-if="user.addresses === 0">No tienes direcciones guardadas</p>
-          <ul v-for="address in user.addresses" :key="address.uuid">
-          <li> {{ address.street  }} - {{ address.number }} - {{ address.apartment}} <button  @click="editarDireccion(address.uuid)" >Editar</button> <button @click="eliminarDireccion(address.uuid)">Eliminar</button></li>
+          <p v-if="!user.addresses || user.addresses.length === 0">No tienes direcciones guardadas</p>
+          
+          <ul v-else class="address-list">
+            <li v-for="address in user.addresses" 
+                :key="address.uuid" 
+                :class="{ 'address-actual': storeUserUuid.currentAddressId === address.uuid }"
+                class="address-item"> 
+              
+              <span>{{ address.street }} {{ address.number }} {{ address.apartment }}</span>
+              
+              <div class="address-actions">
+                <button 
+                  v-if="storeUserUuid.currentAddressId !== address.uuid" 
+                  @click="storeUserUuid.setActualAddress(address.uuid)"
+                  class="btn-select">
+                  Marcar como actual
+                </button>
+                <span v-else class="badge-actual">⭐ Actual</span> 
+                </div>
+            <button  @click="editarDireccion(address.uuid)" >Editar</button> 
+            <button @click="eliminarDireccion(address.uuid)">Eliminar</button></li>
          </ul>
 
         </div>
