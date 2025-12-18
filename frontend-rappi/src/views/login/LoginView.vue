@@ -34,8 +34,8 @@ const login = async () => {
     else if (userRole === 'vendor'){
       router.push('/vendor/'+ userUuid)
     }
-    else if (userRole === 'user-driver'){
-      router.push('/driver/'+ userUuid)
+    else if (userRole === 'driver'){
+      router.push('/orders/'+ userUuid)
     }
      else {
       console.log('Lo que envió la Api fue: '+ answer)

@@ -7,6 +7,7 @@ import { VendorsModule } from './modules/vendors/vendor.module';
 import { ProductsModule } from './modules/products/product.module';
 import { DriversModule } from './modules/drivers/driver.module';
 import { LoginModule } from './shared/login/login.module';
+import { OrdersModule } from './modules/orders/orders.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { LoginModule } from './shared/login/login.module';
     AddressOrmEntity,
     VendorsModule,
     ProductsModule,
+    OrdersModule,
   ],
 })
 export class AppModule {}

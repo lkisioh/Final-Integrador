@@ -17,13 +17,21 @@ const items = ref([])
     localStorage.setItem('cart_items', JSON.stringify(newVal))
   }, { deep: true })
 
-  function addToCart(product) {
-    const existingItem = items.value.find(item => item.uuid === product.uuid)
-    if (existingItem) {
-      existingItem.quantity += 1
-    } else {
-      items.value.push({ ...product, quantity: 1 })
-    }
+  function addToCart(product, storeId, storeName) {
+    const existingItem = items.value.find(item => 
+    item.uuid === product.uuid && item.storeId === storeId
+  )
+
+  if (existingItem) {
+    existingItem.quantity += 1
+  } else {
+    items.value.push({ 
+      ...product, 
+      quantity: 1, 
+      storeId: storeId, 
+      storeName: storeName
+    })
+  }
     alert(`Agregado: ${product.name}`)
   }
 

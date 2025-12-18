@@ -16,12 +16,14 @@ function comprar(uuidProduct){
 }
 const productsCarrito = ref([])
 
-function agregarCarrito(product) {
+function agregarCarrito(product,vendorUuid,vendorName) {
   cartStore.addToCart({
     uuid: product.uuid,
     name: product.name,
     price: product.price,
-  })
+  },
+  vendorUuid,
+  vendorName)
 }
 
 //const {productos,cargando,error,llamarProductosAPI} = traerProductos()
@@ -65,7 +67,8 @@ function irAlVendedor(uuidVendor){
           <p>Productos</p>
           <ul>
             <li v-for="product in vendor.products" :key="product.uuid">
-              {{ product.name }} - ${{ product.price }} <button @click="agregarCarrito(product)">Agregar al carrito</button>
+              {{ product.name }} - ${{ product.price }} 
+              <button @click="agregarCarrito(product,vendor.uuid,vendor.name)">Agregar al carrito</button>
             </li>
             
           </ul>
