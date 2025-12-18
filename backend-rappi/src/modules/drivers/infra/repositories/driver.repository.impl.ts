@@ -10,15 +10,16 @@ import { DriverEntity } from '../../domain/entities/driver.entity';
 
 @Injectable()
 export class DriverRepositoryImpl implements IDriverRepository {
+  private drivers: any[] = [];
   constructor(
     @InjectRepository(DriverOrmEntity)
     private readonly driverRepo: Repository<DriverOrmEntity>,
   ) {}
 
-  async findByEmail(email: string, password: string): Promise<{ uuid: string } | null> {
+  async findByEmail(email: string, password: string): Promise<{ uuid: string, name: string } | null> {
     const driver = await this.driverRepo.findOne({ where: { email, password } });
     if (!driver) return null;
-    return { uuid: driver.uuid };
+    return { uuid: driver.uuid, name: driver.name };
   }
   async save(driver: DriverEntity): Promise<DriverEntity> {
     const ormDriver = this.driverRepo.create({
@@ -67,4 +68,11 @@ export class DriverRepositoryImpl implements IDriverRepository {
 
     return driverFind;
   }
+
+  async delete(uuid: string): Promise<void> {
+    const index = this.drivers.findIndex(d => d.uuid === uuid);
+    if (index !== -1) {
+      this.drivers.splice(index, 1);
+    }
+}
 }

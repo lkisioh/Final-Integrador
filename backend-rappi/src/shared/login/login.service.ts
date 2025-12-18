@@ -26,24 +26,32 @@ export class LoginService {
     const vendor = await this.vendorRepo.findByEmail(email, password);
     const driver = await this.driverRepo.findByEmail(email, password);
 
+    console.log('Datos del driver encontrados:', driver);
+
     let role = '';
     let uuid = '';
+    let name = '';
+
     if (user) {
       uuid = user.uuid;
       role = 'final-user';
+      name = (user as any).name;    
     }
     if (driver) {
       uuid = driver.uuid;
       role = 'driver';
+    name = (driver as any).name;
     }
     if (vendor) {
       uuid = vendor.uuid;
       role = 'vendor';
+    name = (vendor as any).name;
     }
 
     return {
       uuid,
       role,
+      name,
       // token,
       redirectTo:
         role === 'driver'

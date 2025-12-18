@@ -18,6 +18,8 @@ import VentasView from '@/views/vendor/VentasView.vue'
 import HistorialPedidosView from '@/views/driver/HistorialPedidosView.vue'
 import ProductView from '@/views/product/ProductView.vue'
 import EditProductView from '@/views/product/EditProductView.vue'
+import MisPedidosView from '@/views/user/MisPedidosView.vue'
+import VendorsView from '@/views/vendor/VendorsView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -105,10 +107,6 @@ const router = createRouter({
     {path:'/user/payment',
       name: 'payment',
       component: PaymentView
-    },{
-      path:'/vendor/ventas/:uuid',
-      name: 'ventas',
-      component: VentasView
     },
     {
       path:'/driver/historial/:uuid',
@@ -129,6 +127,21 @@ const router = createRouter({
       path: '/vendors/:vendorUuid/products/edit/:productUuid', 
         name: 'ProductEdit', 
         component: EditProductView,
+    },
+    {
+      path : '/mis-pedidos/:uuid',
+      name : 'mis-pedidos',
+      component : MisPedidosView
+    },
+    {
+      path: '/vendors',
+      name: 'vendors-list',
+      component : VendorsView
+    },
+    {
+      path: '/orders/vendor/:uuid',
+      name: 'ventas-view',
+      component: VentasView
     }
 
   ],

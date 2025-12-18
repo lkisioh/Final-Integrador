@@ -199,10 +199,15 @@ export class VendorRepositoryImpl implements IVendorRepository {
     return domainVendor;
   }
   async delete(uuid: string): Promise<string> {
-    const entity = await this.vendorRepo.findOne({ where: { uuid } });
-    if (!entity) return 'No se encontro Vendor con uuid: ' + uuid;
-    return 'vendor eliminado correctamente';
+  const entity = await this.vendorRepo.findOne({ where: { uuid } });
+  
+  if (!entity) {
+    return 'No se encontro Vendor con uuid: ' + uuid;
   }
+  await this.vendorRepo.remove(entity); 
+  
+  return 'vendor eliminado correctamente';
+}
   async update(
     uuid: string,
     vendor: UpdateVendorDto,

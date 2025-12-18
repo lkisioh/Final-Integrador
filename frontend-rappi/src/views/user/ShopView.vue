@@ -63,7 +63,6 @@ function irAlVendedor(uuidVendor){
         <div v-for="vendor in vendors" :key="vendor.uuid">
           <h3> xs </h3>
           <p> Local: {{ vendor.name }}</p>
-          <button @click="irAlVendedor(vendor.uuid)">Ver Vendedor</button>
           <p>Productos</p>
           <ul>
             <li v-for="product in vendor.products" :key="product.uuid">
@@ -96,4 +95,79 @@ function irAlVendedor(uuidVendor){
 </template>
 
 <style scoped>
+  :deep(nav), :deep(.navbar) {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999 !important; 
+  background-color: white; 
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.user-view {
+  background-color: #f0f4f8; 
+  min-height: 100vh;         
+  width: 100vw;              
+  display: flex;
+  flex-direction: column;
+  align-items: center;       
+  padding: 100px 0 40px 0; 
+  margin: 0;
+  position: absolute;        
+  left: 0;
+  top: 0;
+  z-index: 1; 
+}
+
+.user-view > div {
+  width: 90%;                
+  max-width: 600px;          
+  display: flex;
+  flex-direction: column;
+}
+
+div[v-for="vendor in vendors"] {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  border: 1px solid #d9e2ec;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+p:nth-of-type(2) {
+  background-color: #38a169;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  align-self: center; 
+}
+
+button {
+  background-color: #486581;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px;
+  cursor: pointer;
+  width: 100%;
+  margin: 10px 0;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #f0f4f8;
+  list-style: none;
+  background: white;
+}
+
+li button {
+  width: auto;
+  background-color: #2c7a7b;
+  padding: 5px 10px;
+}
 </style>

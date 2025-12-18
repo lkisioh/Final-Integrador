@@ -9,6 +9,14 @@ const {user,llamarUserAPI} = traerUser()
 const storeUserUuid = userUuid()
 
 const uuid = ref(storeUserUuid.getUuid())
+
+function logout() {
+  localStorage.removeItem('userUuid')
+  localStorage.removeItem('userName')
+  localStorage.removeItem('userRole')
+
+  router.push('/')
+}
 function comprar(){
   router.push('/shop')
 }
@@ -95,18 +103,20 @@ async function eliminarDireccion(uuidAddress){
         <button class="primary" @click="agregarDireccion">Nueva dirección!</button>
       </div>
 
-      <div class="section">
+      <!-- <div class="section">
         <h3>Locales Favoritos</h3>
         <ul>
           <li></li>
           <li></li>
         </ul>
-      </div>
+      </div> -->
 
       <div class="actions">
         <button class="primary" @click="verCarrito">Ver Carrito</button>
         <button class="primary" @click="comprar">Ir a comprar!</button>
-        <button class="primary" @click="editar">Editar Datos</button>
+        <button @click="logout" class="btn-logout">Cerrar Sesión</button>
+        <!-- <button class="primary" @click="editar">Editar Datos</button> -->
+      
       </div>
     </div>
   </div>

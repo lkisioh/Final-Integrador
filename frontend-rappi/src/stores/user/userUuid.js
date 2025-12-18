@@ -4,10 +4,16 @@ import { defineStore } from 'pinia'
 export const userUuid = defineStore('userUuid', () => {
   const uuid = ref(localStorage.getItem('userUuid') || null)
   const userType = ref(localStorage.getItem('userType') || null)
+  const nombre = ref(localStorage.getItem('userName') || null)
 
   function setUuid(newUuid) {
     uuid.value = newUuid
     localStorage.setItem('userUuid', newUuid)
+  }
+
+  function setNombre(newName) {
+    nombre.value = newName
+    localStorage.setItem('userName', newName)
   }
 
   function setUserType(userTypeApi) {
@@ -19,6 +25,8 @@ export const userUuid = defineStore('userUuid', () => {
     return uuid.value
   }
 
+ function getNombre() { return nombre.value }
+
   function getUserType() {
     return userType.value
   }
@@ -28,6 +36,7 @@ export const userUuid = defineStore('userUuid', () => {
     userType.value = null
     localStorage.removeItem('userUuid')
     localStorage.removeItem('userType')
+    localStorage.removeItem('userName') 
   }
 
 const currentAddressId = ref(localStorage.getItem('currentAddressId') || null)
@@ -40,8 +49,11 @@ const currentAddressId = ref(localStorage.getItem('currentAddressId') || null)
   return { 
     uuid, 
     userType, 
+    nombre,
     setUuid, 
     setUserType, 
+    setNombre,
+    getNombre,
     getUuid, 
     getUserType,
     clearStorage,

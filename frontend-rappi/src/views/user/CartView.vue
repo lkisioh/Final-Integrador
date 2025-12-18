@@ -42,27 +42,23 @@ async function pagarOrden(nombreTienda, productosTienda) {
 
   const nuevaOrden = {
     compradorUuid: uuid,
-    
-    tiendaNombre: nombreTienda,
-    storeId: productosTienda[0].storeId, 
-    
-    direccionEnvio: {
-      calle: direccionSeleccionada.value.street,
-      numero: direccionSeleccionada.value.number,
-      depto: direccionSeleccionada.value.apartment || 'N/A'
-    },
-    
-      items: productosTienda.map(p => ({
-      nombre: p.name,
-      cantidad: p.quantity,
-      precioUnitario: p.price
-    })),
-    
-    totalAPagar: calcularTotalTienda(productosTienda),
-    estado: 'pendiente', 
-    driverUuid: null,    
-    fechaCreacion: new Date().toISOString()
-  };
+  tiendaNombre: nombreTienda,
+  storeId: productosTienda[0].storeId, 
+  direccionEnvio: {
+    calle: direccionSeleccionada.value.street,
+    numero: direccionSeleccionada.value.number,
+    depto: direccionSeleccionada.value.apartment || 'N/A'
+  },
+  items: productosTienda.map(p => ({
+    nombre: p.name,
+    cantidad: p.quantity,
+    precioUnitario: p.price
+  })),
+  totalAPagar: calcularTotalTienda(productosTienda),
+  status: 'pendiente', 
+  driverUuid: null,    
+  fechaCreacion: new Date().toISOString()
+};
 
   try {    
     await axios.post('http://localhost:3000/ordenes', nuevaOrden);
@@ -71,7 +67,7 @@ async function pagarOrden(nombreTienda, productosTienda) {
 
     const idsAQuitar = productosTienda.map(p => p.uuid);
     cartStore.items = cartStore.items.filter(item => !idsAQuitar.includes(item.uuid));
-
+    router.push('/mis-pedidos/' + uuid);
   } catch (error) {
     console.error("Error al generar la orden", error);
     alert("Hubo un error al procesar tu pedido.");

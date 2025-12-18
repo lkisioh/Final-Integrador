@@ -11,12 +11,21 @@ export class OrdersController {
   }
 
   @Get()
-  findAll(@Query('status') status: string) {
-    return this.ordersService.findAll(status);
+  findAll(
+    @Query('status') status: string,
+    @Query('storeId') storeId: string,
+    @Query('userUuid') userUuid: string
+  ) {
+    return this.ordersService.findAll(status, storeId, userUuid);
   }
 
   @Patch(':uuid')
-  update(@Param('uuid') uuid: string, @Body() body: { status: string, driverUuid: string }) {
-    return this.ordersService.updateStatus(uuid, body.status, body.driverUuid);
+  update(@Param('uuid') uuid: string, @Body() body: any) {
+    return this.ordersService.updateStatus(
+      uuid, 
+      body.status, 
+      body.driverUuid, 
+      body.driverNombre
+    );
   }
 }

@@ -1,16 +1,15 @@
 <script setup>
 import { ref,} from 'vue'
 import { RouterLink } from 'vue-router'
-
 import { openSesion } from '@/composables/login/openSesion'
 import router from '@/router'
 
+
 import { userUuid } from '@/stores/user/userUuid'
-const { setUuid, getUuid, setUserType, getUserType }= userUuid()
+const { setUuid, getUuid, setUserType, getUserType, setNombre, getNombre }= userUuid()
 
 const email = ref('')
 const password= ref('')
-
 const { answer, cargando, error, openSesionAPI } = openSesion()
 
 const login = async () => {
@@ -24,9 +23,11 @@ const login = async () => {
     console.log('Respuesta login:', data)
     setUuid(data.uuid)
     setUserType(data.role)
+    setNombre(data.name)
 
     const userRole = getUserType()
     const userUuid = getUuid()
+    const userName = getNombre()
 
     if (userRole === 'final-user') {
       router.push('/shop')

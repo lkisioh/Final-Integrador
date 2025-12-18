@@ -28,7 +28,14 @@ export class VendorService {
   }
 
   async delete(uuid: string) {
-    await this.vendorRepository.delete(uuid);
-    return { message: 'Vendor deleted successfully' };
+  const vendor = await this.vendorRepository.findByUuid(uuid);
+  
+  if (!vendor) {
+    throw new Error(`Vendor con UUID ${uuid} no encontrado`); 
   }
+
+  await this.vendorRepository.delete(uuid);
+  
+  return { message: 'Vendor deleted successfully' };
+}
 }

@@ -5,6 +5,7 @@ import { CreateDriverUseCase } from '../use-cases/create-driver.usecase';
 
 @Injectable()
 export class DriverService {
+  private drivers: any[] = [];
   constructor(
     private readonly createDriverUseCase: CreateDriverUseCase,
     @Inject('IDriverRepository')
@@ -14,4 +15,16 @@ export class DriverService {
   create(createDriverDto) {
     return this.createDriverUseCase.execute(createDriverDto);
   }
+
+  async delete(uuid: string) {
+  const index = this.drivers.findIndex(d => d.uuid === uuid);
+  if (index !== -1) {
+    this.drivers.splice(index, 1);
+    return { message: 'Driver eliminado correctamente' };
+  }
+  
+  await this.driverRepository.delete(uuid);
+  return { message: 'Driver eliminado correctamente' };
+
+}
 }

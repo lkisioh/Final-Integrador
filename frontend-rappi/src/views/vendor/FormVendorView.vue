@@ -1,6 +1,6 @@
 <script setup>
 import { RouterLink } from 'vue-router'
-import { ref } from 'vue'
+import { ref,watch } from 'vue'
 import { createVendor } from '@/composables/vendor/createVendor'
 import router from '@/router'
 import { userUuid } from '@/stores/user/userUuid'
@@ -16,13 +16,21 @@ const name = ref('')
 const category = ref('')
 const initDay = ref('')
 const endDay = ref('')
-const time = ref('')
+const time = ref([])
 const phone = ref(0)
 const email = ref('')
 const password = ref('')
 const street = ref('')
 const number = ref(0)
 
+watch(time, (newTime, oldTime) => {
+  if (newTime.includes('24hs') && !oldTime.includes('24hs')) {
+    time.value = ['24hs']
+  } 
+  else if (newTime.length > 1 && newTime.includes('24hs')) {
+    time.value = newTime.filter(t => t !== '24hs')
+  }
+})
 
 function mapearVendor() {
   vendor.value = {
@@ -59,29 +67,19 @@ async function nuevoVendor() {
   }
 }
 
+function handleCheckChange(event) {
+  const selectedValue = event.target.value;
+  const isChecked = event.target.checked;
 
-
-let currentChecked = null;
-  function handleCheckChange(event) {
-    const selectedValue = event.target.value;
-
-    if (selectedValue === '24hs') {
-      time.value = '24hs';
-      currentChecked = '24hs';
-    } else {
-      if (currentChecked === '24hs') {
-        time.value = '';
-        currentChecked = null;
-      }
-
-      const index = time.value.indexOf(selectedValue);
-      if (index > -1) {
-        time.value.splice(index, 1);
-      } else {
-        time.value.push(selectedValue);
-      }
+  if (selectedValue === '24hs') {
+    time.value = isChecked ? ['24hs'] : [];
+  } else {
+    if (time.value.includes('24hs')) {
+      time.value = time.value.filter(t => t !== '24hs');
     }
+
   }
+}
 
 function editar(){
   alert('Vendedor editado con éxito')
@@ -144,33 +142,20 @@ function editar(){
         </div>
 
         <div>
-          <label>Horario:</label>
-
-          <check-group v-model="time" @change="handleCheckChange">
-            <label>
-              <input type="checkbox" value="madrugada" />
-              Madrugada 00hs - 6hs
-            </label>
-            <label>
-              <input type="checkbox" value="mañana" />
-              Mañana 9hs - 12hs
-            </label>
-            <label>
-              <input type="checkbox" value="tarde" />
-              Tarde 12hs - 18hs
-            </label>
-            <label>
-              <input type="checkbox" value="noche" />
-              Noche 18hs - 00hs
-            </label>
-            <label>
-              <input type="checkbox" value="24hs" />
-              24 hs
-            </label>
-            <br>
-            <label>Se eligio : {{ time }}</label>
-          </check-group>
-        </div>
+  <label>Horario:</label>
+  <div class="opciones-horario">
+    <label><input type="checkbox" value="madrugada" v-model="time" /> Madrugada (00 hs a 06 hs)</label>
+    <label><input type="checkbox" value="mañana" v-model="time" /> Mañana (09 hs a 12hs)</label>
+    <label><input type="checkbox" value="tarde" v-model="time" /> Tarde (12 hs a 18 hs)</label>
+    <label><input type="checkbox" value="noche" v-model="time" /> Noche (18 hs a 00 hs)</label>
+    <label><input type="checkbox" value="24hs" v-model="time" /> 24 hs</label>
+    
+    <br>
+    <label v-if="time.length > 0">
+      Se eligió: <strong>{{ time.join(' , ') }}</strong>
+    </label>
+  </div>
+</div>
 
         <div>
           <label>Teléfono:</label>
