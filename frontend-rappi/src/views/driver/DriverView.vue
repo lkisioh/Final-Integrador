@@ -12,8 +12,8 @@ const cargando = ref(false)
 const error = ref(null)
 
 const uuidDriver = route.params.uuid;
-// const storeDriver = userUuid()
-// const uuidDriver = storeDriver.getUuid()
+const storeDriver = userUuid()
+//const uuidDriver = storeDriver.getUuid()
 
 function logout() {
   localStorage.removeItem('userUuid')

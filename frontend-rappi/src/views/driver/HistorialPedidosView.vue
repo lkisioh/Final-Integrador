@@ -33,15 +33,6 @@ onMounted(() => {
 })
 </script>
 
-¡Perfecto! Vamos a hacer esos ajustes finales. He agregado la dirección de entrega y el monto del pedido (total a pagar), y eliminé el subtítulo que no querías.
-
-Así queda el código de tu historial para el Driver:
-
-1. Template Actualizado
-He modificado las columnas para incluir "Dirección" y "Monto", y limpié el encabezado.
-
-HTML
-
 <template>
   <div class="historial-view-container">
     <div class="historial-box">

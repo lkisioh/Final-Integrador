@@ -39,8 +39,6 @@ function irAlVendedor(uuidVendor){
   router.push('/vendor/' + uuidVendor)
 }
 
-// FALTARÏA QUE LA API DEVUELVA LOS PRODUCTOS DE CADA VENDEDOR PARA MOSTRARLOS ACÁ; HABRÍA que modificar
-// el BAck en /vendors por get que devuelve todo pero no tiene la entidad products en la devolución.
 </script>
 
 <template>
@@ -61,7 +59,7 @@ function irAlVendedor(uuidVendor){
         <h3>Vendedores</h3>
 
         <div v-for="vendor in vendors" :key="vendor.uuid">
-          <h3> xs </h3>
+          <h3> A </h3>
           <p> Local: {{ vendor.name }}</p>
           <p>Productos</p>
           <ul>
@@ -77,17 +75,7 @@ function irAlVendedor(uuidVendor){
 
       </div>
 
-      <!-- <div class="products-box" v-for="product in productos" :key="product.uuid" >
-        <h4>{{ product.name }}</h4>
-        <h4>$ {{  product.price  }}</h4>
-        <img src="" :alt= product.photo>
-        <h5>{{ product.description }}</h5>
-
-        <button @click="irAlVendedor(product.vendorUuid)">Más Sobre el vendedor</button>
-        <button @click="agregarCarrito(product.uuid)">Agregar</button>
-        <button @click="comprar(product.uuid)">Comprar</button>
-      </div> -->
-
+  
       <h5 v-if="error">{{ error }}</h5>
       <h5 v-if="cargando">Cargando...</h5>
     </div>
