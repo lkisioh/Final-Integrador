@@ -3,13 +3,17 @@ export class OrderEntity {
   uuid: string;
   userUuid: string;
   userName: string;
-  storeId: string;
-  storeName: string;
-  items: any[];
-  total: number;
   address: string;
+
+    createdAt: Date = new Date();
+
+  vendorUuid: string;
+  vendorName: string;
+  items: any[];
   status: string = 'pendiente';
   driverUuid: string | null = null;
-  driverNombre: string | null = null;
-  createdAt: Date = new Date();
+  driverName: string | null = null;
+
+  total: number;
+
 }
