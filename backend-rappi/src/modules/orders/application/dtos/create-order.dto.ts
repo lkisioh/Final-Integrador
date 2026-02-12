@@ -27,7 +27,7 @@ export class CreateOrderDto {
   vendorName: string;
 
   @IsNotEmpty()
-  items: any[]; // FALTARIA RELACIONAR LOS DTO CON DATOS NECESARIO
+  products: any[]; // FALTARIA RELACIONAR LOS DTO CON DATOS NECESARIO
 
   @IsString()
   @IsNotEmpty()

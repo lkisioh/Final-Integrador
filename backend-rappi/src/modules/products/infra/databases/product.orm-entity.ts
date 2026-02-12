@@ -6,6 +6,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { VendorOrmEntity } from 'src/modules/vendors/infra/databases/vendor.orm-entity';
+import { OrderOrmEntity } from 'src/modules/orders/infra/databases/order.orm-entity';
 
 @Entity({ name: 'products' })
 export class ProductOrmEntity {
@@ -39,4 +40,8 @@ export class ProductOrmEntity {
   @JoinColumn({ name: 'vendor_uuid', referencedColumnName: 'uuid' }) 
   vendor: VendorOrmEntity;
 
+  @ManyToOne(() => OrderOrmEntity, order => order.products, { 
+    onDelete: 'CASCADE',
+  })
+  orders: OrderOrmEntity[];
 }

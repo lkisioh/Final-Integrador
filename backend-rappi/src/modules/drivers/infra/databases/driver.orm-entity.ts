@@ -1,7 +1,9 @@
+import { OrderOrmEntity } from 'src/modules/orders/infra/databases/order.orm-entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  OneToMany,
 } from 'typeorm';
 
 
@@ -34,4 +36,9 @@ export class DriverOrmEntity {
   @Column()
   available: boolean;
 
+  @OneToMany(() => OrderOrmEntity, order => order.driver, {
+    cascade: true,
+    nullable: true,
+  })
+  orders: OrderOrmEntity[];
 }

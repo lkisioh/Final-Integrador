@@ -17,24 +17,21 @@ export class ProductController {
     @Inject('IProductRepository')
     private readonly productRepository: IProductRepository,
   ) {}
-  @Get() 
- async findAllByVendor(@Param('vendorUuid') vendorUuid: string ) {
-      const products = await this.productRepository.findByVendorUuid(vendorUuid); 
-      return products;
- }
- @Get(':productUuid') 
-    async findOne(@Param('productUuid') productUuid: string) {
-        
-        const product = await this.productRepository.findByUuid(productUuid); 
-        
-        if (!product) {
-            throw new Error(`Product con UUID ${productUuid} no encontrado`);
-        }
-        
-        return product;
+  @Get()
+  async findAllByVendor(@Param('vendorUuid') vendorUuid: string) {
+    const products = await this.productRepository.findByVendorUuid(vendorUuid);
+    return products;
+  }
+  @Get(':productUuid')
+  async findOne(@Param('productUuid') productUuid: string) {
+    const product = await this.productRepository.findByUuid(productUuid);
+    if (!product) {
+      throw new Error(`Product con UUID ${productUuid} no encontrado`);
     }
+    return product;
+  }
   @Post()
- async create(@Param('vendorUuid') vendorUuid: string, @Body() dto: CreateProductDto) {
+  async create(@Param('vendorUuid') vendorUuid: string, @Body() dto: CreateProductDto) {
      return await this.createProductUseCase.execute(dto, vendorUuid);
  }
  @Delete(':productUuid')

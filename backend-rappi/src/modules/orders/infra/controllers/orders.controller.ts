@@ -1,17 +1,14 @@
 import { Controller, Get, Post, Body, Patch, Param, Query, Inject } from '@nestjs/common';
-import { OrdersService } from '../../application/services/orders.service';
 import { CreateOrderDto } from '../../application/dtos/create-order.dto';
 import type { IOrderRepository } from '../../domain/repositories/order.repository.interface';
 import { CreateOrderUseCase } from '../../application/use-cases/create-order.usecase';
 
-@Controller('orders') 
-export class OrdersController {
+@Controller('orders')
+export class OrderController {
   constructor(
-    private readonly ordersService: OrdersService,
     private readonly createOrderUseCase: CreateOrderUseCase,
-    @Inject('IProductRepository')
+    @Inject('IOrderRepository')
     private readonly orderRepository: IOrderRepository,
-
   ) {}
 
   @Post()
@@ -22,14 +19,20 @@ export class OrdersController {
   //  falta de aca para abajo
   // ACOMODAR FILTRO O SEPARARLO POR LOGICA DE QUERY POR SI TIENEN DEVOLUCIONES DISTEINTAS
   @Get()
-  findAll(
-    @Query('status') status: string,
-    @Query('storeId') storeId: string,
-    @Query('userUuid') userUuid: string
-  ) {
-    return this.ordersService.findAll(status, storeId, userUuid);
+  findAll() {
+    return this.orderRepository.findAll();
   }
-
+  //buscar todos filtro
+  //@Get()
+  //findAll(
+  // @Query('status') status: string,
+  // @Query('storeId') storeId: string,
+  // @Query('userUuid') userUuid: string,
+  //) {
+  //  return this.orderRepository.findAll(status, storeId, userUuid);
+  //}
+  //buscar por id
+  /*
   @Patch(':uuid')
   updatOrder(@Param('uuid') uuid: string, @Body() body: any) {
     return this.ordersService.updateStatus(
@@ -66,5 +69,5 @@ export class OrdersController {
    @Patch(':productUuid')
    async update(@Param('productUuid') productUuid: string, @Body() dto: UpdateProductDto) : Promise<ProductEntity> {
       return await this.updateProductUseCase.execute(productUuid, dto);
-   }
+   }*/
 }

@@ -6,19 +6,18 @@ import { UpdateOrderDto } from '../dtos/update-order.dto';
 
 @Injectable()
 export class OrdersService {
-
   constructor(
     private readonly createOrderUseCase: CreateOrderUseCase,
     @Inject('IOrderRepository')
     private readonly orderRepository: IOrderRepository,
   ) {}
 
- async create(createOrderDto:CreateOrderDto) {
+  async create(createOrderDto: CreateOrderDto) {
     return this.createOrderUseCase.execute(createOrderDto);
   }
 
-  async findAll(status:string, storeId:string, userUuid:string){
-    return this.orderRepository.findAll(status, storeId, userUuid);
+  async findAll() {
+    return this.orderRepository.findAll();
   }
 
   // async updateStatus (uuid: string,
@@ -27,8 +26,4 @@ export class OrdersService {
   // driverNombre?: string){
   //   return this.orderRepository.update(uuid,status,driverUuid,driverNombre);
   // }
-
-
-
 }
-

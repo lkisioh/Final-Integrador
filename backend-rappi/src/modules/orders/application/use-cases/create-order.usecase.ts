@@ -7,26 +7,23 @@ import { CreateOrderDto } from '../dtos/create-order.dto';
 export class CreateOrderUseCase {
   constructor(private readonly orderRepo: IOrderRepository) {}
 
-  async execute(
-    dto: CreateOrderDto, 
-    ): Promise<OrderEntity> {
-  const newOrder = new OrderEntity();
-    
-  newOrder.userUuid = dto.userUuid;
-  newOrder.userName = dto.userName;
-  newOrder.address = dto.address;
-  newOrder.createdAt = dto.createAt;
-  newOrder.vendorUuid = dto.vendorUuid;
-  newOrder.vendorName = dto.vendorName;
-  // hay quee mapear los products que llegan, mirar vendor dto y usecase
-  newOrder.items = dto.items;
+  async execute(dto: CreateOrderDto): Promise<OrderEntity> {
+    const newOrder = new OrderEntity();
+    newOrder.userUuid = dto.userUuid;
+    newOrder.userName = dto.userName;
+    newOrder.userOrderAddress = dto.address;
+    newOrder.createdAt = dto.createAt;
+    newOrder.vendorUuid = dto.vendorUuid;
+    newOrder.vendorName = dto.vendorName;
+    // hay quee mapear los products que llegan, mirar vendor dto y usecase
+    newOrder.products = dto.products;
 
-  newOrder.status = dto.status;
-  newOrder.driverUuid = dto.driverUuid;
-  newOrder.driverName = dto.driverName;
+    newOrder.status = dto.status;
+    newOrder.driverUuid = dto.driverUuid;
+    newOrder.driverName = dto.driverName;
 
-  newOrder.total = dto.total;
+    newOrder.total = dto.total;
 
-  return await this.orderRepo.save(newOrder);
- }
+    return await this.orderRepo.save(newOrder);
+  }
 }
