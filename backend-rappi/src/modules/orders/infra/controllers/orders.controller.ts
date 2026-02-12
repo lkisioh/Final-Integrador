@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Query, Inject } from '@nestjs/common';
-import { OrdersService } from './orders.service';
-import { CreateOrderDto } from '../dto/create-order.dto'
+import { OrdersService } from '../../application/services/orders.service';
+import { CreateOrderDto } from '../../application/dtos/create-order.dto';
 import type { IOrderRepository } from '../../domain/repositories/order.repository.interface';
 import { CreateOrderUseCase } from '../../application/use-cases/create-order.usecase';
 
@@ -15,7 +15,7 @@ export class OrdersController {
   ) {}
 
   @Post()
-  async create(@Body() dto: CreateOrderDtp) {
+  async Create(@Body() dto: CreateOrderDto) {
     return await this.createOrderUseCase.execute(dto);
   }
 
@@ -31,7 +31,7 @@ export class OrdersController {
   }
 
   @Patch(':uuid')
-  update(@Param('uuid') uuid: string, @Body() body: any) {
+  updatOrder(@Param('uuid') uuid: string, @Body() body: any) {
     return this.ordersService.updateStatus(
       uuid, 
       body.status, 
@@ -63,8 +63,8 @@ export class OrdersController {
  async delete(@Param('productUuid') productUuid: string) {
      return await this.deleteProductUseCase.execute(productUuid);
  }
-  @Patch(':productUuid')
-  async update(@Param('productUuid') productUuid: string, @Body() dto: UpdateProductDto) : Promise<ProductEntity> {
+   @Patch(':productUuid')
+   async update(@Param('productUuid') productUuid: string, @Body() dto: UpdateProductDto) : Promise<ProductEntity> {
       return await this.updateProductUseCase.execute(productUuid, dto);
-  }
+   }
 }

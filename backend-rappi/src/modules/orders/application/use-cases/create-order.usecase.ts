@@ -9,23 +9,23 @@ export class CreateOrderUseCase {
 
   async execute(
     dto: CreateOrderDto, 
-    ): Promise<orderEntity> {
+    ): Promise<OrderEntity> {
   const newOrder = new OrderEntity();
     
-  newOrder.userUuid: dto.userUuid;
-  newOrder.userName: dto.userName;
-  newOrder.address: dto.address;
-  newOrder.createdAt: dto.createdAt;
-  newOrder.vendorUuid: dto.vendorUuid;
-  newOrder.vendorName: dto.vendorName;
+  newOrder.userUuid = dto.userUuid;
+  newOrder.userName = dto.userName;
+  newOrder.address = dto.address;
+  newOrder.createdAt = dto.createAt;
+  newOrder.vendorUuid = dto.vendorUuid;
+  newOrder.vendorName = dto.vendorName;
   // hay quee mapear los products que llegan, mirar vendor dto y usecase
-  newOrder.items:dto.items;
+  newOrder.items = dto.items;
 
-  newOrder.status: dto.status;
-  newOrder.driverUuid: dto.driverUuid;
-  newOrder.driverName: dto.driverName;
+  newOrder.status = dto.status;
+  newOrder.driverUuid = dto.driverUuid;
+  newOrder.driverName = dto.driverName;
 
-  newOrder.total: dro.total;
+  newOrder.total = dto.total;
 
   return await this.orderRepo.save(newOrder);
  }

@@ -1,7 +1,8 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import type { IOrderRepository } from '../../domain/repositories/order.repository.interface';
 import { CreateOrderUseCase } from '../use-cases/create-order.usecase';
-import { CreateOrderDto } from '../dto/create-order.usecase';
+import { CreateOrderDto } from '../dtos/create-order.dto';
+import { UpdateOrderDto } from '../dtos/update-order.dto';
 
 @Injectable()
 export class OrdersService {
@@ -12,9 +13,22 @@ export class OrdersService {
     private readonly orderRepository: IOrderRepository,
   ) {}
 
-  create(createOrderDto) {
+ async create(createOrderDto:CreateOrderDto) {
     return this.createOrderUseCase.execute(createOrderDto);
   }
+
+  async findAll(status:string, storeId:string, userUuid:string){
+    return this.orderRepository.findAll(status, storeId, userUuid);
+  }
+
+  // async updateStatus (uuid: string,
+  // status: string,
+  // driverUuid?: string,
+  // driverNombre?: string){
+  //   return this.orderRepository.update(uuid,status,driverUuid,driverNombre);
+  // }
+
+
 
 }
 

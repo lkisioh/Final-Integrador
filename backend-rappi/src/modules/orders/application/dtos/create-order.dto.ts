@@ -16,7 +16,7 @@ export class CreateOrderDto {
 
   
   @IsNotEmpty()
-  createAt: date;
+  createAt: Date;
 
    @IsString()
   @IsNotEmpty()
