@@ -25,6 +25,6 @@ export class UserOrmEntity {
   @OneToMany(() => AddressOrmEntity, address => address.user, { cascade: true, eager: true })
   addresses: AddressOrmEntity[];
 
-  @OneToMany(() => OrderOrmEntity, order => order.user, { cascade: true, eager: true })
+  @OneToMany(() => OrderOrmEntity, (order) => order.user, { cascade: true, eager: true })
   orders: OrderOrmEntity[];
 }

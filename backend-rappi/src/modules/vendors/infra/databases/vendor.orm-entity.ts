@@ -41,11 +41,8 @@ export class VendorOrmEntity {
   })
   address: AddressVendorOrmEntity;
 
-  @OneToMany(() => OrderOrmEntity, order => order.vendor, {
-    cascade: true,
-    nullable: true,
-  })
-  orders: OrderOrmEntity;
+  @OneToMany(() => OrderOrmEntity, (order) => order.vendor, { cascade: true })
+  orders: OrderOrmEntity[];
 
   @Column()
   password: string;

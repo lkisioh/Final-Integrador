@@ -36,9 +36,6 @@ export class DriverOrmEntity {
   @Column()
   available: boolean;
 
-  @OneToMany(() => OrderOrmEntity, order => order.driver, {
-    cascade: true,
-    nullable: true,
-  })
+  @OneToMany(() => OrderOrmEntity, (order) => order.driver, { cascade: true })
   orders: OrderOrmEntity[];
 }
