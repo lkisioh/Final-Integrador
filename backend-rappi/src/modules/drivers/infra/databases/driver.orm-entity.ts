@@ -3,9 +3,8 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  OneToMany,
+ OneToMany,
 } from 'typeorm';
-
 
 @Entity({ name: 'drivers' })
 export class DriverOrmEntity {
@@ -36,9 +35,6 @@ export class DriverOrmEntity {
   @Column()
   available: boolean;
 
-  @OneToMany(() => OrderOrmEntity, order => order.driver, {
-    cascade: true,
-    nullable: true,
-  })
+  @OneToMany(() => OrderOrmEntity, (order) => order.driver, { cascade: true })
   orders: OrderOrmEntity[];
 }

@@ -21,7 +21,7 @@ export class OrderOrmEntity {
   @Column({ unique: true })
   uuid: string;
 
-  @Column({ type: 'uuid', name: 'user_uuid' })
+  @Column({ type: 'varchar', name: 'user_uuid' })
   userUuid: string;
 
   @ManyToOne(() => UserOrmEntity, user => user.orders, { 
@@ -39,10 +39,10 @@ export class OrderOrmEntity {
   @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ type: 'uuid', name: 'vendor_uuid' })
+  @Column({ type: 'varchar', name: 'vendor_uuid' })
   vendorUuid: string;
 
-  @ManyToOne(() => VendorOrmEntity, vendor => vendor.orders, { 
+  @ManyToOne(() => VendorOrmEntity, (vendor) => vendor.orders, { 
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'vendor_uuid', referencedColumnName: 'uuid' })
@@ -57,13 +57,16 @@ export class OrderOrmEntity {
   @Column()
   status: string;
 
-  @Column({ type: 'uuid', name: 'driver_uuid', nullable: true })
+  @Column({ type: 'varchar', name: 'driver_uuid', nullable: true })
   driverUuid: string | null;
   @ManyToOne(() => DriverOrmEntity, driver => driver.orders, {
     onDelete: 'SET NULL',
   })
   @JoinColumn({ name: 'driver_uuid', referencedColumnName: 'uuid' })
   driver: DriverOrmEntity | null;
+
+  @Column({ nullable: true })
+  driverName: string | null;
 
   @Column('decimal', { precision: 10, scale: 2 })
   total: number;
