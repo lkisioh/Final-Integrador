@@ -1,49 +1,39 @@
-import { IsString, IsNumber, IsNotEmpty } from 'class-validator';
+import { IsString, IsNumber, IsNotEmpty, IsOptional } from 'class-validator';
 
+import { CreateOrderItemDto } from './create-order-item.dto';
 export class CreateOrderDto {
-
   @IsString()
   @IsNotEmpty()
-  userUuid: string;  
-  
+  userUuid: string;
+
   @IsString()
   @IsNotEmpty()
   userName: string;
 
   @IsString()
   @IsNotEmpty()
-  address: string;
+  userOrderAddress: string;
 
-  
+  @IsString()
   @IsNotEmpty()
-  createAt: Date;
+  vendorUuid: string;
 
-   @IsString()
-  @IsNotEmpty()
-  vendorUuid: string;  
-  
   @IsString()
   @IsNotEmpty()
   vendorName: string;
 
   @IsNotEmpty()
-  products: any[]; // FALTARIA RELACIONAR LOS DTO CON DATOS NECESARIO
+  items: CreateOrderItemDto[];
 
   @IsString()
   @IsNotEmpty()
-  status: string;  
+  status: string;
 
-   @IsString()
-  @IsNotEmpty()
-  driverUuid: string;  
-  
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  driverName: string;
-
+  driverUuid?: string;
 
   @IsNumber()
   @IsNotEmpty()
-  total: number
-
+  total: number;
 }

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { OrderOrmEntity } from '../databases/order.orm-entity';
+import { VendorOrmEntity } from 'src/modules/vendors/infra/databases/vendor.orm-entity';
 import type { IOrderRepository } from '../../domain/repositories/order.repository.interface';
 import { OrderEntity } from '../../domain/entities/order.entity';
 @Injectable()
@@ -13,36 +14,55 @@ export class OrderRepositoryImpl implements IOrderRepository {
   ) {}
 
   async save(order: OrderEntity): Promise<OrderEntity> {
-    const ormOrder = this.orderRepo.create({
+    const ormOrder: OrderOrmEntity = this.orderRepo.create({
       uuid: order.uuid ?? uuidv4(),
-      userUuid: order.userUuid,
-      userName: order.userName,
-      userOrderAddress: order.userOrderAddress,
-      vendorUuid: order.vendorUuid,
-      products: order.products,
+      userUuid: order.userUuid ?? null,
+      userName: order.userName ?? null,
+      userOrderAddress: order.userOrderAddress ?? null,
+      vendorUuid: order.vendorUuid ?? null,
+      vendorName: order.vendorName,
+      items: order.items.map((i) => ({
+        orderUuid: order.uuid,
+        productUuid: i.productUuid,
+        quantity: i.quantity,
+        unitPrice: i.unitPrice,
+        subtotal: i.subtotal,
+      })),
       status: order.status,
-      driverUuid: order.driverUuid,
-      driverName: order.driverName,
+      driverUuid: order.driverUuid ?? null,
       total: order.total,
     });
 
     const saved = await this.orderRepo.save(ormOrder);
 
+    const orderWithVendor = await this.orderRepo.findOne({
+      where: { uuid: saved.uuid },
+      relations: ['vendor'],
+    });
+
+    if (!orderWithVendor) {
+      throw new Error('Order not found after save');
+    }
+
     const domainOrder = new OrderEntity();
     Object.assign(domainOrder, {
-      id: saved.id,
-      uuid: saved.uuid,
-      userUuid: saved.userUuid,
-      userName: saved.userName,
-      userOrderAddress: saved.userOrderAddress,
-      createdAt: saved.createdAt,
-      vendorUuid: saved.vendorUuid,
-      vendorName: saved.vendor ? saved.vendor.name : null,
-      products: saved.products,
-      status: saved.status,
-      driverUuid: saved.driverUuid,
-      driverName: saved.driverName,
-      total: saved.total,
+      id: orderWithVendor.id ?? null,
+      uuid: orderWithVendor.uuid,
+      userUuid: orderWithVendor.userUuid,
+      userName: orderWithVendor.userName,
+      userOrderAddress: orderWithVendor.userOrderAddress,
+      vendorUuid: orderWithVendor.vendorUuid,
+      vendorName: orderWithVendor.vendor.name,
+      items: orderWithVendor.items.map((i) => ({
+        productUuid: i.productUuid,
+        quantity: i.quantity,
+        unitPrice: i.unitPrice,
+        subtotal: i.subtotal,
+      })),
+      createdAt: orderWithVendor.createdAt,
+      status: orderWithVendor.status,
+      driverUuid: orderWithVendor.driverUuid,
+      total: orderWithVendor.total,
     });
 
     return domainOrder;
@@ -51,22 +71,26 @@ export class OrderRepositoryImpl implements IOrderRepository {
   async findAll(): Promise<OrderEntity[]> {
     const entities = await this.orderRepo.find();
 
-    return entities.map(entity => {
+    return entities.map((entity) => {
       const order = new OrderEntity();
 
       Object.assign(order, {
-        id: entity.uuid,
+        id: entity.id,
         uuid: entity.uuid,
         userUuid: entity.userUuid,
         userName: entity.userName,
         userOrderAddress: entity.userOrderAddress,
         vendorUuid: entity.vendorUuid,
-        vendorName: entity.vendor ? entity.vendor.name : null,
-        products: entity.products,
+        vendorName: entity.vendorName,
+        items: entity.items.map((i) => ({
+          productUuid: i.productUuid,
+          quantity: i.quantity,
+          unitPrice: i.unitPrice,
+          subtotal: i.subtotal,
+        })),
         createdAt: entity.createdAt,
         status: entity.status,
         driverUuid: entity.driverUuid,
-        driverName: entity.driverName,
         total: entity.total,
       });
       return order;

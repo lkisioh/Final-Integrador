@@ -1,3 +1,5 @@
+import { OrderItemEntity } from './order-item.entity';
+
 export class OrderEntity {
   id: number;
   uuid: string;
@@ -9,10 +11,9 @@ export class OrderEntity {
 
   vendorUuid: string;
   vendorName: string;
-  products: any[];
+  items: OrderItemEntity[];
   status: string = 'pendiente';
   driverUuid: string | null = null;
-  driverName: string | null = null;
 
   total: number;
 }

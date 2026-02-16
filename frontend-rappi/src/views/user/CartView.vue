@@ -1,8 +1,8 @@
 <script setup>
-import { computed } from 'vue' 
+import { computed } from 'vue'
 import router from '@/router';
 import { RouterLink } from 'vue-router'
-import { useCartStore } from '@/stores/user/cartStore' 
+import { useCartStore } from '@/stores/user/cartStore'
 import { userUuid } from '@/stores/user/userUuid';
 import { traerUser } from '@/composables/user/traerUser';
 import axios from 'axios';
@@ -40,28 +40,29 @@ async function pagarOrden(nombreTienda, productosTienda) {
     return;
   }
 
-  const nuevaOrden = {
-    compradorUuid: uuid,
-  tiendaNombre: nombreTienda,
-  storeId: productosTienda[0].storeId, 
-  direccionEnvio: {
-    calle: direccionSeleccionada.value.street,
-    numero: direccionSeleccionada.value.number,
-    depto: direccionSeleccionada.value.apartment || 'N/A'
-  },
+ const nuevaOrden = {
+  userUuid: uuid,
+  userName: `${user.value.name}`,
+  userOrderAddress: `${direccionSeleccionada.value.street} ${direccionSeleccionada.value.number}, Depto ${direccionSeleccionada.value.apartment || 'N/A'}`,
+  vendorUuid: String(productosTienda[0].storeId),
+  vendorName: nombreTienda,
   items: productosTienda.map(p => ({
-    nombre: p.name,
-    cantidad: p.quantity,
-    precioUnitario: p.price
+    // acá seria el producto uuid, cantidad porque el back deberia sacar el precio del producto, y subtotal que seria cantidad * precio
+    productUuid: p.uuid,
+    quantity: Number(p.quantity),
+    unitPrice: Number(p.price),
+    subtotal: Number(p.quantity) * Number(p.price),
   })),
-  totalAPagar: calcularTotalTienda(productosTienda),
-  status: 'pendiente', 
-  driverUuid: null,    
-  fechaCreacion: new Date().toISOString()
-};
+  status: 'PENDIENTE',
+  total: Number(calcularTotalTienda(productosTienda)),
+}
 
-  try {    
-    await axios.post('http://localhost:3000/ordenes', nuevaOrden);
+
+  try {
+    alert(`Procesando tu pedido a ${nombreTienda}...`)
+    alert( ` el json es ${JSON.stringify(nuevaOrden)}`)
+    console.log("Enviando nueva orden al backend:", nuevaOrden);
+    await axios.post('http://localhost:3000/orders', nuevaOrden);
 
     alert(`✅ Pedido enviado a ${nombreTienda}. Un repartidor lo tomará pronto.`);
 
@@ -69,6 +70,8 @@ async function pagarOrden(nombreTienda, productosTienda) {
     cartStore.items = cartStore.items.filter(item => !idsAQuitar.includes(item.uuid));
     router.push('/mis-pedidos/' + uuid);
   } catch (error) {
+    console.log('status', error?.response?.status)
+    console.log('data', error?.response?.data)
     console.error("Error al generar la orden", error);
     alert("Hubo un error al procesar tu pedido.");
   }
@@ -119,7 +122,7 @@ function eliminarProducto(uuid) {
       <div v-if="cartStore.items.length > 0">
         <div v-for="(productos, tiendaNombre) in productosAgrupados" :key="tiendaNombre" class="store-section">
           <h2 class="store-title">Tienda: {{ tiendaNombre }}</h2>
-          
+
           <table class="cart-table">
             <thead>
               <tr>
@@ -153,9 +156,9 @@ function eliminarProducto(uuid) {
             <div class="store-total">
               Subtotal: <strong>${{ calcularTotalTienda(productos) }}</strong>
             </div>
-            <button 
-              @click="pagarOrden(tiendaNombre, productos)" 
-              class="primary" 
+            <button
+              @click="pagarOrden(tiendaNombre, productos)"
+              class="primary"
               :disabled="!direccionSeleccionada"
             >
               Finalizar pedido en {{ tiendaNombre }}
@@ -173,43 +176,43 @@ function eliminarProducto(uuid) {
 </template>
 
 <style scoped>
-.cart-table { 
-  width: 100%; 
-  border-collapse: collapse; 
-  margin-top: 20px; 
+.cart-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
-.cart-table th, .cart-table td { 
-  border-bottom: 1px solid #ddd; 
-  padding: 10px; text-align: left; 
+.cart-table th, .cart-table td {
+  border-bottom: 1px solid #ddd;
+  padding: 10px; text-align: left;
 }
 
-.cart-summary { 
-  margin-top: 30px; 
-  text-align: right; 
+.cart-summary {
+  margin-top: 30px;
+  text-align: right;
 }
 
-.primary { 
-  background-color: #4CAF50; 
-  color: white; 
-  padding: 10px 20px; 
-  border: none; 
-  cursor: pointer; 
+.primary {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
 }
 
-.secondary { 
-  background-color: #f44336; 
-  color: white; 
-  padding: 5px 10px; 
-  border: none; 
-  cursor: pointer; 
-  margin-left: 5px; 
+.secondary {
+  background-color: #f44336;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+  margin-left: 5px;
 
 }
 
-button:disabled { 
-  background-color: #ccc; 
-  cursor: not-allowed; 
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 
 }
 
@@ -240,7 +243,7 @@ button:disabled {
 }
 
 .store-section {
-  margin-bottom: 40px; 
+  margin-bottom: 40px;
   border: 1px solid #eee;
   padding: 15px;
   border-radius: 8px;

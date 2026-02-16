@@ -6,16 +6,16 @@ import { userUuid } from '@/stores/user/userUuid'
 const pedidos = ref([])
 const cargando = ref(false)
 const storeUser = userUuid()
-const uuidCliente = storeUser.getUuid() 
+const uuidCliente = storeUser.getUuid()
 
 async function cargarMisPedidos() {
   if (!uuidCliente) return
   cargando.value = true
   try {
-    const respuesta = await axios.get('http://localhost:3000/ordenes')
+    const respuesta = await axios.get('http://localhost:3000/orders')
     console.log("Todas las órdenes del servidor:", respuesta.data)
     console.log("Mi UUID de cliente es:", uuidCliente)
-    pedidos.value = respuesta.data.filter(o => o.compradorUuid === uuidCliente)
+    pedidos.value = respuesta.data.filter(o => o.userUuid === uuidCliente)
   } catch (error) {
     console.error("Error al cargar:", error)
   } finally {
@@ -31,7 +31,7 @@ function formatFecha(fecha) {
 
 onMounted(() => {
   cargarMisPedidos()
-  setInterval(cargarMisPedidos, 15000) 
+  setInterval(cargarMisPedidos, 15000)
 })
 </script>
 
@@ -50,7 +50,7 @@ onMounted(() => {
 
     <div v-else class="lista-pedidos">
       <div v-for="pedido in pedidos" :key="pedido.uuid" class="pedido-card">
-        
+
         <div class="pedido-header">
           <div class="info-tienda">
             <span class="tienda-name">{{ pedido.tiendaNombre }}</span>
@@ -73,7 +73,7 @@ onMounted(() => {
         <div class="pedido-footer">
           <div class="entrega">
             <p v-if = "pedido.status === 'pendiente'">
-                
+
                 ⏳ Tu pedido está siendo procesado.
             </p>
             <p v-if="pedido.status === 'aceptado'">
@@ -97,13 +97,13 @@ onMounted(() => {
 
 <style scoped>
 .mis-pedidos-container {
-  background-color: #f0f4f8; 
+  background-color: #f0f4f8;
   min-height: 100vh;
   width: 100vw;
   display: flex;
   flex-direction: column;
-  align-items: center;       
-  justify-content: center;    
+  align-items: center;
+  justify-content: center;
   padding: 40px 20px;
   margin: 0;
   position: absolute;
@@ -119,7 +119,7 @@ onMounted(() => {
   }
 }
 
-.header, 
+.header,
 .lista-pedidos,
 .msg-info,
 .msg-vacio {
@@ -148,7 +148,7 @@ h1 {
   margin-bottom: 20px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.05);
   border: 1px solid #d9e2ec;
-  border-left: 6px solid #ff441f; 
+  border-left: 6px solid #ff441f;
 }
 
 .btn-volver {

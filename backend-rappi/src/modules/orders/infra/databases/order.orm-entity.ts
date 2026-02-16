@@ -2,15 +2,16 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
+  CreateDateColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
 } from 'typeorm';
 
 import { VendorOrmEntity } from 'src/modules/vendors/infra/databases/vendor.orm-entity';
 import { UserOrmEntity } from 'src/modules/users/infra/databases/user.orm-entity';
 import { DriverOrmEntity } from 'src/modules/drivers/infra/databases/driver.orm-entity';
-
-import { ProductOrmEntity } from 'src/modules/products/infra/databases/product.orm-entity';
+import { OrderItemOrmEntity } from './order-item.orm-entity';
 
 @Entity({ name: 'orders' })
 export class OrderOrmEntity {
@@ -29,13 +30,13 @@ export class OrderOrmEntity {
   @JoinColumn({ name: 'user_uuid', referencedColumnName: 'uuid' })
   user: UserOrmEntity;
 
-  @Column()
+  @Column({ nullable: true })
   userName: string;
 
   @Column()
   userOrderAddress: string;
 
-  @Column()
+  @CreateDateColumn()
   createdAt: Date;
 
   @Column({ type: 'uuid', name: 'vendor_uuid' })
@@ -48,10 +49,11 @@ export class OrderOrmEntity {
   vendor: VendorOrmEntity;
 
   @Column()
-  products: ProductOrmEntity[];
-  @ManyToOne(() => ProductOrmEntity, product => product.orders, {
-    onDelete: 'SET NULL',
-  })
+  vendorName: string;
+
+  @OneToMany(() => OrderItemOrmEntity, (i) => i.order, { cascade: true, eager: true })
+  items: OrderItemOrmEntity[];
+
   @Column()
   status: string;
 
@@ -62,9 +64,6 @@ export class OrderOrmEntity {
   })
   @JoinColumn({ name: 'driver_uuid', referencedColumnName: 'uuid' })
   driver: DriverOrmEntity | null;
-
-  @Column({ nullable: true })
-  driverName: string | null;
 
   @Column('decimal', { precision: 10, scale: 2 })
   total: number;
