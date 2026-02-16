@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { OrderOrmEntity } from '../databases/order.orm-entity';
-import { VendorOrmEntity } from 'src/modules/vendors/infra/databases/vendor.orm-entity';
 import type { IOrderRepository } from '../../domain/repositories/order.repository.interface';
 import { OrderEntity } from '../../domain/entities/order.entity';
 @Injectable()

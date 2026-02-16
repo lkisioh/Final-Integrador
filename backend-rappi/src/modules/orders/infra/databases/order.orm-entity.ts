@@ -48,7 +48,7 @@ export class OrderOrmEntity {
   @JoinColumn({ name: 'vendor_uuid', referencedColumnName: 'uuid' })
   vendor: VendorOrmEntity;
 
-  @Column()
+  @Column({ type: 'text' })
   vendorName: string;
 
   @OneToMany(() => OrderItemOrmEntity, (i) => i.order, { cascade: true, eager: true })
@@ -65,7 +65,7 @@ export class OrderOrmEntity {
   @JoinColumn({ name: 'driver_uuid', referencedColumnName: 'uuid' })
   driver: DriverOrmEntity | null;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   driverName: string | null;
 
   @Column('decimal', { precision: 10, scale: 2 })
