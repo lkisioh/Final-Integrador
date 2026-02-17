@@ -13,9 +13,9 @@ const uuidDriver = route.params.uuid
 async function cargarHistorial() {
   cargando.value = true
   try {
-    const respuesta = await axios.get('http://localhost:3000/ordenes')
-    pedidos.value = respuesta.data.filter(o => 
-      o.status === 'entregado' && o.driverUuid === uuidDriver
+    const respuesta = await axios.get('http://localhost:3000/orders')
+    pedidos.value = respuesta.data.filter(o =>
+      o.status === 'ENTREGADO' && o.driverUuid === uuidDriver
     )
   } catch (error) {
     console.error("Error al cargar el historial", error)
@@ -25,7 +25,7 @@ async function cargarHistorial() {
 }
 
 function volver() {
-  router.push('/orders/' + uuidDriver) 
+  router.push('/orders/' + uuidDriver)
 }
 
 onMounted(() => {
@@ -40,9 +40,9 @@ onMounted(() => {
         <button @click="volver" class="btn-back">← Volver a pedidos activos</button>
         <h1 class="hist-title">Historial de Entregas</h1>
         </header>
-      
+
       <div v-if="cargando" class="status-msg">Cargando historial...</div>
-      
+
       <div v-else-if="pedidos.length === 0" class="no-data">
         <div class="empty-icon">📦</div>
         <p>Aún no has completado ninguna entrega.</p>
@@ -65,18 +65,18 @@ onMounted(() => {
                 {{ new Date(pedido.createdAt).toLocaleDateString() }}
               </td>
               <td>
-                <strong>{{ pedido.tiendaNombre }}</strong>
+                <strong>{{ pedido.vendorName }}</strong>
               </td>
-              
+
               <td>
                 <ul class="items-list">
-                  <li v-for="item in pedido.items" :key="item.nombre">
-                    {{ item.cantidad }}x {{ item.nombre }}
+                  <li v-for="item in pedido.items" :key="item.productUuid">
+                    {{ item.quantity }} x producto: {{ item.productName }}
                   </li>
                 </ul>
               </td>
               <td class="amount-cell">
-                ${{ pedido.totalAPagar }}
+                ${{ pedido.total }}
               </td>
               <td style="text-align: center;">
                 <span class="badge-success">Entregado</span>

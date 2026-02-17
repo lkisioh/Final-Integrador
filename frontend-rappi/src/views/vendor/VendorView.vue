@@ -100,7 +100,7 @@ function logout() {
 
 onMounted(() => {
   console.log('Cargando productos para el Vendedor UUID:', vendorUuid);
-  const productosUrl = `http://localhost:3000/vendors/${vendorUuid}/products`;
+  const productosUrl = `http://localhost:3000/products/${vendorUuid}`;
   llamarProductosAPI(productosUrl);
 
     console.log('Cargando datos del Vendedor:', vendorUuid);
@@ -133,6 +133,7 @@ onMounted(() => {
           </div>
         </div>
          <RouterLink :to="'/orders/vendor/' + vendorUuid" class="btn-link orders"> 📋 Mis ventas </RouterLink>
+         <RouterLink :to="'/edit/vendor/' + vendorUuid" class="btn-link orders"> Editar </RouterLink>
       </section>
 
       <hr>

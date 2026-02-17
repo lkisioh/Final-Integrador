@@ -9,7 +9,7 @@ const cargando = ref(false)
 async function fetchVendors() {
   cargando.value = true
   try {
-    const response = await axios.get('http://localhost:3000/vendors') 
+    const response = await axios.get('http://localhost:3000/vendors')
     vendors.value = response.data
   } catch (error) {
     console.error("Error:", error)
@@ -39,7 +39,7 @@ onMounted(fetchVendors)
 
       <div v-else class="vendors-grid">
         <div v-for="vendor in vendors" :key="vendor.uuid" class="vendor-card">
-          
+
           <div class="vendor-header">
             <div>
               <span class="emoji">🏪</span>
@@ -52,8 +52,10 @@ onMounted(fetchVendors)
             <p><strong>📅 Días:</strong> {{ vendor.daysOpen }}</p>
             <p><strong>⏰ Horarios:</strong> {{ formatTime(vendor.time) }}</p>
             <p v-if="vendor.address">
-              <strong>📍 Dirección:</strong> {{ vendor.address.street }} {{ vendor.address.number }}
+              <strong>📍 Dirección:</strong> Calle: {{ vendor.address.street }} Nº {{ vendor.address.number }}
             </p>
+            <p><strong>📞 Teléfono:</strong> {{ vendor.phone }}</p>
+            <button @click="$router.push('/shop/' + vendor.uuid)">Ver productos</button>
           </div>
         </div>
       </div>
@@ -114,7 +116,7 @@ h1 { color: #243b55; text-align: center; margin-bottom: 30px; }
 }
 
 .btn-visitar {
-  background-color: #ff6b6b; 
+  background-color: #ff6b6b;
   color: white;
   border: none;
   border-radius: 8px;

@@ -25,7 +25,7 @@ onMounted(() => {
   cargarVentas()
 
   console.log('Cargando productos para el Vendedor UUID:', vendorUuid);
-  const productosUrl = `http://localhost:3000/vendors/${vendorUuid}/products`;
+  const productosUrl = `http://localhost:3000/products`;
   llamarProductosAPI(productosUrl);
 
     console.log('Cargando datos del Vendedor:', vendorUuid);

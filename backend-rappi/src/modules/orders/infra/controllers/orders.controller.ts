@@ -35,7 +35,11 @@ export class OrderController {
   }
   @Patch(':uuid/assign-driver')
   assignDriver(@Param('uuid') uuid: string, @Body() body: any) {
-    return this.orderRepository.assignDriver(uuid, body.status, body.driverUuid, body.driverNombre);
+    return this.orderRepository.assignDriver(uuid, body.status, body.driverUuid);
+  }
+  @Patch(':uuid/finish-delivery')
+  finishDelivery(@Param('uuid') uuid: string, @Body() body: any) {
+    return this.orderRepository.finishDelivery(uuid, body.status, body.driverUuid);
   }
   /*
   @Get() 

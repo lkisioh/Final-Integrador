@@ -16,6 +16,25 @@ export class DriverRepositoryImpl implements IDriverRepository {
     private readonly driverRepo: Repository<DriverOrmEntity>,
   ) {}
 
+  async findAll(): Promise<DriverEntity[]> {
+    const entities = await this.driverRepo.find();
+
+    return entities.map(entity => {
+      const driver = new DriverEntity();
+      Object.assign(driver, {
+        id: entity.id,
+        uuid: entity.uuid,
+        name: entity.name,
+        email: entity.email,
+        phone: entity.phone,
+        vehicle: entity.vehicle,
+        location: entity.location,
+        available: entity.available,
+      });
+      return driver;
+    });
+  }
+
   async findByEmail(email: string, password: string): Promise<{ uuid: string, name: string } | null> {
     const driver = await this.driverRepo.findOne({ where: { email, password } });
     if (!driver) return null;
@@ -70,9 +89,10 @@ export class DriverRepositoryImpl implements IDriverRepository {
   }
 
   async delete(uuid: string): Promise<void> {
-    const index = this.drivers.findIndex(d => d.uuid === uuid);
-    if (index !== -1) {
-      this.drivers.splice(index, 1);
+    const entity = await this.driverRepo.findOne({ where: { uuid } });
+    if (!entity) {
+      throw new Error('No se encontró Driver con uuid: ' + uuid);
     }
-}
+    await this.driverRepo.remove(entity);
+  }
 }

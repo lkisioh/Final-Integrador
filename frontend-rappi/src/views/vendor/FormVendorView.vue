@@ -4,11 +4,22 @@ import { ref,watch } from 'vue'
 import { createVendor } from '@/composables/vendor/createVendor'
 import router from '@/router'
 import { userUuid } from '@/stores/user/userUuid'
+import { onMounted } from 'vue'
+
+import { traerVendor } from '@/composables/vendor/traerVendor'
 
 const {setUuid} = userUuid()
 
 const vendorUuid = router.currentRoute.value.params.uuid
 
+const { llamarVendorAPI} = traerVendor();
+onMounted(() => {
+if (vendorUuid) {
+  console.log('Cargando datos del Vendedor para edición, UUID:', vendorUuid);
+  const vendorUrl = `http://localhost:3000/vendors/${vendorUuid}`;
+  const driverParaEditar = llamarVendorAPI(vendorUrl);
+  vendor.value = driverParaEditar.value
+}})
 
 const {vendor,createVendorAPI} = createVendor()
 
@@ -26,7 +37,7 @@ const number = ref(0)
 watch(time, (newTime, oldTime) => {
   if (newTime.includes('24hs') && !oldTime.includes('24hs')) {
     time.value = ['24hs']
-  } 
+  }
   else if (newTime.length > 1 && newTime.includes('24hs')) {
     time.value = newTime.filter(t => t !== '24hs')
   }
@@ -149,7 +160,7 @@ function editar(){
     <label><input type="checkbox" value="tarde" v-model="time" /> Tarde (12 hs a 18 hs)</label>
     <label><input type="checkbox" value="noche" v-model="time" /> Noche (18 hs a 00 hs)</label>
     <label><input type="checkbox" value="24hs" v-model="time" /> 24 hs</label>
-    
+
     <br>
     <label v-if="time.length > 0">
       Se eligió: <strong>{{ time.join(' , ') }}</strong>
@@ -173,7 +184,7 @@ function editar(){
         </div>
 
         <div>
-          <button v-if="vendorUuid>=0" @click="editar">Editar</button>
+          <button v-if="vendorUuid" @click="editar">Editar</button>
           <button v-else type="submit">Crear</button>
       </div>
 

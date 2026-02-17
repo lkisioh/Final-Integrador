@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { userUuid } from '@/stores/user/userUuid'
-import router from '@/router'
+import { useRoute, useRouter } from 'vue-router'
 import NavBar from '@/components/user/NavBar.vue'
 //import { traerProductos } from '@/composables/products/traerProductos'
 import { traerVendor } from '@/composables/vendor/traerVendor'
@@ -11,10 +11,8 @@ const {getUuid} = userUuid()
 const uuid = getUuid()
 const cartStore = useCartStore()
 console.log('Lo que trae el storeUuid es '+uuid)
-function comprar(uuidProduct){
-  router.push('/product/' + uuidProduct)
-}
-const productsCarrito = ref([])
+
+
 
 function agregarCarrito(product,vendorUuid,vendorName) {
   cartStore.addToCart({
@@ -26,17 +24,18 @@ function agregarCarrito(product,vendorUuid,vendorName) {
   vendorName)
 }
 
-//const {productos,cargando,error,llamarProductosAPI} = traerProductos()
-//llamarProductosAPI('http://localhost:3000/products')
-
 const {vendors,cargando,error, llamarVendorAPI,llamarVendorsAPI} = traerVendor()
 llamarVendorsAPI('http://localhost:3000/vendors')
 
-function irAlVendedor(uuidVendor){
+const router = useRouter()
+const route = useRoute()
 
-  llamarVendorAPI('http://localhost:3000/vendors/' + uuidVendor)
+if (route.params.vendorUuid) {
+filtarVendedorRouter(route.params.vendorUuid)
+}
 
-  router.push('/vendor/' + uuidVendor)
+function filtarVendedorRouter(vendorFiltro) {
+  vendorFiltro = vendors.value.find(v => v.uuid === vendorFiltro)
 }
 
 </script>
@@ -49,25 +48,20 @@ function irAlVendedor(uuidVendor){
     <div >
       <div>
         <h1>Productos</h1>
-        <h2>Usuario comprador</h2>
-        <p>UUID: {{ uuid }}</p>
-        <h2>Cantidad en el carrito</h2>
-        <p>{{ cartStore.totalItems }}</p>
       </div>
 
       <div>
         <h3>Vendedores</h3>
 
         <div v-for="vendor in vendors" :key="vendor.uuid">
-          <h3> A </h3>
           <p> Local: {{ vendor.name }}</p>
-          <p>Productos</p>
+
           <ul>
             <li v-for="product in vendor.products" :key="product.uuid">
-              {{ product.name }} - ${{ product.price }} 
+              {{ product.name }} - ${{ product.price }}
               <button @click="agregarCarrito(product,vendor.uuid,vendor.name)">Agregar al carrito</button>
             </li>
-            
+
           </ul>
 
         </div>
@@ -75,7 +69,7 @@ function irAlVendedor(uuidVendor){
 
       </div>
 
-  
+
       <h5 v-if="error">{{ error }}</h5>
       <h5 v-if="cargando">Cargando...</h5>
     </div>
@@ -88,28 +82,28 @@ function irAlVendedor(uuidVendor){
   top: 0;
   left: 0;
   width: 100%;
-  z-index: 9999 !important; 
-  background-color: white; 
+  z-index: 9999 !important;
+  background-color: white;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 .user-view {
-  background-color: #f0f4f8; 
-  min-height: 100vh;         
-  width: 100vw;              
+  background-color: #f0f4f8;
+  min-height: 100vh;
+  width: 100vw;
   display: flex;
   flex-direction: column;
-  align-items: center;       
-  padding: 100px 0 40px 0; 
+  align-items: center;
+  padding: 100px 0 40px 0;
   margin: 0;
-  position: absolute;        
+  position: absolute;
   left: 0;
   top: 0;
-  z-index: 1; 
+  z-index: 1;
 }
 
 .user-view > div {
-  width: 90%;                
-  max-width: 600px;          
+  width: 90%;
+  max-width: 600px;
   display: flex;
   flex-direction: column;
 }
@@ -129,7 +123,7 @@ p:nth-of-type(2) {
   padding: 10px 20px;
   border-radius: 8px;
   font-weight: bold;
-  align-self: center; 
+  align-self: center;
 }
 
 button {

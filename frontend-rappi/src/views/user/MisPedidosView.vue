@@ -3,6 +3,12 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { userUuid } from '@/stores/user/userUuid'
 
+import { traerDriver } from '@/composables/driver/traerDriver'
+
+const { drivers, llamarDriverAPI} = traerDriver();
+
+
+
 const pedidos = ref([])
 const cargando = ref(false)
 const storeUser = userUuid()
@@ -31,6 +37,7 @@ function formatFecha(fecha) {
 
 onMounted(() => {
   cargarMisPedidos()
+  llamarDriverAPI('http://localhost:3000/drivers/')
   setInterval(cargarMisPedidos, 15000)
 })
 </script>
@@ -54,7 +61,9 @@ onMounted(() => {
         <div class="pedido-header">
           <div class="info-tienda">
             <span class="tienda-name">{{ pedido.vendorName }}</span>
+            <br>
             <span class="fecha">{{ formatFecha(pedido.createdAt) }}</span>
+            <br>
           </div>
           <span :class="['estado-badge', (pedido.status)]">
         {{ pedido.status}}
@@ -76,13 +85,13 @@ onMounted(() => {
                 ⏳ Tu pedido está siendo procesado.
             </p>
             <p v-else-if="pedido.status === 'ACEPTADO'">
-                🛵 <strong>{{ pedido.driverNombre }}</strong> está en camino.
+                🍽️ <strong>{{ pedido.vendorName}}</strong> está preparando tu pedido.
             </p>
-            <p v-else-if="pedido.status === 'EN CAMINO'">
-                🛵 <strong>{{ pedido.driverNombre }}</strong> está en camino.
+            <p v-else-if="pedido.status === 'En camino'">
+                🛵 <strong>{{ drivers.find(d => d.uuid === pedido.driverUuid)?.name}}</strong> está en camino.
             </p>
             <p v-else-if="pedido.status === 'ENTREGADO'">
-                ✅ Entregado por: <strong>{{ pedido.driverNombre }}</strong>
+                ✅ Entregado por: <strong>{{ drivers.find(d => d.uuid === pedido.driverUuid)?.name }}</strong>
             </p>
             <p v-else-if="pedido.status === 'CANCELADO'">
                 ❌ Pedido cancelado.

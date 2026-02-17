@@ -95,6 +95,11 @@ const router = createRouter({
       component: ShopView
     },
     {
+      path: '/shop/:vendorUuid',
+      name: 'shop-vendor',
+      component: ShopView
+    },
+    {
       path: '/cart',
       name: 'cart',
       component: CartView
@@ -119,13 +124,13 @@ const router = createRouter({
       component : FormAddressView
     },
     {
-      path: '/user/edit-address/:addressUuid', 
+      path: '/user/edit-address/:addressUuid',
       name: 'EditAddress',
       component: EditAddressView
     },
     {
-      path: '/vendors/:vendorUuid/products/edit/:productUuid', 
-        name: 'ProductEdit', 
+      path: '/vendors/:vendorUuid/products/edit/:productUuid',
+        name: 'ProductEdit',
         component: EditProductView,
     },
     {

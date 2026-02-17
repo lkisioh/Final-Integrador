@@ -96,14 +96,13 @@ export class OrderRepositoryImpl implements IOrderRepository {
     });
   }
 
-  async assignDriver(uuid: string, status: string, driverUuid: string, driverNombre: string): Promise<OrderEntity> {
+  async assignDriver(uuid: string, status: string, driverUuid: string): Promise<OrderEntity> {
     const orderOrm = await this.orderRepo.findOneBy({ uuid });
     if (!orderOrm) {
       throw new Error('Order not found');
     }
     orderOrm.status = status;
     orderOrm.driverUuid = driverUuid;
-    orderOrm.driverName = driverNombre;
     const updatedOrm = await this.orderRepo.save(orderOrm);
     const domainOrder = new OrderEntity();
     Object.assign(domainOrder, {
@@ -159,6 +158,37 @@ export class OrderRepositoryImpl implements IOrderRepository {
     });
     return domainOrder;
   }
+  async finishDelivery(uuid: string, status: string, driverUuid: string): Promise<OrderEntity> {
+    const orderOrm = await this.orderRepo.findOneBy({ uuid });
+    if (!orderOrm) {
+      throw new Error('Order not found');
+    }
+    orderOrm.status = status;
+    const updatedOrm = await this.orderRepo.save(orderOrm);
+    const domainOrder = new OrderEntity();
+    Object.assign(domainOrder, {
+      id: updatedOrm.id ?? null,
+      uuid: updatedOrm.uuid,
+      userUuid: updatedOrm.userUuid,
+      userName: updatedOrm.userName,
+      userOrderAddress: updatedOrm.userOrderAddress,
+      vendorUuid: updatedOrm.vendorUuid,
+      vendorName: updatedOrm.vendorName,
+      items: updatedOrm.items.map((i) => ({
+        productUuid: i.productUuid,
+        quantity: i.quantity,
+        unitPrice: i.unitPrice,
+        subtotal: i.subtotal,
+      })),
+      createdAt: updatedOrm.createdAt,
+      status: updatedOrm.status,
+      driverUuid: updatedOrm.driverUuid,
+      driverNombre: updatedOrm.driverName,
+      total: updatedOrm.total,
+    });
+    return domainOrder;
+  }
+
   /*
   async findById(id: number): Promise<ProductEntity | null> {
     const entity = await this.productRepo.findOne({ where: { id } });

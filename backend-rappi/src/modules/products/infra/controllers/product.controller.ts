@@ -8,7 +8,7 @@ import { ProductEntity } from '../../domain/entities/product.entity';
 import type { IProductRepository } from '../../domain/repositories/product.repository.interface';
 //import { UserRepositoryImpl } from '../repositories/user.repository.impl';
 
-@Controller('vendors/:vendorUuid/products')
+@Controller('/products')
 export class ProductController {
   constructor(
     private readonly createProductUseCase: CreateProductUseCase,
@@ -18,6 +18,12 @@ export class ProductController {
     private readonly productRepository: IProductRepository,
   ) {}
   @Get()
+  async findAll() {
+    const products = await this.productRepository.findAll();
+    return products;
+  }
+
+  @Get('/:vendorUuid')
   async findAllByVendor(@Param('vendorUuid') vendorUuid: string) {
     const products = await this.productRepository.findByVendorUuid(vendorUuid);
     return products;

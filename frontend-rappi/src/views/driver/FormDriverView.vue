@@ -9,7 +9,7 @@ import router from '@/router'
 const uuidDriver = router.currentRoute.value.params.uuid
 
 const name = ref('')
-const location = ref('')
+const location = ref(' ')
 const phone = ref(0)
 const vehicle = ref('')
 const email = ref('')
@@ -21,10 +21,10 @@ async function nuevoDriver() {
 
   mapearDriver(name,location,phone,vehicle,email,password)
 
-  const ok = await createDriverAPI('http://localhost:3000/drivers', driver.value)
-if (ok) {
+  const data = await createDriverAPI('http://localhost:3000/drivers', driver.value)
+if (data && data.uuid) {
     alert('Conductor creado con éxito')
-    router.push('/orders')
+    router.push('/orders/' + data.uuid)
   } else {
     console.log('Error al cambiar página')
   }
@@ -56,11 +56,6 @@ driver.value = {
         <div>
           <label>Nombre:</label>
           <input v-model="name" type="text" />
-        </div>
-
-        <div>
-          <label>Ubicación (GPS):</label>
-          <input v-model="location" type="text" />
         </div>
 
         <div>

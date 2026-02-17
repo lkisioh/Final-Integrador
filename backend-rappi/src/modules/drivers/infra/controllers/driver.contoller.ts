@@ -1,7 +1,7 @@
-import { Controller, Post, Body, Delete, Param } from '@nestjs/common';
+import { Controller, Post, Body, Delete, Param, Get } from '@nestjs/common';
 import { CreateDriverUseCase } from '../../application/use-cases/create-driver.usecase';
 import { CreateDriverDto } from '../../application/dtos/create-driver.dto';
-// Importamos la interfaz del repositorio, que es lo que Nest ya conoce
+import type { IDriverRepository } from '../../domain/repositories/driver.repository.interface';
 import { Inject } from '@nestjs/common';
 
 @Controller('drivers')
@@ -9,9 +9,13 @@ export class DriverController {
   constructor(
     private readonly createDriverUseCase: CreateDriverUseCase,
     @Inject('IDriverRepository') // Usamos el repositorio directamente para no romper el módulo
-    private readonly driverRepo: any 
+    private readonly driverRepo: IDriverRepository,
   ) {}
 
+  @Get()
+  async findAll() {
+    return await this.driverRepo.findAll();
+  }
   @Post()
   async create(@Body() dto: CreateDriverDto) {
     return await this.createDriverUseCase.execute(dto);
