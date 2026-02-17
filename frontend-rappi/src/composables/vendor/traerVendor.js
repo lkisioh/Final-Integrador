@@ -12,11 +12,12 @@ export const traerVendor = ()=> {
   try{
     cargando.value=true
     const res = await axios.get(url)
-
     vendor.value= res.data
     console.log(vendor.value)
+    return res.data
   }catch (error){
     console.error(`Error al buscar el vendor: ${error.message}`)
+    return null
   }finally {
       cargando.value = false
     } }

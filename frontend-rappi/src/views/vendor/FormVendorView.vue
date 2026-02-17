@@ -5,21 +5,47 @@ import { createVendor } from '@/composables/vendor/createVendor'
 import router from '@/router'
 import { userUuid } from '@/stores/user/userUuid'
 import { onMounted } from 'vue'
+import axios from 'axios'
 
 import { traerVendor } from '@/composables/vendor/traerVendor'
 
 const {setUuid} = userUuid()
-
+const cargando = ref(false)
 const vendorUuid = router.currentRoute.value.params.uuid
 
 const { llamarVendorAPI} = traerVendor();
-onMounted(() => {
+onMounted(async() => {
 if (vendorUuid) {
   console.log('Cargando datos del Vendedor para edición, UUID:', vendorUuid);
   const vendorUrl = `http://localhost:3000/vendors/${vendorUuid}`;
-  const driverParaEditar = llamarVendorAPI(vendorUrl);
-  vendor.value = driverParaEditar.value
+  const vendorData = await llamarVendorAPI(vendorUrl);
+
+if (vendorData) {
+name.value = vendorData.name || '';
+category.value = vendorData.category || '';
+phone.value = vendorData.phone || 0;
+email.value = vendorData.email || '';
+password.value = vendorData.password || '';
+
+if (vendorData.address) {
+street.value = vendorData.address.street || '';
+number.value = vendorData.address.number || 0;
+}
+
+if (vendorData.daysOpen && vendorData.daysOpen.includes(' a ')) {
+const partes = vendorData.daysOpen.split(' a ');
+initDay.value = partes[0].trim();
+endDay.value = partes[1].trim();
+}
+if (typeof vendorData.time === 'string') {
+      time.value = vendorData.time.split(',').map(t => t.trim());
+    } else {
+      time.value = vendorData.time || [];
+    }
+console.log('✅ Datos cargados en los inputs');
+}
 }})
+
 
 const {vendor,createVendorAPI} = createVendor()
 
@@ -92,9 +118,29 @@ function handleCheckChange(event) {
   }
 }
 
-function editar(){
-  alert('Vendedor editado con éxito')
-}
+const editar = async () => {
+  mapearVendor(); 
+
+  try {
+    cargando.value = true;
+
+    const { password, products, ...datosLimpios } = vendor.value;
+
+    const url = `http://localhost:3000/vendors/${vendorUuid}`;
+    
+    const res = await axios.patch(url, datosLimpios);
+
+    if (res.status === 200 || res.status === 204) {
+      alert('Vendedor actualizado con éxito ✅');
+      router.push(`/vendor/${vendorUuid}`);
+    }
+  } catch (error) {
+    console.error("Error al editar:", error.response?.data || error);
+    alert('No se pudo guardar la edición. Revisá los datos.');
+  } finally {
+    cargando.value = false;
+  }
+};
 
 </script>
 
@@ -184,9 +230,9 @@ function editar(){
         </div>
 
         <div>
-          <button v-if="vendorUuid" @click="editar">Editar</button>
+          <button v-if="vendorUuid" @click.prevent="editar">Editar</button>
           <button v-else type="submit">Crear</button>
-      </div>
+        </div>
 
     </form>
 

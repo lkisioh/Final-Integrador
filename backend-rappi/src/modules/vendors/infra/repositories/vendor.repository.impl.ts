@@ -206,20 +206,47 @@ export class VendorRepositoryImpl implements IVendorRepository {
     await this.vendorRepo.remove(entity);
     return 'vendor eliminado correctamente';
   }
+ 
   async update(
-    uuid: string,
-    vendor: UpdateVendorDto,
-  ): Promise<VendorEntity | string> {
-    const entity = await this.vendorRepo.findOne({ where: { uuid } });
-    if (!entity)
-      return 'No se encontro Vendor con uuid: ' + uuid + ' para editar';
-    const vendorFind = new VendorEntity();
-    Object.assign(vendorFind, {
-      id: entity.id,
-      uuid: entity.uuid,
-      name: vendor.name,
+  uuid: string,
+  dto: UpdateVendorDto,
+): Promise<VendorEntity | string> {
+  try {
+    const entity = await this.vendorRepo.findOne({ 
+      where: { uuid }, 
+      relations: ['address'] 
     });
 
-    return vendorFind;
+    if (!entity) return `No se encontro Vendor con uuid: ${uuid} para editar`;
+
+    entity.name = dto.name ?? entity.name;
+    entity.category = dto.category ?? entity.category;
+    entity.phone = dto.phone ?? entity.phone;
+    entity.email = dto.email ?? entity.email;
+    entity.daysOpen = dto.daysOpen ?? entity.daysOpen;
+if (dto.time) {
+  entity.time = Array.isArray(dto.time) 
+    ? dto.time.join(', ') 
+    : dto.time;
+}
+    if (dto.address) {
+      if (!entity.address) {
+        entity.address = new AddressVendorOrmEntity();
+        entity.address.vendor = entity;
+      }
+      entity.address.street = dto.address.street ?? entity.address.street;
+      entity.address.number = dto.address.number ?? entity.address.number;
+    }
+
+    const saved = await this.vendorRepo.save(entity);
+
+    const domainVendor = new VendorEntity();
+    Object.assign(domainVendor, saved);
+    return domainVendor;
+    
+  } catch (err) {
+    console.error("Error en Repository Update:", err);
+    return "Error al actualizar el vendor";
   }
+}
 }
