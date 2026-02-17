@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue'; 
+import { onMounted } from 'vue';
 import { traerProductos } from '@/composables/products/traerProductos'
 import { traerVendor } from '@/composables/vendor/traerVendor'
 import { useRouter } from 'vue-router'
@@ -12,7 +12,7 @@ const vendorUuid = router.currentRoute.value.params.uuid;
 const deleteLoading = ref(false);
 
 const {getUuid} = userUuid();
-const userLoginUuid = getUuid(); 
+const userLoginUuid = getUuid();
 
 const { productos, cargando, error, llamarProductosAPI } = traerProductos();
 
@@ -20,8 +20,8 @@ const {vendor, llamarVendorAPI} = traerVendor();
 
 const toggleAvailability = async (productUuid, currentStatus) => {
     const newStatus = !currentStatus;
-    
-    const confirmation = newStatus 
+
+    const confirmation = newStatus
         ? "¿Estás seguro de que quieres poner el producto como DISPONIBLE?"
         : "¿Estás seguro de que quieres poner el producto como NO DISPONIBLE?";
 
@@ -31,13 +31,13 @@ const toggleAvailability = async (productUuid, currentStatus) => {
 
     try {
         const url = `http://localhost:3000/vendors/${vendorUuid}/products/${productUuid}`;
-        
-        await axios.patch(url, { available: newStatus }); 
-        
+
+        await axios.patch(url, { available: newStatus });
+
         alert(`Disponibilidad de producto actualizada a: ${newStatus ? 'Disponible' : 'No Disponible'}`);
 
-        const reloadUrl = `http://localhost:3000/vendors/${vendorUuid}/products`; 
-        llamarProductosAPI(reloadUrl); 
+        const reloadUrl = `http://localhost:3000/vendors/${vendorUuid}/products`;
+        llamarProductosAPI(reloadUrl);
 
     } catch (e) {
         console.error("Error al cambiar disponibilidad:", e);
@@ -52,13 +52,13 @@ const deleteProduct = async (productUuid) => {
     deleteLoading.value = true;
     try {
         const url = `http://localhost:3000/vendors/${vendorUuid}/products/${productUuid}`;
-        
-        await axios.delete(url); 
-        
+
+        await axios.delete(url);
+
         alert("Producto eliminado con éxito.");
 
-        const reloadUrl = `http://localhost:3000/vendors/${vendorUuid}/products`; 
-        llamarProductosAPI(reloadUrl); 
+        const reloadUrl = `http://localhost:3000/vendors/${vendorUuid}/products`;
+        llamarProductosAPI(reloadUrl);
 
     } catch (e) {
         console.error("Error al eliminar el producto:", e);
@@ -69,9 +69,9 @@ const deleteProduct = async (productUuid) => {
 };
 
 const goToEditView = (productUuid) => {
-    router.push({ 
-        name: 'ProductEdit', 
-        params: { vendorUuid: vendorUuid, productUuid: productUuid} 
+    router.push({
+        name: 'ProductEdit',
+        params: { vendorUuid: vendorUuid, productUuid: productUuid}
     });
 };
 
@@ -80,7 +80,7 @@ async function eliminarVendor(uuid) {
 
   try {
     await axios.delete(`http://localhost:3000/vendors/${vendorUuid}`);
-    
+
     alert('Cuenta eliminada');
     localStorage.clear();
     router.push('/');
@@ -100,9 +100,9 @@ function logout() {
 
 onMounted(() => {
   console.log('Cargando productos para el Vendedor UUID:', vendorUuid);
-  const productosUrl = `http://localhost:3000/vendors/${vendorUuid}/products`;   
-  llamarProductosAPI(productosUrl); 
-    
+  const productosUrl = `http://localhost:3000/vendors/${vendorUuid}/products`;
+  llamarProductosAPI(productosUrl);
+
     console.log('Cargando datos del Vendedor:', vendorUuid);
     const vendorUrl = `http://localhost:3000/vendors/${vendorUuid}`;
     llamarVendorAPI(vendorUrl);
@@ -132,6 +132,7 @@ onMounted(() => {
             <h3>{{ vendor.phone }}</h3>
           </div>
         </div>
+         <RouterLink :to="'/orders/vendor/' + vendorUuid" class="btn-link orders"> 📋 Mis ventas </RouterLink>
       </section>
 
       <hr>
@@ -154,17 +155,17 @@ onMounted(() => {
                 <td>{{ product.description }}</td>
                 <td>${{ product.price }}</td>
                 <td class="actions-cell">
-                  <button @click="goToEditView(product.uuid)" class="btn-edit">Editar</button> 
-                  
-                  <button 
+                  <button @click="goToEditView(product.uuid)" class="btn-edit">Editar</button>
+
+                  <button
                     @click="toggleAvailability(product.uuid, product.available)"
                     :class="product.available ? 'status-on' : 'status-off'"
                   >
                     {{ product.available ? '✅ Disponible' : '❌ No disponible' }}
                   </button>
 
-                  <button 
-                    @click="deleteProduct(product.uuid)" 
+                  <button
+                    @click="deleteProduct(product.uuid)"
                     :disabled="deleteLoading"
                     class="btn-delete"
                   >
@@ -182,10 +183,8 @@ onMounted(() => {
           <RouterLink :to="'/products/' + vendorUuid" class="btn-link add">
             ➕ Agregar producto
           </RouterLink>
-          
-          <!-- <RouterLink :to="'/orders/vendor/' + vendorUuid" class="btn-link orders">
-  📋 Mis ventas
-</RouterLink> -->
+
+
         </div>
 
         <button @click="logout" class="btn-logout">Cerrar Sesión</button>
@@ -216,7 +215,7 @@ onMounted(() => {
 .vendor-box {
   background-color: #ffffff;
   width: 90%;
-  max-width: 900px; 
+  max-width: 900px;
   border-radius: 16px;
   padding: 30px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
@@ -296,7 +295,7 @@ button:nth-of-type(2) {
   color: #486581;
 }
 
-.router-link-active, 
+.router-link-active,
 a {
   text-decoration: none;
   color: #486581;

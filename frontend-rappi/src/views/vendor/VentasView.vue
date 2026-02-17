@@ -1,30 +1,64 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { traerOrders } from '@/composables/order/traerOrders'
+import { traerProductos } from '@/composables/products/traerProductos'
+import { traerVendor } from '@/composables/vendor/traerVendor'
+
+import { cambiarEstadoOrders } from '@/composables/order/cambiarEstado'
 
 const route = useRoute()
 const router = useRouter()
 const vendorUuid = route.params.uuid
 
-const { orders, cargando, error, llamarProductosAPI } = traerOrders()
+const { orders, llamarOrdersAPI } = traerOrders()
+
+const { productos, llamarProductosAPI } = traerProductos();
+
+const { vendor, llamarVendorAPI} = traerVendor();
+
+const { AceptarOrdenAPI, CancelarOrdenAPI} = cambiarEstadoOrders()
+
+
 
 onMounted(() => {
-  llamarProductosAPI('http://localhost:3000/orders/')
+  cargarVentas()
+
+  console.log('Cargando productos para el Vendedor UUID:', vendorUuid);
+  const productosUrl = `http://localhost:3000/vendors/${vendorUuid}/products`;
+  llamarProductosAPI(productosUrl);
+
+    console.log('Cargando datos del Vendedor:', vendorUuid);
+    const vendorUrl = `http://localhost:3000/vendors/${vendorUuid}`;
+    llamarVendorAPI(vendorUrl);
 })
+
+const ventasDelVendor= ref([])
+const ventasFiltradas = ref([])
 
 const cargarVentas = async () => {
   try {
-    const respuesta = await axios.get(`http://localhost:3000/ordenes?storeId=${vendorUuid.value}`);
-    ventas.value = respuesta.data;
-  } catch (error) {
-    console.error("Error al cargar ventas", error);
+    await llamarOrdersAPI('http://localhost:3000/orders/')
+  } catch (err) {
+    console.error('Error al cargar ventas:', err)
   }
+
+  ventasDelVendor.value = orders.value.filter(order => order.vendorUuid === vendorUuid) // Todas las ventas del vendor
+
+}
+
+const cambiarLista = (filtro) => {
+
+  if (filtro === 'todas') {
+    ventasFiltradas.value = ventasDelVendor.value
+    return
+  }
+  ventasFiltradas.value = ventasDelVendor.value.filter(order => order.status === filtro)
 }
 
 const totalVentas = computed(() => {
   if (!orders.value || !Array.isArray(orders.value)) return 0
-  
+
   return orders.value.reduce((acc, orden) => {
     return acc + (Number(orden.total) || 0)
   }, 0)
@@ -34,9 +68,31 @@ function volver() {
   router.push('/vendor/' + vendorUuid)
 }
 
-onMounted(() => {
-  cargarVentas()
-})
+const aceptarOrden = async (orderUuid) => {
+  try {
+    const url = `http://localhost:3000/orders/${orderUuid}`;
+
+    await AceptarOrdenAPI(url);
+    alert('Orden aceptada con éxito.');
+    cargarVentas();
+  } catch (e) {
+    console.error('Error al aceptar la orden:', e);
+    alert(`Error al aceptar la orden: ${e.response?.data?.message || 'Error desconocido'}`);
+  }
+};
+
+const cancelarOrden = async (orderUuid) => {
+  try {
+    const url = `http://localhost:3000/orders/${orderUuid}`;
+    await CancelarOrdenAPI(url);
+    alert('Orden cancelada con éxito.');
+    cargarVentas();
+  } catch (e) {
+    console.error('Error al cancelar la orden:', e);
+    alert(`Error al cancelar la orden: ${e.response?.data?.message || 'Error desconocido'}`);
+  }
+};
+
 </script>
 
 <template>
@@ -44,12 +100,19 @@ onMounted(() => {
     <div class="ventas-box">
       <header class="header-ventas">
         <button @click="volver" class="btn-back">← Volver al Perfil</button>
-        <h1>Ventas del Local</h1>
+        <h1>Ventas</h1>
+
+        <button @click="cambiarLista('todas')">Todas</button>
+        <button @click="cambiarLista('PENDIENTE')"> Esperando aceptación</button>
+        <button @click="cambiarLista('ACEPTADO')"> Aceptadas</button>
+        <button @click="cambiarLista('CANCELADO')"> Canceladas</button>
+
       </header>
 
-      <div v-if="cargando" class="status-msg">Cargando historial de ventas...</div>
-      <div v-else-if="error" class="error-msg">⚠️ {{ error }}</div>
-      
+      <div v-if="!orders || orders.length === 0" class="status-msg">
+        Aún no hay ventas registradas.
+      </div>
+
       <div v-else>
         <div class="table-container">
           <table>
@@ -57,27 +120,50 @@ onMounted(() => {
               <tr>
                 <th>Orden</th>
                 <th>Productos</th>
-                <th>Cant.</th>
+                <th>Cantidad.</th>
+                <th>Subtotal</th>
                 <th>Cliente</th>
+                <th>Dirección</th>
+                <th>Estado</th>
                 <th>Total</th>
+
               </tr>
             </thead>
             <tbody>
-              <tr v-for="orden in ordenes" :key="orden.uuid">
+              <tr v-for="orden in ventasFiltradas" :key="orden.uuid">
                 <td><span class="order-id">#{{ orden.uuid?.slice(0, 5) }}</span></td>
                 <td>
-                  <p v-for="product in orden.products" :key="product.uuid" class="product-item">
-                    {{ product.name }}
+                  <p v-for="item in orden.items" :key="item.uuid" class="product-item">
+                    {{  productos.find(p => p.uuid === item.productUuid)?.name || 'Producto desconocido' }}
                   </p>
                 </td>
                 <td>
-                  <p v-for="product in orden.products" :key="product.uuid" class="qty-item">
-                    {{ product.cantidad }}
+                  <p v-for="item in orden.items" :key="item.uuid" class="qty-item">
+                    {{ item.quantity }}
                   </p>
                 </td>
-                <td>{{ orden.cliente }}</td>
-                <td class="total-cell">${{ orden.total }}</td>
+                <td>
+                  <p v-for="item in orden.items" :key="item.uuid" class="qty-item">
+                    {{ item.subtotal }}
+                  </p>
+                </td>
+                <td>{{ orden.userName }}</td>
+                <td>{{ orden.userOrderAddress }}</td>
+                <td>{{ orden.status }}</td>
+
+              <td class="total-cell">
+                  ${{ orden.total }}
+                </td>
+
+                <td>
+                  <button @click="aceptarOrden(orden.uuid)" class="btn-accept">Aceptar</button>
+                </td>
+
+                <td>
+                  <button @click="cancelarOrden(orden.uuid)" class="btn-cancel">Cancelar</button>
+                </td>
               </tr>
+
             </tbody>
           </table>
         </div>

@@ -53,39 +53,45 @@ onMounted(() => {
 
         <div class="pedido-header">
           <div class="info-tienda">
-            <span class="tienda-name">{{ pedido.tiendaNombre }}</span>
-            <span class="fecha">{{ formatFecha(pedido.fechaCreacion) }}</span>
+            <span class="tienda-name">{{ pedido.vendorName }}</span>
+            <span class="fecha">{{ formatFecha(pedido.createdAt) }}</span>
           </div>
-          <span :class="['estado-badge', (pedido.estado || pedido.status)]">
-  {{ (pedido.estado || pedido.status || 'pendiente').toUpperCase() }}
-</span>
+          <span :class="['estado-badge', (pedido.status)]">
+        {{ pedido.status}}
+        </span>
         </div>
 
         <div class="pedido-detalle">
           <p class="titulo-seccion">Productos:</p>
           <ul class="lista-items">
-            <li v-for="item in pedido.items" :key="item.nombre">
-              {{ item.cantidad }}x {{ item.nombre }} - <span class="precio">${{ item.precioUnitario }}</span>
+            <li v-for="item in pedido.items" :key="item.productUuid">
+              {{ item.quantity }} x {{ item.nombre }} - <span class="precio">${{ item.unitPrice }}</span>
             </li>
           </ul>
         </div>
 
         <div class="pedido-footer">
           <div class="entrega">
-            <p v-if = "pedido.status === 'pendiente'">
-
+            <p v-if = "pedido.status === 'PENDIENTE'">
                 ⏳ Tu pedido está siendo procesado.
             </p>
-            <p v-if="pedido.status === 'aceptado'">
+            <p v-else-if="pedido.status === 'ACEPTADO'">
                 🛵 <strong>{{ pedido.driverNombre }}</strong> está en camino.
             </p>
-            <p v-if="pedido.status === 'entregado'">
+            <p v-else-if="pedido.status === 'EN CAMINO'">
+                🛵 <strong>{{ pedido.driverNombre }}</strong> está en camino.
+            </p>
+            <p v-else-if="pedido.status === 'ENTREGADO'">
                 ✅ Entregado por: <strong>{{ pedido.driverNombre }}</strong>
             </p>
+            <p v-else-if="pedido.status === 'CANCELADO'">
+                ❌ Pedido cancelado.
+            </p>
+
           </div>
           <div class="total-box">
-            <span class="total-label">Total pagado</span>
-            <span class="total-monto">${{ pedido.totalAPagar }}</span>
+            <span class="total-label">Total</span>
+            <span class="total-monto">${{ pedido.total }}</span>
           </div>
         </div>
 

@@ -15,9 +15,6 @@ export class OrderController {
   async Create(@Body() dto: CreateOrderDto) {
     return await this.createOrderUseCase.execute(dto);
   }
-
-  //  falta de aca para abajo
-  // ACOMODAR FILTRO O SEPARARLO POR LOGICA DE QUERY POR SI TIENEN DEVOLUCIONES DISTEINTAS
   @Get()
   findAll() {
     return this.orderRepository.findAll();
@@ -32,16 +29,15 @@ export class OrderController {
   //  return this.orderRepository.findAll(status, storeId, userUuid);
   //}
   //buscar por id
-  /*
   @Patch(':uuid')
-  updatOrder(@Param('uuid') uuid: string, @Body() body: any) {
-    return this.ordersService.updateStatus(
-      uuid, 
-      body.status, 
-      body.driverUuid, 
-      body.driverNombre
-    );
+  updateOrder(@Param('uuid') uuid: string, @Body() body: any) {
+    return this.orderRepository.updateStatus(uuid, body.status);
   }
+  @Patch(':uuid/assign-driver')
+  assignDriver(@Param('uuid') uuid: string, @Body() body: any) {
+    return this.orderRepository.assignDriver(uuid, body.status, body.driverUuid, body.driverNombre);
+  }
+  /*
   @Get() 
  async findAllByVendor(@Param('vendorUuid') vendorUuid: string ) {
       const products = await this.productRepository.findByVendorUuid(vendorUuid); 
