@@ -3,23 +3,21 @@ import { Type } from 'class-transformer';
 import { AddressDto } from '../dtos/address.dto';
 
 export class UpdateUserDto {
-  @IsString()
-  uuid: string;
 
   @IsOptional()
   @IsString()
-  name: string;
+  name?: string;
 
   @IsOptional()
   @IsEmail()
-  email: string;
+  email?: string;
 
   @IsOptional()
   @IsString()
-  password: string;
+  password?: string;
 
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => AddressDto)
-  addresses: AddressDto[];
+  addresses?: AddressDto[];
 }

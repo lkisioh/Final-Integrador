@@ -111,8 +111,8 @@ export class UserRepositoryImpl implements IUserRepository {
     const ormUser = await this.userRepo.findOne({ where: { uuid } });
     if (!ormUser) throw new Error('User not found');
 
-    ormUser.name = user.name;
-    ormUser.email = user.email;
+    ormUser.name = user.name ?? ormUser.name;
+    ormUser.email = user.email ?? ormUser.email;
 
     if (user.addresses) {
       ormUser.addresses = user.addresses.map((addr) => {

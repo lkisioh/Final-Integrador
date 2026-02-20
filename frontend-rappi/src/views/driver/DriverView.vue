@@ -14,7 +14,12 @@ const error = ref(null)
 
 const uuidDriver = route.params.uuid;
 const storeDriver = userUuid()
+const driverInfo = ref(null);
 //const uuidDriver = storeDriver.getUuid()
+
+function editar() {
+  router.push('/edit/driver/' + uuidDriver); 
+}
 
 function logout() {
   localStorage.removeItem('userUuid')
@@ -22,6 +27,15 @@ function logout() {
   localStorage.removeItem('userRole')
 
   router.push('/')
+}
+
+async function cargarDatosDriver() {
+  try {
+    const respuesta = await axios.get(`http://localhost:3000/drivers/${uuidDriver}`);
+    driverInfo.value = respuesta.data;
+  } catch (e) {
+    console.error("Error al cargar datos del perfil", e);
+  }
 }
 
 async function cargarOrdenesSinDriver() {
@@ -105,13 +119,12 @@ async function entregarPedido(orden) {
 }
 
 onMounted(() => {
+  cargarDatosDriver()
   cargarOrdenesSinDriver()
   cargarOrdenesaTomadasDriver()
 })
 
-function editar(){
-  router.push('/edit/driver/' + uuidDriver)
-}
+
 function historial(){
   router.push('/driver/historial/' + uuidDriver)
 }
@@ -120,6 +133,18 @@ function historial(){
 <template>
   <div class="driver-view-container">
     <div class="driver-box">
+      
+      <div v-if="driverInfo" class="profile-card">
+        <div class="profile-header">
+          <h2>Bienvenido {{ driverInfo.name }}</h2>
+        </div>
+        <div class="profile-details">
+          <p><strong>Vehículo:</strong> {{ driverInfo.vehicle }}</p>
+          <p><strong>Teléfono:</strong> {{ driverInfo.phone }}</p>
+          <p><strong>Email:</strong> {{ driverInfo.email }}</p>
+        </div>
+      </div>
+      <hr class="separator" />
       <h1>PEDIDOS DISPONIBLES</h1>
 
       <div v-if="ordenes.length === 0 && !cargando">
@@ -209,7 +234,7 @@ function historial(){
 
       <div style="margin-top: 20px;">
         <button @click="historial">Ver historial de PEDIDOS</button>
-
+        <button @click="editar" class="btn-edit-profile">Editar Perfil</button>
         <button @click="logout" class="btn-logout">Cerrar Sesión</button>
          <button @click="eliminarCuentaDriver" class="btn-delete-account">Eliminar Cuenta</button>
 
@@ -250,5 +275,14 @@ button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
   opacity: 0.7;
+}
+
+.btn-edit-profile {
+  color: white;
+  margin-right: 10px;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
 }
 </style>

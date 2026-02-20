@@ -7,7 +7,7 @@ import { DriverOrmEntity } from '../databases/driver.orm-entity';
 
 import { IDriverRepository } from '../../domain/repositories/driver.repository.interface';
 import { DriverEntity } from '../../domain/entities/driver.entity';
-
+import { UpdateDriverDto } from '../../application/dtos/update-driver.dto';
 @Injectable()
 export class DriverRepositoryImpl implements IDriverRepository {
   private drivers: any[] = [];
@@ -54,7 +54,6 @@ export class DriverRepositoryImpl implements IDriverRepository {
 
     const saved = await this.driverRepo.save(ormDriver);
 
-    // Devolvemos al dominio
     const domainDriver = new DriverEntity();
     Object.assign(domainDriver, {
       id: saved.id,
@@ -87,6 +86,33 @@ export class DriverRepositoryImpl implements IDriverRepository {
 
     return driverFind;
   }
+
+  async findByUuid(uuid: string): Promise<DriverEntity | null> {
+  const entity = await this.driverRepo.findOne({ where: { uuid } });
+  if (!entity) return null;
+
+  const driver = new DriverEntity();
+  Object.assign(driver, entity);
+  return driver;
+}
+
+  async update(uuid: string, dto: UpdateDriverDto): Promise<DriverEntity | string> {
+  const entity = await this.driverRepo.findOne({ where: { uuid } });
+  if (!entity) return `No se encontró Driver con uuid: ${uuid}`;
+
+  entity.name = dto.name ?? entity.name;
+  entity.email = dto.email ?? entity.email;
+  entity.phone = dto.phone ?? entity.phone;
+  entity.vehicle = dto.vehicle ?? entity.vehicle;
+  entity.location = dto.location ?? entity.location;
+  if (dto.password) entity.password = dto.password;
+
+  const saved = await this.driverRepo.save(entity);
+
+  const domainDriver = new DriverEntity();
+  Object.assign(domainDriver, saved);
+  return domainDriver;
+}
 
   async delete(uuid: string): Promise<void> {
     const entity = await this.driverRepo.findOne({ where: { uuid } });

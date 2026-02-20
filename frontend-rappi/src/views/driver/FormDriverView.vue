@@ -1,8 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { createDriver } from '@/composables/driver/createDriver'
-
+import axios from 'axios'
 const {driver,cargando,error,createDriverAPI} = createDriver()
 
 import router from '@/router'
@@ -15,6 +15,43 @@ const vehicle = ref('')
 const email = ref('')
 const password = ref('')
 
+onMounted(async () => {
+  if (uuidDriver) {
+    console.log('Cargando datos para editar el Driver:', uuidDriver);
+    try {
+      const res = await axios.get(`http://localhost:3000/drivers/${uuidDriver}`);
+      const d = res.data;
+      
+      name.value = d.name;
+      email.value = d.email;
+      phone.value = d.phone;
+      vehicle.value = d.vehicle;
+      location.value = d.location;      
+      console.log('✅ Datos del driver cargados con éxito');
+    } catch (err) {
+      console.error("Error cargando driver:", err);
+    }
+  }
+});
+
+const editar = async () => {
+  mapearDriver(name, location, phone, vehicle, email, password);
+  
+  const datosLimpios = { ...driver.value };
+  if (!datosLimpios.password) delete datosLimpios.password;
+
+  try {
+    cargando.value = true;
+    await axios.patch(`http://localhost:3000/drivers/${uuidDriver}`, datosLimpios);
+    alert('Conductor actualizado ✅');
+    router.push('/orders/' + uuidDriver);
+  } catch (err) {
+    console.error("Error al editar", err.response?.data);
+    alert('Error al editar el conductor');
+  } finally {
+    cargando.value = false;
+  }
+}
 
 async function nuevoDriver() {
   console.log('Creando conductor:'+driver.value)
@@ -82,7 +119,7 @@ driver.value = {
           <input v-model="password" type="password" />
         </div>
 
-        <button v-if="uuidDriver>=0"> Editar</button>
+        <button v-if="uuidDriver" @click.prevent="editar">Editar</button>
         <button v-else type="submit">Crear</button>
       </form>
       <h3 v-if="error" class="error">{{ error }}</h3>

@@ -114,6 +114,7 @@ async function eliminarDireccion(uuidAddress){
       <div class="actions">
         <button class="primary" @click="verCarrito">Ver Carrito</button>
         <button class="primary" @click="comprar">Ir a comprar!</button>
+        <button class="btn-edit" @click="editar">Editar Perfil</button>
         <button @click="logout" class="btn-logout">Cerrar Sesión</button>
         <!-- <button class="primary" @click="editar">Editar Datos</button> -->
       
