@@ -25,11 +25,11 @@ onMounted(() => {
   cargarVentas()
 
   console.log('Cargando productos para el Vendedor UUID:', vendorUuid);
-  const productosUrl = `http://localhost:3000/products`;
+  const productosUrl = `/products`;
   llamarProductosAPI(productosUrl);
 
     console.log('Cargando datos del Vendedor:', vendorUuid);
-    const vendorUrl = `http://localhost:3000/vendors/${vendorUuid}`;
+    const vendorUrl = `/vendors/${vendorUuid}`;
     llamarVendorAPI(vendorUrl);
 })
 
@@ -38,7 +38,7 @@ const ventasFiltradas = ref([])
 
 const cargarVentas = async () => {
   try {
-    await llamarOrdersAPI('http://localhost:3000/orders/')
+    await llamarOrdersAPI('/orders/')
   } catch (err) {
     console.error('Error al cargar ventas:', err)
   }
@@ -70,7 +70,7 @@ function volver() {
 
 const aceptarOrden = async (orderUuid) => {
   try {
-    const url = `http://localhost:3000/orders/${orderUuid}`;
+    const url = `/orders/${orderUuid}`;
 
     await AceptarOrdenAPI(url);
     alert('Orden aceptada con éxito.');
@@ -83,7 +83,7 @@ const aceptarOrden = async (orderUuid) => {
 
 const cancelarOrden = async (orderUuid) => {
   try {
-    const url = `http://localhost:3000/orders/${orderUuid}`;
+    const url = `/orders/${orderUuid}`;
     await CancelarOrdenAPI(url);
     alert('Orden cancelada con éxito.');
     cargarVentas();

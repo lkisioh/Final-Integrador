@@ -1,5 +1,5 @@
 
-import axios from 'axios'
+import http from '@/services/http'
 import {ref} from 'vue'
 import { userUuid } from '@/stores/user/userUuid'
 
@@ -28,13 +28,14 @@ export const createUser = () => {
     try {
       cargando.value = true
 
-      const res = await axios.post(url, usuario.value)
+      const res = await http.post(url, usuario.value)
 
       setUuid(res.data.uuid)  // Guardar el UUID en el store
 
       return res.data
     } catch (err) {
-      console.error(`Error al crear el usuario: ${error.message}`)
+      console.error(`Error al cargar el usuario: ${err.message}`)
+      error.value = 'Error al cargar el usuario'
     } finally {
       cargando.value = false
     }
@@ -46,7 +47,7 @@ export const createUser = () => {
       cargando.value = true
       error.value = null
 
-      const res = await axios.get(url)
+      const res = await http.get(url)
       usuario.value = res.data
 
       if (!usuario.value.addresses || usuario.value.addresses.length === 0) {
@@ -72,7 +73,7 @@ export const createUser = () => {
       cargando.value = true
       error.value = null
 
-      const res = await axios.put(url, usuario.value)
+      const res = await http.put(url, usuario.value)
       return res.data
     } catch (err) {
       console.error(`Error al actualizar el usuario: ${err.message}`)

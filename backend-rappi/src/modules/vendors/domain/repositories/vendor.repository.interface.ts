@@ -5,7 +5,7 @@ import { UpdateVendorDto } from '../../application/dtos/update-vendor.dto';
 export const VENDOR_REPO = Symbol('VENDOR_REPO');
 export interface IVendorRepository {
   findById(id: number): Promise<VendorEntity | null>;
-  findByEmail(email: string, password: string): Promise<{ uuid: string } | null>;
+  findByEmail(email: string): Promise<VendorEntity | null>;
   findByUuid(uuid: string): Promise<VendorEntity | null>;
   createVendor(vendor: CreateVendorDto): Promise<VendorEntity | string>;
   findAll(): Promise<VendorEntity[] | string>;

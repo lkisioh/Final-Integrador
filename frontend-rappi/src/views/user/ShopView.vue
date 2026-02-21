@@ -25,7 +25,7 @@ function agregarCarrito(product,vendorUuid,vendorName) {
 }
 
 const {vendors,cargando,error, llamarVendorAPI,llamarVendorsAPI} = traerVendor()
-llamarVendorsAPI('http://localhost:3000/vendors')
+llamarVendorsAPI('/vendors')
 
 const router = useRouter()
 const route = useRoute()

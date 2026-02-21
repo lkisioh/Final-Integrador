@@ -30,13 +30,13 @@ const toggleAvailability = async (productUuid, currentStatus) => {
     }
 
     try {
-        const url = `http://localhost:3000/vendors/${vendorUuid}/products/${productUuid}`;
+        const url = `/vendors/${vendorUuid}/products/${productUuid}`;
 
         await axios.patch(url, { available: newStatus });
 
         alert(`Disponibilidad de producto actualizada a: ${newStatus ? 'Disponible' : 'No Disponible'}`);
 
-        const reloadUrl = `http://localhost:3000/vendors/${vendorUuid}/products`;
+        const reloadUrl = `/vendors/${vendorUuid}/products`;
         llamarProductosAPI(reloadUrl);
 
     } catch (e) {
@@ -57,7 +57,7 @@ const deleteProduct = async (productUuid) => {
 
         alert("Producto eliminado con éxito.");
 
-        const reloadUrl = `http://localhost:3000/vendors/${vendorUuid}/products`;
+        const reloadUrl = `/vendors/${vendorUuid}/products`;
         llamarProductosAPI(reloadUrl);
 
     } catch (e) {
@@ -100,11 +100,11 @@ function logout() {
 
 onMounted(() => {
   console.log('Cargando productos para el Vendedor UUID:', vendorUuid);
-  const productosUrl = `http://localhost:3000/products/${vendorUuid}`;
+  const productosUrl = `/products/${vendorUuid}`;
   llamarProductosAPI(productosUrl);
 
     console.log('Cargando datos del Vendedor:', vendorUuid);
-    const vendorUrl = `http://localhost:3000/vendors/${vendorUuid}`;
+    const vendorUrl = `/vendors/${vendorUuid}`;
     llamarVendorAPI(vendorUrl);
 });
 </script>

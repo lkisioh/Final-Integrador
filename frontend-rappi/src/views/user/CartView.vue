@@ -12,7 +12,7 @@ const storeUserUuid = userUuid()
 const { user, llamarUserAPI } = traerUser()
 const uuid = storeUserUuid.getUuid()
 
-llamarUserAPI('http://localhost:3000/users/' + uuid)
+llamarUserAPI('/users/' + uuid)
 
 const direccionSeleccionada = computed(() => {
   if (!user.value.addresses || !storeUserUuid.currentAddressId) return null

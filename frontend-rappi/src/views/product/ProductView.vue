@@ -10,7 +10,6 @@ import { userUuid } from '@/stores/user/userUuid'
 const storeUserUuid = userUuid()
 const uuid = ref(storeUserUuid.getUuid())
 
-// HACERRRRRR
 const {order,createOrderAPI} = createOrder()
 
 
@@ -19,7 +18,7 @@ const {productos,llamarProductosAPI} = traerProductos()
 
 const product= ref({})
 onMounted(() => {
-  llamarProductosAPI('http://localhost:3000/products/'+ productUuid)
+  llamarProductosAPI('/products/'+ productUuid)
   product.value = productos[0].value
 })
 
@@ -33,7 +32,7 @@ async function ordenar() {
 
   mapearOrden(productUuid, clientUuid, price, cantidad)
   //lamada api
-  const ok = await createOrderAPI('http://localhost:3000/orders', product.value)
+  const ok = await createOrderAPI('/orders', product.value)
 if (ok) {
     alert('Orden creado con éxito')
     console.log('uuid routa ' +order.value.OrderUuid)

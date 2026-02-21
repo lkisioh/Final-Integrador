@@ -5,12 +5,11 @@ import { traerProductos } from '@/composables/products/traerProductos'
 
 
 const {productos,cargando,error,llamarProductosAPI} = traerProductos()
-llamarProductosAPI('http://localhost:3000/products')
+llamarProductosAPI('/products')
 
 onMounted(() => {
-  llamarProductosAPI('http://localhost:3000/products')
+  llamarProductosAPI('/products')
 })
-
 
 </script>
 

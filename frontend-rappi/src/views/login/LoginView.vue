@@ -2,32 +2,39 @@
 import { ref,} from 'vue'
 import { RouterLink } from 'vue-router'
 import { openSesion } from '@/composables/login/openSesion'
-import router from '@/router'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 
 import { userUuid } from '@/stores/user/userUuid'
-const { setUuid, getUuid, setUserType, getUserType, setNombre, getNombre }= userUuid()
+const { setUuid, getUuid, setUserType, getUserType, setNombre }= userUuid()
 
 const email = ref('')
 const password= ref('')
-const { answer, cargando, error, openSesionAPI } = openSesion()
+const { answer, cargando, openSesionAPI } = openSesion()
 
 const login = async () => {
-
   try {
-    const data = await openSesionAPI('http://localhost:3000/login', {
+    const data = await openSesionAPI('/auth/login', {
       email: email.value,
       password: password.value,
     })
 
+  localStorage.setItem('token', data.accessToken);
+  localStorage.setItem('auth', JSON.stringify({
+  uuid: data.uuid,
+  role: data.kind,
+  name: data.name,
+  email: data.email,
+}));
+
     console.log('Respuesta login:', data)
     setUuid(data.uuid)
-    setUserType(data.role)
+    setUserType(data.kind)
     setNombre(data.name)
 
     const userRole = getUserType()
     const userUuid = getUuid()
-    const userName = getNombre()
 
     if (userRole === 'final-user') {
       router.push('/shop')
@@ -78,5 +85,4 @@ const login = async () => {
 </template>
 
 <style scoped>
-
 </style>

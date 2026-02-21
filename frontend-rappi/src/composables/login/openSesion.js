@@ -1,4 +1,4 @@
-import axios from 'axios'
+import http from '@/services/http'
 import { ref } from 'vue'
 import { userUuid } from '@/stores/user/userUuid'
 
@@ -13,7 +13,7 @@ export const openSesion = () => {
     cargando.value = true
     error.value = null
     try {
-      const res = await axios.post(url, { email, password })
+      const res = await http.post(url, { email, password })
       const data = res.data
 
 

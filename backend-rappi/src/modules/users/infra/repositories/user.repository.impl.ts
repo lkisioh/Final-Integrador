@@ -20,10 +20,12 @@ export class UserRepositoryImpl implements IUserRepository {
     private readonly userRepo: Repository<UserOrmEntity>,
   ) {}
 
-  async findByEmail(email: string, password: string): Promise<{ uuid: string } | null> {
-    const user = await this.userRepo.findOne({ where: { email, password } });
+  async findByEmail(email: string): Promise<UserEntity | null> {
+    const user = await this.userRepo.findOne({ where: { email } });
     if (!user) return null;
-    return { uuid: user.uuid };
+    const domainUser = new UserEntity();
+    Object.assign(domainUser, user);
+    return domainUser;
   }
   async createUser(dto: CreateUserDto): Promise<UserEntity> {
     const user = this.userRepo.create({

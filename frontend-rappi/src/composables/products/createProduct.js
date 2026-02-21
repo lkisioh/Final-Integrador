@@ -1,5 +1,4 @@
-
-import axios from 'axios'
+import http from '@/services/http'
 import {ref} from 'vue'
 import { userUuid } from '@/stores/user/userUuid'
 
@@ -23,7 +22,7 @@ export const createProduct = () => {
   const createProductAPI = async (url) => {
     try {
       cargando.value = true
-      const res = await axios.post(url, product.value)
+      const res = await http.post(url, product.value)
 
       return res.data
     } catch (error) {

@@ -51,10 +51,10 @@ async function nuevoUsuario() {
 
   mapearUser()
 
-  const ok = await createUserAPI('http://localhost:3000/users', usuario.value)
+  const ok = await createUserAPI('/users', usuario.value)
 if (ok) {
     alert('Usuario creado con éxito')
-    router.push('/user/' + usuario.value.uuid)  
+    router.push('/user/' + usuario.value.uuid)
   } else {
     console.log('Error al cambiar página')
   }
@@ -87,7 +87,7 @@ async function editar() {
     </nav>
     <div class="form-box">
       <h2>{{ isEdit ? 'Editar Mi Perfil' : 'Registro de Comprador' }}</h2>
-      
+
       <form @submit.prevent="isEdit ? editar() : nuevoUsuario()">
         <div>
           <label>Nombre:</label>
@@ -117,7 +117,7 @@ async function editar() {
         <button v-if="isEdit" type="button" @click="editar">Editar perfil</button>
         <button v-else type="submit">Crear Cuenta</button>
       </form>
-      
+
       <h3 v-if="error" class="error">{{ error }}</h3>
       <h3 v-if="cargando" class="loading">Procesando...</h3>
     </div>

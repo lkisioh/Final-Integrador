@@ -23,7 +23,7 @@ async function guardarDireccion() {
     number: number.value,
     apartment: apartment.value
   };
-  await createAddressAPI(`http://localhost:3000/users/${rawUuid}/addresses`)
+  await createAddressAPI(`/users/${rawUuid}/addresses`)
 
   console.log('Dirección guardada:', address.value);
   router.push('/user/' + rawUuid);

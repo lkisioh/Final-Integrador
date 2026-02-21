@@ -37,7 +37,7 @@ function formatFecha(fecha) {
 
 onMounted(() => {
   cargarMisPedidos()
-  llamarDriverAPI('http://localhost:3000/drivers/')
+  llamarDriverAPI('/drivers/')
   setInterval(cargarMisPedidos, 15000)
 })
 </script>

@@ -27,7 +27,7 @@ function verCarrito(){
   router.push('/cart')
 }
 
-llamarUserAPI('http://localhost:3000/users/' + uuid.value )
+llamarUserAPI('/users/' + uuid.value )
 
 function agregarDireccion(){
   router.push('/user/address/' + uuid.value)
@@ -48,7 +48,7 @@ async function eliminarDireccion(uuidAddress){
         const apiUrl = `http://localhost:3000/users/${userUuidValue}/addresses/${uuidAddress}`;
         await axios.delete(apiUrl);
         alert('Dirección eliminada con éxito.');
-        llamarUserAPI('http://localhost:3000/users/' + userUuidValue);
+        llamarUserAPI('/users/' + userUuidValue);
     } catch (error) {
         console.error("Error al eliminar la dirección:", error.response?.data || error.message);
         alert('Error al eliminar la dirección. Revisa la consola.');
@@ -76,25 +76,25 @@ async function eliminarDireccion(uuidAddress){
         <h3>Direcciones</h3>
         <div>
           <p v-if="!user.addresses || user.addresses.length === 0">No tienes direcciones guardadas</p>
-          
+
           <ul v-else class="address-list">
-            <li v-for="address in user.addresses" 
-                :key="address.uuid" 
+            <li v-for="address in user.addresses"
+                :key="address.uuid"
                 :class="{ 'address-actual': storeUserUuid.currentAddressId === address.uuid }"
-                class="address-item"> 
-              
+                class="address-item">
+
               <span>{{ address.street }} {{ address.number }} {{ address.apartment }}</span>
-              
+
               <div class="address-actions">
-                <button 
-                  v-if="storeUserUuid.currentAddressId !== address.uuid" 
+                <button
+                  v-if="storeUserUuid.currentAddressId !== address.uuid"
                   @click="storeUserUuid.setActualAddress(address.uuid)"
                   class="btn-select">
                   Marcar como actual
                 </button>
-                <span v-else class="badge-actual">⭐ Actual</span> 
+                <span v-else class="badge-actual">⭐ Actual</span>
                 </div>
-            <button  @click="editarDireccion(address.uuid)" >Editar</button> 
+            <button  @click="editarDireccion(address.uuid)" >Editar</button>
             <button @click="eliminarDireccion(address.uuid)">Eliminar</button></li>
          </ul>
 
@@ -117,7 +117,7 @@ async function eliminarDireccion(uuidAddress){
         <button class="btn-edit" @click="editar">Editar Perfil</button>
         <button @click="logout" class="btn-logout">Cerrar Sesión</button>
         <!-- <button class="primary" @click="editar">Editar Datos</button> -->
-      
+
       </div>
     </div>
   </div>

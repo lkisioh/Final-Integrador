@@ -23,10 +23,10 @@ const fetchProductData = async () => {
     loading.value = true;
     error.value = null;
     try {
- 
-        const url = `http://localhost:3000/vendors/${vendorUuid}/products/${productUuid}`; 
+
+        const url = `http://localhost:3000/vendors/${vendorUuid}/products/${productUuid}`;
         const response = await axios.get(url);
-        
+
         productData.value = response.data;
 
     } catch (e) {
@@ -42,18 +42,18 @@ const updateProduct = async () => {
     error.value = null;
 
     try {
-        const dataToSend = { ...productData.value }; 
+        const dataToSend = { ...productData.value };
 
-        delete dataToSend.id; 
-        delete dataToSend.uuid; 
+        delete dataToSend.id;
+        delete dataToSend.uuid;
         delete dataToSend.vendorUuid;
-        
+
         const url = `http://localhost:3000/vendors/${vendorUuid}/products/${productUuid}`;
-        
-        await axios.patch(url, dataToSend); 
+
+        await axios.patch(url, dataToSend);
 
         alert("¡Producto actualizado con éxito!");
-        
+
         router.push({ name: 'vendor-details', params: { uuid: vendorUuid } });
 
     } catch (e) {
@@ -76,7 +76,7 @@ const goBack = () => {
   <div class="product-form-view">
     <div class="form-card">
       <button @click="goBack" class="btn-back">← Volver</button>
-      
+
       <h2>Editar Producto</h2>
       <p class="subtitle">{{ productData.name || 'Cargando datos...' }}</p>
 

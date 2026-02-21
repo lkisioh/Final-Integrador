@@ -19,13 +19,12 @@ export class VendorRepositoryImpl implements IVendorRepository {
     private readonly vendorRepo: Repository<VendorOrmEntity>,
   ) {}
 
-  async findByEmail(
-    email: string,
-    password: string,
-  ): Promise<{ uuid: string } | null> {
-    const vendor = await this.vendorRepo.findOne({ where: { email, password } });
+  async findByEmail(email: string): Promise<VendorEntity | null> {
+    const vendor = await this.vendorRepo.findOne({ where: { email } });
     if (!vendor) return null;
-    return { uuid: vendor.uuid };
+    const domainVendor = new VendorEntity();
+    Object.assign(domainVendor, vendor);
+    return domainVendor;
   }
   async findAll(): Promise<VendorEntity[]> {
     const vendors = await this.vendorRepo.find({relations: ['products']});

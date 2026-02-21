@@ -35,10 +35,12 @@ export class DriverRepositoryImpl implements IDriverRepository {
     });
   }
 
-  async findByEmail(email: string, password: string): Promise<{ uuid: string, name: string } | null> {
-    const driver = await this.driverRepo.findOne({ where: { email, password } });
+  async findByEmail(email: string): Promise<DriverEntity | null> {
+    const driver = await this.driverRepo.findOne({ where: { email } });
     if (!driver) return null;
-    return { uuid: driver.uuid, name: driver.name };
+    const domainDriver = new DriverEntity();
+    Object.assign(domainDriver, driver);
+    return domainDriver;
   }
   async save(driver: DriverEntity): Promise<DriverEntity> {
     const ormDriver = this.driverRepo.create({

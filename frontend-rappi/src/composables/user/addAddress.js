@@ -1,4 +1,4 @@
-import axios from 'axios'
+import http from '@/services/http'
 import {ref} from 'vue'
 
 export const addAddress = () => {
@@ -15,7 +15,7 @@ export const addAddress = () => {
     try {
       cargando.value = true
 
-      const res = await axios.post(url, address.value)
+      const res = await http.post(url, address.value)
 
       return res.data
     } catch (err) {

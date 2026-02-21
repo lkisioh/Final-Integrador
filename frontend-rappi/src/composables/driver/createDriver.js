@@ -1,4 +1,4 @@
-import axios from 'axios'
+import http from '@/services/http'
 import {ref} from 'vue'
 
 export const createDriver = () => {
@@ -18,7 +18,7 @@ export const createDriver = () => {
   const createDriverAPI = async (url) => {
     try {
       cargando.value = true
-      const res = await axios.post(url, driver.value)
+      const res = await http.post(url, driver.value)
       return res.data
     } catch (error) {
       console.error(`Error al crear el conductor: ${error.message}`)

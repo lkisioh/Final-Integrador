@@ -18,7 +18,7 @@ const driverInfo = ref(null);
 //const uuidDriver = storeDriver.getUuid()
 
 function editar() {
-  router.push('/edit/driver/' + uuidDriver); 
+  router.push('/edit/driver/' + uuidDriver);
 }
 
 function logout() {
@@ -133,7 +133,7 @@ function historial(){
 <template>
   <div class="driver-view-container">
     <div class="driver-box">
-      
+
       <div v-if="driverInfo" class="profile-card">
         <div class="profile-header">
           <h2>Bienvenido {{ driverInfo.name }}</h2>

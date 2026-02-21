@@ -1,4 +1,4 @@
-import axios from 'axios'
+import http from '@/services/http'
 import {ref} from 'vue'
 
 export const traerVendor = ()=> {
@@ -11,7 +11,7 @@ export const traerVendor = ()=> {
   const llamarVendorAPI= async(url)=>{
   try{
     cargando.value=true
-    const res = await axios.get(url)
+    const res = await http.get(url)
     vendor.value= res.data
     console.log(vendor.value)
     return res.data
@@ -25,12 +25,12 @@ export const traerVendor = ()=> {
   const llamarVendorsAPI= async(url)=>{
   try{
     cargando.value=true
-    const res = await axios.get(url)
+    const res = await http.get(url)
 
     vendors.value= res.data
     console.log(vendors.value)
   }catch (error){
-    console.error(`Error al buscar el vendor: ${error.message}`)
+    console.error(`Error al buscar los vendors: ${error.message}`)
   }finally {
       cargando.value = false
     }

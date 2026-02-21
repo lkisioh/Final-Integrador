@@ -16,140 +16,175 @@ import CartView from '@/views/user/CartView.vue'
 import PaymentView from '@/views/user/PaymentView.vue'
 import VentasView from '@/views/vendor/VentasView.vue'
 import HistorialPedidosView from '@/views/driver/HistorialPedidosView.vue'
-import ProductView from '@/views/product/ProductView.vue'
 import EditProductView from '@/views/product/EditProductView.vue'
 import MisPedidosView from '@/views/user/MisPedidosView.vue'
-import VendorsView from '@/views/vendor/VendorsView.vue'
+import VendorsView from '@/views/user/VendorsView.vue'
 
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'login',
-      component: LoginView,
+const routes = [
+  { path: '/', name: 'login', component: LoginView },
+  {
+    path: '/SelectUser',
+    name: 'select-user',
+    component: SelectUserView,
+    meta: { requiresAuth: false },
+  },
+  {
+    path: '/newUser',
+    name: 'new-user',
+    component: FormUserView,
+    meta: { requiresAuth: false },
+  },
+  {
+      path: '/user/:uuid',
+      name: 'user-details',
+      component: UserView,
+      meta: { requiresAuth: true, roles: ['final-user'] },
     },
-    {
-      path: '/newUser',
-      name: 'new-user',
-      component: FormUserView,
-    },
-    {
-      path: '/SelectUser',
-      name: 'select-user',
-      component: SelectUserView,
-    },
-    {
-      path: '/newVendor',
-      name: 'new-vendor',
-      component: FormVendorView,
-    },
-    {
-      path: '/edit/vendor/:uuid',
-      name: 'edit-vendor',
-      component: FormVendorView,
-    },
-    {
+  {
       path: '/edit/user/:uuid',
       name: 'edit-user',
       component: FormUserView,
-    },
-    {
-      path: '/newDriver',
-      name: 'new-driver',
-      component: FormDriverView,
-    },
-    {
-      path: '/edit/driver/:uuid',
-      name: 'edit-driver',
-      component: FormDriverView,
-    },
-    {
-      path : '/products/:vendorUuid',
-      name : 'form-products',
-      component : FormProductView
-    },
-    {
+      meta: { requiresAuth: true, roles: ['final-user'] },
+  },
+  {
       path: '/user/products',
       name: 'user-products',
       component: UserView,
+      meta: { requiresAuth: true, roles: ['final-user'] },
+  },
+  {
+    path:'/user/payment',
+      name: 'payment',
+      component: PaymentView,
+      meta: { requiresAuth: true, roles: ['final-user'] },
     },
-    {
-      path: '/orders/:uuid',
-      name: 'orders',
-      component: DriverView
-    },
-    {
-      path: '/vendor/:uuid',
-      name: 'vendor-details',
-      component: VendorView
-    },
-    {
-      path: '/user/:uuid',
-      name: 'user-details',
-      component: UserView
-    },
-    {
-      path: '/shop',
-      name: 'shop',
-      component: ShopView
-    },
-    {
-      path: '/shop/:vendorUuid',
-      name: 'shop-vendor',
-      component: ShopView
-    },
-    {
+  {
+    path: '/shop',
+    name: 'shop',
+    component: ShopView,
+    meta: { requiresAuth: true, roles: ['final-user'] },
+  },
+  {
+    path: '/shop/:vendorUuid',
+    name: 'shop-vendor',
+    component: ShopView,
+    meta: { requiresAuth: true, roles: ['final-user'] },
+  },
+  {
       path: '/cart',
       name: 'cart',
-      component: CartView
+      component: CartView,
+      meta: { requiresAuth: true, roles: ['final-user'] },
     },
-    {
-      path: '/product/:uuid',
-      name: 'buy-product',
-      component: ProductView
-    },
-    {path:'/user/payment',
-      name: 'payment',
-      component: PaymentView
-    },
-    {
-      path:'/driver/historial/:uuid',
-      name: 'historial-pedidos',
-      component: HistorialPedidosView
-    },
-    {
+  {
+    path: '/newVendor',
+    name: 'new-vendor',
+    component: FormVendorView,
+    meta: { requiresAuth: false },
+  },
+  {
       path : '/user/address/:uuid',
       name : 'form-product',
-      component : FormAddressView
+      component : FormAddressView,
+      meta: { requiresAuth: true, roles: ['final-user'] },
     },
     {
       path: '/user/edit-address/:addressUuid',
       name: 'EditAddress',
-      component: EditAddressView
+      component: EditAddressView,
+      meta: { requiresAuth: true, roles: ['final-user'] },
     },
-    {
-      path: '/vendors/:vendorUuid/products/edit/:productUuid',
-        name: 'ProductEdit',
-        component: EditProductView,
-    },
-    {
-      path : '/mis-pedidos/:uuid',
+  {
+    path : '/mis-pedidos/:uuid',
       name : 'mis-pedidos',
-      component : MisPedidosView
+      component : MisPedidosView,
+      meta: { requiresAuth: true, roles: ['final-user'] },
     },
     {
       path: '/vendors',
       name: 'vendors-list',
-      component : VendorsView
+      component : VendorsView,
+      meta: { requiresAuth: true, roles: ['final-user'] },
     },
-    {
+  {
+    path: '/edit/vendor/:uuid',
+    name: 'edit-vendor',
+    component: FormVendorView,
+    meta: { requiresAuth: true, roles: ['vendor'] },
+  },
+  {
+      path: '/vendor/:uuid',
+      name: 'vendor-details',
+      component: VendorView,
+      meta: { requiresAuth: true, roles: ['vendor'] },
+  },
+  {
+      path : '/products/:vendorUuid',
+      name : 'form-products',
+      component : FormProductView,
+      meta: { requiresAuth: true, roles: ['vendor'] },
+    },
+     {
+      path: '/vendors/:vendorUuid/products/edit/:productUuid',
+        name: 'ProductEdit',
+        component: EditProductView,
+        meta: { requiresAuth: true, roles: ['vendor'] },
+     },
+     {
       path: '/orders/vendor/:uuid',
       name: 'ventas-view',
-      component: VentasView
-    }
+      component: VentasView,
+      meta: { requiresAuth: true, roles: ['vendor'] },
+    },
+  {
+    path: '/newDriver',
+    name: 'new-driver',
+    component: FormDriverView,
+    meta: { requiresAuth: false },
+  },
+  {
+      path: '/edit/driver/:uuid',
+      name: 'edit-driver',
+      component: FormDriverView,
+      meta: { requiresAuth: true, roles: ['driver'] },
+  },
+   {
+      path: '/orders/:uuid',
+      name: 'orders',
+      component: DriverView,
+      meta: { requiresAuth: true, roles: ['driver'] },
+   },
+   {
+      path:'/driver/historial/:uuid',
+      name: 'historial-pedidos',
+      component: HistorialPedidosView,
+      meta: { requiresAuth: true, roles: ['driver'] },
+   },
+   {
+    path: '/forbidden',
+    name: 'forbidden',
+    component: () => import('@/views/ForbiddenView.vue'),
+    meta: { requiresAuth: false },
+  },
+  ]
 
-  ],
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+})
+
+router.beforeEach((to) => {
+  const token = localStorage.getItem('token')
+  const auth = JSON.parse(localStorage.getItem('auth') || 'null')
+
+  // requiere login
+  if (to.meta.requiresAuth && !token) return { name: 'login' }
+
+  // requiere roles
+  if (to.meta.roles?.length) {
+    if (!auth?.role) return { name: 'login' }
+    if (!to.meta.roles.includes(auth.role)) return { name: 'forbidden' }
+  }
 })
 
 export default router

@@ -17,7 +17,7 @@ const { llamarVendorAPI} = traerVendor();
 onMounted(async() => {
 if (vendorUuid) {
   console.log('Cargando datos del Vendedor para edición, UUID:', vendorUuid);
-  const vendorUrl = `http://localhost:3000/vendors/${vendorUuid}`;
+  const vendorUrl = `/vendors/${vendorUuid}`;
   const vendorData = await llamarVendorAPI(vendorUrl);
 
 if (vendorData) {
@@ -92,7 +92,7 @@ async function nuevoVendor() {
 
   console.log('JSON de Vendedor a enviar:', JSON.stringify(vendor.value))
 
-  const ok = await createVendorAPI('http://localhost:3000/vendors', vendor.value)
+  const ok = await createVendorAPI('/vendors', vendor.value)
 
   if (ok && ok.uuid) {
     alert('Vendedor creado con éxito')
@@ -119,7 +119,7 @@ function handleCheckChange(event) {
 }
 
 const editar = async () => {
-  mapearVendor(); 
+  mapearVendor();
 
   try {
     cargando.value = true;
@@ -127,7 +127,7 @@ const editar = async () => {
     const { password, products, ...datosLimpios } = vendor.value;
 
     const url = `http://localhost:3000/vendors/${vendorUuid}`;
-    
+
     const res = await axios.patch(url, datosLimpios);
 
     if (res.status === 200 || res.status === 204) {

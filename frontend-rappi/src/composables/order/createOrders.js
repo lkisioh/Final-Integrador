@@ -1,4 +1,4 @@
-import axios from 'axios'
+import http from '@/services/http'
 import {ref} from 'vue'
 
 export const createOrder = () => {
@@ -18,10 +18,10 @@ export const createOrder = () => {
   const createOrderAPI = async (url) => {
     try {
       cargando.value = true
-      const res = await axios.post(url, order.value)
+      const res = await http.post(url, order.value)
       return res.data
     } catch (error) {
-      console.error(`Error al crear el conductor: ${error.message}`)
+      console.error(`Error al crear la orden: ${error.message}`)
     } finally {
       cargando.value = false
     }

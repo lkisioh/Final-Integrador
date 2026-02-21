@@ -1,5 +1,5 @@
 
-import axios from 'axios'
+import http from '@/services/http'
 import {ref} from 'vue'
 
 export const createVendor = () => {
@@ -26,7 +26,7 @@ export const createVendor = () => {
   const createVendorAPI = async (url) => {
     try {
       cargando.value = true
-      const res = await axios.post(url, vendor.value)
+      const res = await http.post(url, vendor.value)
       return res.data
     } catch (err) {
     console.error('Error al crear vendedor:', {

@@ -1,4 +1,4 @@
-import axios from 'axios'
+import http from '@/services/http'
 import {ref} from 'vue'
 
 export const traerOrders= ()=> {
@@ -10,11 +10,11 @@ export const traerOrders= ()=> {
   const llamarOrdersAPI= async(url)=>{
   try{
     cargando.value=true
-    const res = await axios.get(url)
+    const res = await http.get(url)
 
     orders.value= res.data
   }catch (error){
-    console.error(`Error al buscar los productos: ${error.message}`)
+    console.error(`Error al buscar las órdenes: ${error.message}`)
   }finally {
       cargando.value = false
     }

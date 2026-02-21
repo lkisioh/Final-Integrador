@@ -1,21 +1,22 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from './infra/database/database.module';
 import { UsersModule } from './modules/users/user.module';
-import { AddressOrmEntity } from './modules/users/infra/databases/address.orm-entity';
-
 import { VendorsModule } from './modules/vendors/vendor.module';
 import { ProductsModule } from './modules/products/product.module';
 import { DriversModule } from './modules/drivers/driver.module';
-import { LoginModule } from './shared/login/login.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { OrdersModule } from './modules/orders/orders.module';
+import { ConfigModule } from '@nestjs/config/dist/config.module';
 
 @Module({
   imports: [
-    LoginModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    AuthModule,
     DatabaseModule,
     UsersModule,
     DriversModule,
-    AddressOrmEntity,
     VendorsModule,
     ProductsModule,
     OrdersModule,

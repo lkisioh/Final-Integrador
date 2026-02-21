@@ -1,4 +1,4 @@
-import axios from 'axios'
+import http from '@/services/http'
 import {ref} from 'vue'
 
 export const cambiarEstadoOrders= ()=> {
@@ -10,7 +10,7 @@ export const cambiarEstadoOrders= ()=> {
   const AceptarOrdenAPI= async(url)=>{
   try{
     cargando.value=true
-    const res = await axios.patch(url, { status: "ACEPTADO" })
+    const res = await http.patch(url, { status: "ACEPTADO" })
 
     order.value= res.data
   }catch (error){
@@ -22,7 +22,7 @@ export const cambiarEstadoOrders= ()=> {
   const CancelarOrdenAPI= async(url)=>{
   try{
     cargando.value=true
-    const res = await axios.patch(url, { status: "CANCELADO" })
+    const res = await http.patch(url, { status: "CANCELADO" })
 
     order.value= res.data
   }catch (error){
