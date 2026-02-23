@@ -1,7 +1,7 @@
 import {Entity,PrimaryGeneratedColumn,Column, OneToOne, OneToMany} from 'typeorm';
 import { AddressVendorOrmEntity } from './addressVendor.orm-entity';
-import { ProductOrmEntity } from 'src/modules/products/infra/databases/product.orm-entity';
-import { OrderOrmEntity } from 'src/modules/orders/infra/databases/order.orm-entity';
+import { ProductOrmEntity } from '../../../products/infra/databases/product.orm-entity';
+import { OrderOrmEntity } from '../../../orders/infra/databases/order.orm-entity';
 
 @Entity({ name: 'vendors' })
 export class VendorOrmEntity {

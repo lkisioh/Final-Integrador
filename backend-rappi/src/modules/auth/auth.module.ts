@@ -6,10 +6,10 @@ import { AuthService } from './application/services/auth.service';
 import { AuthController } from './infra/controllers/auth.controller';
 import { JwtStrategy } from './application/strategies/jwt.strategy';
 
-import { UsersModule } from 'src/modules/users/user.module';
-import { VendorsModule } from 'src/modules/vendors/vendor.module';
-import { DriversModule } from 'src/modules/drivers/driver.module';
-//prueba string no null ni generico
+import { UsersModule } from '../users/user.module';
+import { VendorsModule } from '../vendors/vendor.module';
+import { DriversModule } from '../drivers/driver.module';
+
 import type { StringValue } from 'ms';
 @Module({
   imports: [

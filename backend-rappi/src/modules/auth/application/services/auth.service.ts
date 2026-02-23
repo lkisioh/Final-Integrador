@@ -3,13 +3,13 @@ import { JwtService } from '@nestjs/jwt';
 // validar password con bcrypt
 import * as bcrypt from 'bcrypt';
 
-import { USER_REPO } from 'src/modules/users/domain/repositories/user.repository.interface';
-import { VENDOR_REPO } from 'src/modules/vendors/domain/repositories/vendor.repository.interface';
-import { DRIVER_REPO } from 'src/modules/drivers/domain/repositories/driver.repository.interface';
+import { USER_REPO } from '../../../users/domain/repositories/user.repository.interface';
+import { VENDOR_REPO } from '../../../vendors/domain/repositories/vendor.repository.interface';
+import { DRIVER_REPO } from '../../../drivers/domain/repositories/driver.repository.interface';
 
-import type { IUserRepository } from 'src/modules/users/domain/repositories/user.repository.interface';
-import type { IVendorRepository } from 'src/modules/vendors/domain/repositories/vendor.repository.interface';
-import type { IDriverRepository } from 'src/modules/drivers/domain/repositories/driver.repository.interface';
+import type { IUserRepository } from '../../../users/domain/repositories/user.repository.interface';
+import type { IVendorRepository } from '../../../vendors/domain/repositories/vendor.repository.interface';
+import type { IDriverRepository } from '../../../drivers/domain/repositories/driver.repository.interface';
 
 type LoginResult =
   | { kind: 'final-user'; uuid: string; name?: string; email: string; passwordHash: string }

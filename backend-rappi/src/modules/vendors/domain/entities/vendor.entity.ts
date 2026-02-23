@@ -1,4 +1,4 @@
-import { ProductEntity } from 'src/modules/products/domain/entities/product.entity';
+import { ProductEntity } from '../../../products/domain/entities/product.entity';
 import { AddressVendorEntity } from './addressVendor.entity';
 
 export class VendorEntity {

@@ -8,9 +8,9 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import { VendorOrmEntity } from 'src/modules/vendors/infra/databases/vendor.orm-entity';
-import { UserOrmEntity } from 'src/modules/users/infra/databases/user.orm-entity';
-import { DriverOrmEntity } from 'src/modules/drivers/infra/databases/driver.orm-entity';
+import { VendorOrmEntity } from '../../../vendors/infra/databases/vendor.orm-entity';
+import { UserOrmEntity } from '../../../users/infra/databases/user.orm-entity';
+import { DriverOrmEntity } from '../../../drivers/infra/databases/driver.orm-entity';
 import { OrderItemOrmEntity } from './order-item.orm-entity';
 
 @Entity({ name: 'orders' })

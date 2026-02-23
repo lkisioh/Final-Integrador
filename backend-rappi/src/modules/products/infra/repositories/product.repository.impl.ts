@@ -6,7 +6,7 @@ import { ProductOrmEntity } from '../databases/product.orm-entity';
 import { UpdateProductDto } from '../../application/dtos/update-product.dto';
 import { IProductRepository } from '../../domain/repositories/product.repository.interface';
 import { ProductEntity } from '../../domain/entities/product.entity';
-import { VendorOrmEntity } from 'src/modules/vendors/infra/databases/vendor.orm-entity';
+import { VendorOrmEntity } from '../../../vendors/infra/databases/vendor.orm-entity';
 
 @Injectable()
 export class ProductRepositoryImpl implements IProductRepository {

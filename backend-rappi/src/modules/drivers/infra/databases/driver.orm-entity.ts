@@ -1,4 +1,4 @@
-import { OrderOrmEntity } from 'src/modules/orders/infra/databases/order.orm-entity';
+import { OrderOrmEntity } from '../../../orders/infra/databases/order.orm-entity';
 import {
   Entity,
   PrimaryGeneratedColumn,

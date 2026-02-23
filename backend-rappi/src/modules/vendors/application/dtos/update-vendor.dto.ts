@@ -1,6 +1,6 @@
 import { IsString, IsOptional, IsNumber, IsArray } from 'class-validator';
 import { CreateAddressVendorDto } from './address.dto';
-import { CreateProductDto } from 'src/modules/products/application/dtos/create-product.dto';
+import { CreateProductDto } from '../../../products/application/dtos/create-product.dto';
 
 export class UpdateVendorDto {
   @IsString()

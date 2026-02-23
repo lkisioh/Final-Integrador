@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { AddressOrmEntity } from './address.orm-entity';
-import { OrderOrmEntity } from 'src/modules/orders/infra/databases/order.orm-entity';
+import { OrderOrmEntity } from '../../../orders/infra/databases/order.orm-entity';
 
 @Entity({ name: 'users' })
 export class UserOrmEntity {

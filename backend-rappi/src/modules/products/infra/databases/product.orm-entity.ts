@@ -6,8 +6,8 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import { VendorOrmEntity } from 'src/modules/vendors/infra/databases/vendor.orm-entity';
-import { OrderItemOrmEntity } from 'src/modules/orders/infra/databases/order-item.orm-entity';
+import { VendorOrmEntity } from '../../../vendors/infra/databases/vendor.orm-entity';
+import { OrderItemOrmEntity } from '../../../orders/infra/databases/order-item.orm-entity';
 
 @Entity({ name: 'products' })
 export class ProductOrmEntity {

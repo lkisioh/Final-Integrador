@@ -8,8 +8,8 @@ import { IVendorRepository } from '../../domain/repositories/vendor.repository.i
 import { VendorEntity } from '../../domain/entities/vendor.entity';
 import { UpdateVendorDto } from '../../application/dtos/update-vendor.dto';
 
-//import { ProductEntity } from 'src/modules/products/domain/entities/product.entity';
-import { ProductOrmEntity } from 'src/modules/products/infra/databases/product.orm-entity';
+//import { ProductEntity } from '../../../products/domain/entities/product.entity';
+import { ProductOrmEntity } from '../../../products/infra/databases/product.orm-entity';
 import { CreateVendorDto } from '../../application/dtos/create-vendor.dto';
 
 @Injectable()

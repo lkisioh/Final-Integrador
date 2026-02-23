@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 
 import { OrderOrmEntity } from './order.orm-entity';
-import { ProductOrmEntity } from 'src/modules/products/infra/databases/product.orm-entity';
+import { ProductOrmEntity } from '../../../products/infra/databases/product.orm-entity';
 
 @Entity('order_items')
 export class OrderItemOrmEntity {
