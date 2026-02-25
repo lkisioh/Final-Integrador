@@ -3,9 +3,10 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsArray,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 import { CreateAddressVendorDto } from './address.dto';
 import { CreateProductDto } from '../../../products/application/dtos/create-product.dto';
 
@@ -17,6 +18,11 @@ export class CreateVendorDto {
   //horario
   @IsString()
   daysOpen: string;
+
+  @Transform(({ value }) => {
+    if (Array.isArray(value)) return value.join(', ');
+    return value;
+  }, { toClassOnly: true })
   @IsString()
   time: string;
   //contacto
@@ -37,5 +43,5 @@ export class CreateVendorDto {
 
   @IsString()
   password: string;
-  // Faltaría calificaciones y reseñas
+  
 }

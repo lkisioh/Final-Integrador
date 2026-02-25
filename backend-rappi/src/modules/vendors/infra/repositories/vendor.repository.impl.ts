@@ -102,12 +102,16 @@ export class VendorRepositoryImpl implements IVendorRepository {
   async createVendor(dto: CreateVendorDto): Promise<VendorEntity> {
     const newVendorUuid = uuidv4();
 
+    console.log('time value:', dto.time);
+    console.log('time type:', typeof dto.time);
+    console.log('isArray:', Array.isArray(dto.time));
+
     const ormVendorData: DeepPartial<VendorOrmEntity> = {
       uuid: newVendorUuid,
       name: dto.name,
       category: dto.category,
       daysOpen: dto.daysOpen,
-      time: dto.time,
+      time: Array.isArray(dto.time) ? dto.time.join(', ') : dto.time,
       email: dto.email,
       phone: dto.phone,
       password: dto.password,
@@ -169,12 +173,6 @@ export class VendorRepositoryImpl implements IVendorRepository {
           }
         : null,
     } as VendorEntity;
-
-    // respuesta básica - mapeada
-    //const domainVendor = new VendorEntity();
-    //Object.assign(domainVendor, saved);
-
-    //return domainVendor;
   }
 
   async findById(id: number): Promise<VendorEntity | null> {
@@ -207,13 +205,13 @@ export class VendorRepositoryImpl implements IVendorRepository {
   }
  
   async update(
-  uuid: string,
+  uuid : string,
   dto: UpdateVendorDto,
 ): Promise<VendorEntity | string> {
   try {
     const entity = await this.vendorRepo.findOne({ 
       where: { uuid }, 
-      relations: ['address'] 
+      relations: ['address']
     });
 
     if (!entity) return `No se encontro Vendor con uuid: ${uuid} para editar`;

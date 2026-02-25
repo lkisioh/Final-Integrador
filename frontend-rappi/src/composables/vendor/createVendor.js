@@ -9,7 +9,7 @@ export const createVendor = () => {
     category: "",
     daysOpen: "",
     time: "",
-    email: "",
+    email: [,],
     phone: null,
     password: "",
     address:

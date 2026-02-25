@@ -24,10 +24,10 @@ const fetchProductData = async () => {
     error.value = null;
     try {
 
-        const url = `http://localhost:3000/vendors/${vendorUuid}/products/${productUuid}`;
-        const response = await axios.get(url);
-
-        productData.value = response.data;
+        const url = `http://localhost:3000/products/${vendorUuid}/${productUuid}`;
+        const response = await  axios.get(url);
+      
+        productData.value = await response.data;
 
     } catch (e) {
         console.error("Error al cargar producto para edición:", e);
@@ -48,7 +48,7 @@ const updateProduct = async () => {
         delete dataToSend.uuid;
         delete dataToSend.vendorUuid;
 
-        const url = `http://localhost:3000/vendors/${vendorUuid}/products/${productUuid}`;
+        const url = `http://localhost:3000/products/${productUuid}`;
 
         await axios.patch(url, dataToSend);
 

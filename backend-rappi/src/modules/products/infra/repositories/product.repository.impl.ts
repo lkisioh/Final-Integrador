@@ -8,6 +8,8 @@ import { IProductRepository } from '../../domain/repositories/product.repository
 import { ProductEntity } from '../../domain/entities/product.entity';
 import { VendorOrmEntity } from '../../../vendors/infra/databases/vendor.orm-entity';
 
+
+
 @Injectable()
 export class ProductRepositoryImpl implements IProductRepository {
   constructor(
@@ -19,14 +21,16 @@ export class ProductRepositoryImpl implements IProductRepository {
   
     const ormProduct = this.productRepo.create({
    uuid: product.uuid ?? uuidv4(),
+   vendorUuid: product.vendorUuid,
    name: product.name,
    description: product.description,
-   vendorUuid: product.vendorUuid, 
    price: product.price,
    photo: product.photo,
    available: product.available,
   });
 
+  console.log('vendorUuid:', product.vendorUuid);
+  
   const saved = await this.productRepo.save(ormProduct);
 
  
@@ -39,8 +43,7 @@ export class ProductRepositoryImpl implements IProductRepository {
    price: saved.price,
    photo: saved.photo,
    available: saved.available,
-  
- vendorUuid: saved.vendorUuid, 
+   vendorUuid: saved.vendorUuid, 
  });
 
  return domainProduct;
@@ -117,14 +120,22 @@ async update(productUuid: string, data: UpdateProductDto): Promise<ProductEntity
     return domainProduct;
 }
 async findByUuid(uuid: string): Promise<ProductEntity | null> {
-    const productOrm = await this.productRepo.findOneBy({ uuid: uuid }); 
-    
-    if (!productOrm) {
-        return null;
-    }
-        const domainProduct = new ProductEntity();
-    Object.assign(domainProduct, productOrm);
-    
-    return domainProduct;
+   const entity = await this.productRepo.findOne({ where: { uuid } });
+    if (!entity) return null;
+
+    const productFind = new ProductEntity();
+    Object.assign(productFind, {
+  id: entity.id,
+  uuid: entity.uuid,
+  name: entity.name,
+  description: entity.description,
+  price: entity.price,
+  photo: entity.photo,
+  available: entity.available,
+  vendorUuid: entity.vendorUuid, 
+});
+
+    return productFind;
+  }
 }
-}
+

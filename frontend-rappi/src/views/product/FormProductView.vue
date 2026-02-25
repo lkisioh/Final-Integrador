@@ -26,7 +26,7 @@ const crearProducto = async () => {
             throw new Error('El precio debe ser mayor a cero.');
         }
 
-        const url = `http://localhost:3000/vendors/${vendorUuid}/products`; 
+        const url = `http://localhost:3000/products/`+vendorUuid; 
         
         await axios.post(url, newProduct.value);
         
@@ -36,6 +36,9 @@ const crearProducto = async () => {
 
     } catch (error) {
         console.error("Error al crear producto:", error);
+  console.log('STATUS:', error?.response?.status);
+  console.log('DATA:', error?.response?.data);        // 👈 acá viene el motivo
+  console.log('MESSAGE:', error?.response?.data?.message);
         creationError.value = error.response?.data?.message || error.message || 'Error desconocido al crear.';
     } finally {
         creationLoading.value = false;

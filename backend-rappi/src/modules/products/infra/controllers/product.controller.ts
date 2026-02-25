@@ -7,6 +7,7 @@ import { CreateProductDto } from '../../application/dtos/create-product.dto';
 import { ProductEntity } from '../../domain/entities/product.entity';
 import type { IProductRepository } from '../../domain/repositories/product.repository.interface';
 //import { UserRepositoryImpl } from '../repositories/user.repository.impl';
+ import { NotFoundException } from '@nestjs/common';
 
 @Controller('/products')
 export class ProductController {
@@ -28,15 +29,19 @@ export class ProductController {
     const products = await this.productRepository.findByVendorUuid(vendorUuid);
     return products;
   }
-  @Get(':productUuid')
-  async findOne(@Param('productUuid') productUuid: string) {
-    const product = await this.productRepository.findByUuid(productUuid);
-    if (!product) {
-      throw new Error(`Product con UUID ${productUuid} no encontrado`);
-    }
-    return product;
+
+
+  @Get('/:vendorUuid/:uuid')
+  async findByUuid(@Param('uuid') uuid: string) {
+    const product = await this.productRepository.findByUuid(uuid);
+
+  if (!product) {
+    throw new NotFoundException('Producto no encontrado');
   }
-  @Post()
+
+  return product;
+}
+  @Post(':vendorUuid')
   async create(@Param('vendorUuid') vendorUuid: string, @Body() dto: CreateProductDto) {
      return await this.createProductUseCase.execute(dto, vendorUuid);
  }
