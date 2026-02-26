@@ -12,7 +12,8 @@ import { UpdateUserDto } from '../../application/dtos/update-user.dto';
 
 import { CreateUserDto } from '../../application/dtos/create-user.dto';
 import { AddressDto } from '../../application/dtos/address.dto';
-
+// seguridad en la contraseña
+import * as bcrypt from 'bcrypt';
 @Injectable()
 export class UserRepositoryImpl implements IUserRepository {
   constructor(
@@ -28,11 +29,12 @@ export class UserRepositoryImpl implements IUserRepository {
     return domainUser;
   }
   async createUser(dto: CreateUserDto): Promise<UserEntity> {
+    const passwordHash = await bcrypt.hash(dto.password, 10);
     const user = this.userRepo.create({
       uuid: uuidv4(),
       name: dto.name,
       email: dto.email,
-      password: dto.password,
+      password: passwordHash,
       addresses: (dto.addresses ?? []).map((addr) => {
         const address = new AddressOrmEntity();
         address.uuid = uuidv4();
@@ -247,4 +249,7 @@ async deleteAddress(userUuid: string, addressUuid: string): Promise<UserEntity> 
     
     return domainUser;
 }
+  async updatePasswordHash(uuid: string, passwordHash: string): Promise<void> {
+    await this.userRepo.update({ uuid }, { password: passwordHash });
+  }
 }

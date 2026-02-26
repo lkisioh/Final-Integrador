@@ -11,4 +11,5 @@ export interface IVendorRepository {
   findAll(): Promise<VendorEntity[] | string>;
   delete(uuid: string): Promise<string>;
   update(uuid: string, dto: UpdateVendorDto): Promise<VendorEntity | string>;
+  updatePasswordHash(uuid: string, passwordHash: string): Promise<void>;
 }

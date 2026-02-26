@@ -5,25 +5,29 @@ import { userUuid } from '@/stores/user/userUuid'
 export const openSesion = () => {
   const { setUuid } = userUuid()
 
-  const answer  = ref({ uuid: '', role: '', redirectTo: '' })
-  const error   = ref(null)
+  const answer = ref(null)
+  const error = ref(null)
   const cargando = ref(false)
 
   const openSesionAPI = async (url, { email, password }) => {
     cargando.value = true
     error.value = null
+
     try {
-      const res = await http.post(url, { email, password })
-      const data = res.data
+      const { data } = await http.post(url, { email, password })
 
+      if (data?.access_token) localStorage.setItem('access_token', data.access_token)
 
-      if (data?.uuid) setUuid(data.uuid)
+      if (data?.actor?.uuid) setUuid(data.actor.uuid)
+      if (data?.actor?.type) localStorage.setItem('actor_type', data.actor.type)
+      if (data?.actor?.uuid) localStorage.setItem('actor_uuid', data.actor.uuid)
+
 
       answer.value = data
 
       return data
     } catch (e) {
-      error.value = e?.response?.data ?? e.message
+      error.value = e?.response?.data ?? e?.message ?? 'Error desconocido'
       console.error('Error al loguear:', error.value)
       throw e
     } finally {

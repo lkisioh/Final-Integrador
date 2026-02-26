@@ -11,10 +11,14 @@ import type { IUserRepository } from '../../../users/domain/repositories/user.re
 import type { IVendorRepository } from '../../../vendors/domain/repositories/vendor.repository.interface';
 import type { IDriverRepository } from '../../../drivers/domain/repositories/driver.repository.interface';
 
+//seguridad
+
+import { JwtPayload, ActorType } from '../types/types';
+
 type LoginResult =
-  | { kind: 'final-user'; uuid: string; name?: string; email: string; passwordHash: string }
-  | { kind: 'vendor'; uuid: string; name?: string; email: string; passwordHash: string }
-  | { kind: 'driver'; uuid: string; name?: string; email: string; passwordHash: string };
+  | { type: 'final-user'; uuid: string; name: string; email: string; passwordHash: string }
+  | { type: 'vendor'; uuid: string; name: string; email: string; passwordHash: string }
+  | { type: 'driver'; uuid: string; name: string; email: string; passwordHash: string };
 
 @Injectable()
 export class AuthService {
@@ -25,18 +29,16 @@ export class AuthService {
     private readonly jwt: JwtService,
   ) {}
 
-  async login(email: string): Promise<LoginResult | null> {
-    // falta validar password, pero para eso el loginDto
-    // debería tener password y no solo email. Lo dejo así por ahora para avanzar con el flujo, pero habría que ajustar eso después.
+  async findByEmail(email: string): Promise<LoginResult | null> {
     // 1) users
     const user = await this.userRepo.findByEmail(email);
     if (user) {
       return {
-        kind: 'final-user',
+        type: 'final-user',
         uuid: user.uuid,
-        name: (user as any).name,
+        name: user.name,
         email: user.email,
-        passwordHash: (user as any).passwordHash ?? (user as any).password, // ajustá al campo real
+        passwordHash: (user as any).passwordHash ?? (user as any).password,
       };
     }
 
@@ -44,9 +46,9 @@ export class AuthService {
     const vendor = await this.vendorRepo.findByEmail(email);
     if (vendor) {
       return {
-        kind: 'vendor',
+        type: 'vendor',
         uuid: vendor.uuid,
-        name: (vendor as any).name,
+        name: vendor.name,
         email: vendor.email,
         passwordHash: (vendor as any).passwordHash ?? (vendor as any).password,
       };
@@ -56,14 +58,67 @@ export class AuthService {
     const driver = await this.driverRepo.findByEmail(email);
     if (driver) {
       return {
-        kind: 'driver',
+        type: 'driver',
         uuid: driver.uuid,
-        name: (driver as any).name,
+        name: driver.name,
         email: driver.email,
         passwordHash: (driver as any).passwordHash ?? (driver as any).password,
       };
     }
 
     return null;
+  }
+  async login(email: string, password: string) {
+    const found = await this.findByEmail(email);
+    if (!found) throw new UnauthorizedException('Credenciales inválidas');
+
+    const stored = found.passwordHash;
+
+    const isBcrypt =
+      typeof stored === 'string' &&
+      (stored.startsWith('$2a$') || stored.startsWith('$2b$') || stored.startsWith('$2y$'));
+
+    let ok = false;
+
+    if (isBcrypt) {
+      ok = await bcrypt.compare(password, stored);
+    } else {
+      // ✅ legacy: texto plano
+      ok = password === stored;
+
+      // ✅ upgrade automático: si matchea, lo convertimos a hash y lo guardamos
+      if (ok) {
+        const newHash = await bcrypt.hash(password, 10);
+        // según el tipo, actualizá en su tabla
+        if (found.type === 'final-user') {
+          await this.userRepo.updatePasswordHash(found.uuid, newHash);
+        } else if (found.type === 'vendor') {
+          await this.vendorRepo.updatePasswordHash(found.uuid, newHash);
+        } else if (found.type === 'driver') {
+          await this.driverRepo.updatePasswordHash(found.uuid, newHash);
+        }
+      }
+    }
+
+    if (!ok) throw new UnauthorizedException('Credenciales inválidas');
+
+    const payload: JwtPayload = {
+      sub: found.uuid,
+      type: found.type as ActorType,
+      email: found.email,
+      name: found.name,
+    };
+
+    const access_token = await this.jwt.signAsync(payload);
+
+    return {
+      access_token,
+      actor: {
+        uuid: found.uuid,
+        type: found.type,
+        email: found.email,
+        name: found.name,
+      },
+    };
   }
 }

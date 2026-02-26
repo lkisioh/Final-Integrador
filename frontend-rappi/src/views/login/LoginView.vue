@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 import { userUuid } from '@/stores/user/userUuid'
-const { setUuid, getUuid, setUserType, getUserType, setNombre }= userUuid()
+const { setUuid, setUserType, setNombre }= userUuid()
 
 const email = ref('')
 const password= ref('')
@@ -15,40 +15,34 @@ const { answer, cargando, openSesionAPI } = openSesion()
 
 const login = async () => {
   try {
-    const data = await openSesionAPI('/auth/login', {
-      email: email.value,
-      password: password.value,
-    })
+    const { access_token, actor } =
+      await openSesionAPI('/auth/login', {
+        email: email.value,
+        password: password.value
+      })
 
-  localStorage.setItem('token', data.accessToken);
-  localStorage.setItem('auth', JSON.stringify({
-  uuid: data.uuid,
-  role: data.kind,
-  name: data.name,
-  email: data.email,
-}));
+    localStorage.setItem('access_token', access_token)
+    localStorage.setItem('actor_type', actor.type)
+    localStorage.setItem('actor_uuid', actor.uuid)
 
-    console.log('Respuesta login:', data)
-    setUuid(data.uuid)
-    setUserType(data.kind)
-    setNombre(data.name)
+    // actualizar store
+    setUuid(actor.uuid)
+    setUserType(actor.type)
+    setNombre(actor.name)
 
-    const userRole = getUserType()
-    const userUuid = getUuid()
-
-    if (userRole === 'final-user') {
+    if (actor.type === 'final-user') {
       router.push('/shop')
     }
-    else if (userRole === 'vendor'){
-      router.push('/vendor/'+ userUuid)
+    else if (actor.type === 'vendor') {
+      router.push('/vendor/' + actor.uuid)
     }
-    else if (userRole === 'driver'){
-      router.push('/orders/'+ userUuid)
+    else if (actor.type === 'driver') {
+      router.push('/orders/' + actor.uuid)
     }
-     else {
-      console.log('Lo que envió la Api fue: '+ answer)
+    else {
+      console.log('Respuesta API:', answer.value)
+    }
 
-    }
   } catch (e) {
     console.log(e)
   }

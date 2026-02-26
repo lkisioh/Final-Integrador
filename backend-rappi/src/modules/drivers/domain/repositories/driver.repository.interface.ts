@@ -9,4 +9,5 @@ export interface IDriverRepository {
   findAll(): Promise<DriverEntity[]>;
   delete(uuid: string): Promise<void>;
   update(uuid: string, dto: UpdateDriverDto): Promise<DriverEntity | string>;
+  updatePasswordHash(uuid: string, passwordHash: string): Promise<void>;
 }

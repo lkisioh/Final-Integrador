@@ -14,4 +14,5 @@ export interface IUserRepository {
   postAddress(addressDto: AddressDto, uuid: string): Promise<UserEntity>;
   updateAddress(userUuid: string, addressUuid: string, dto: AddressDto): Promise<UserEntity>;
   deleteAddress(userUuid: string, addressUuid: string): Promise<UserEntity>;
+  updatePasswordHash(uuid: string, passwordHash: string): Promise<void>;
 }

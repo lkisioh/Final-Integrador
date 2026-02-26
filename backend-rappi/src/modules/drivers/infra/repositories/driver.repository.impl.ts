@@ -123,4 +123,7 @@ export class DriverRepositoryImpl implements IDriverRepository {
     }
     await this.driverRepo.remove(entity);
   }
+  async updatePasswordHash(uuid: string, passwordHash: string): Promise<void> {
+    await this.driverRepo.update({ uuid }, { password: passwordHash });
+  }
 }

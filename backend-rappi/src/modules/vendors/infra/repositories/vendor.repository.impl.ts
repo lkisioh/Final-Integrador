@@ -246,4 +246,7 @@ if (dto.time) {
     return "Error al actualizar el vendor";
   }
 }
+  async updatePasswordHash(uuid: string, passwordHash: string): Promise<void> {
+    await this.vendorRepo.update({ uuid }, { password: passwordHash });
+  }
 }
