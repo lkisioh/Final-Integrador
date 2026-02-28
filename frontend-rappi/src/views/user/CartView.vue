@@ -93,8 +93,6 @@ function eliminarProducto(uuid) {
 <template>
   <div class="cart-view-container">
     <nav class="nav-links">
-      <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/about">About</RouterLink>
       <RouterLink to="/shop">← Volver atrás</RouterLink>
     </nav>
 

@@ -178,11 +178,11 @@ router.beforeEach((to) => {
   const auth = JSON.parse(localStorage.getItem('auth') || 'null')
 
   // requiere login
-  if (to.meta.requiresAuth && !token) return { name: 'login' }
+  if (to.meta.requiresAuth && !token) return { name: '/' }
 
   // requiere roles
   if (to.meta.roles?.length) {
-    if (!auth?.role) return { name: 'login' }
+    if (!auth?.role) return { name: '/' }
     if (!to.meta.roles.includes(auth.role)) return { name: 'forbidden' }
   }
 })

@@ -1,12 +1,14 @@
 <script setup>
 import { ref } from 'vue'
 import { userUuid } from '@/stores/user/userUuid'
-import axios from 'axios'
 import { traerUser } from '@/composables/user/traerUser'
+import { deleteAddress } from '@/composables/user/deleteAddress'
 import router from '@/router'
 
 const {user,llamarUserAPI} = traerUser()
 const storeUserUuid = userUuid()
+
+const {deleteAddressAPI} = deleteAddress()
 
 const uuid = ref(storeUserUuid.getUuid())
 
@@ -41,13 +43,12 @@ async function eliminarDireccion(uuidAddress){
     if (!confirm('¿Estás seguro de que quieres eliminar esta dirección?')) {
         return;
     }
-
     const userUuidValue = uuid.value;
 
     try {
-        const apiUrl = `http://localhost:3000/users/${userUuidValue}/addresses/${uuidAddress}`;
-        await axios.delete(apiUrl);
+        await deleteAddressAPI(`/users/${userUuidValue}/addresses/${uuidAddress}`);
         alert('Dirección eliminada con éxito.');
+        // "refrescar"
         llamarUserAPI('/users/' + userUuidValue);
     } catch (error) {
         console.error("Error al eliminar la dirección:", error.response?.data || error.message);
@@ -103,21 +104,11 @@ async function eliminarDireccion(uuidAddress){
         <button class="primary" @click="agregarDireccion">Nueva dirección!</button>
       </div>
 
-      <!-- <div class="section">
-        <h3>Locales Favoritos</h3>
-        <ul>
-          <li></li>
-          <li></li>
-        </ul>
-      </div> -->
-
       <div class="actions">
         <button class="primary" @click="verCarrito">Ver Carrito</button>
         <button class="primary" @click="comprar">Ir a comprar!</button>
         <button class="btn-edit" @click="editar">Editar Perfil</button>
         <button @click="logout" class="btn-logout">Cerrar Sesión</button>
-        <!-- <button class="primary" @click="editar">Editar Datos</button> -->
-
       </div>
     </div>
   </div>
