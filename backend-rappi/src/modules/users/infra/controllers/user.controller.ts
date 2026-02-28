@@ -7,7 +7,6 @@ import {
   Delete,
   Param, //seguridad debajo
   UseGuards,
-  ForbiddenException, //ParseUUIDPipe sin bcrypt es al pedo por ahora
   Req,
 } from '@nestjs/common';
 import { CreateUserDto } from '../../application/dtos/create-user.dto';
@@ -18,87 +17,61 @@ import { AddressDto } from '../../application/dtos/address.dto';
 // para seguridad
 
 import { JwtAuthGuard } from 'src/modules/auth/application/guards/jwt-auth.guard';
-import { ActorType } from 'src/modules/auth/application/types/types';
-import { ActorTypesGuard } from 'src/modules/auth/application/guards/actor-types.guard';
-import { ActorTypes } from 'src/modules/auth/application/types/actor-types.decorator';
+import { Public } from 'src/modules/auth/application/decorators/public.decorator';
+import { FinalUserOwnershipGuard } from 'src/modules/auth/application/guards/final-user-ownership.guard';
 
-@UseGuards(JwtAuthGuard, ActorTypesGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  // crear no necesira restricción, no usa jwt
+  @Public()
   @Post()
   async create(@Body() dto: CreateUserDto) {
-    const user = await this.userService.create(dto);
-    return user;
+    return await this.userService.create(dto);
   }
-  /** 
-
-
-
-@Controller('products')
-export class ProductsController {
-
-  @Post(':vendorUuid')
-  @ActorTypes('vendor')
-  async create(
-    @Param('vendorUuid', new ParseUUIDPipe()) vendorUuid: string,
-    @Body() dto: CreateProductDto,
-    @Req() req: any,
-  ) {
-    
-    if (req.user.uuid !== vendorUuid) {
-      throw new ForbiddenException('No podés crear productos para otro vendor');
-    }
-
-    return this.createProductUseCase.execute(dto, vendorUuid);
-  }
-}*/
+  @UseGuards(JwtAuthGuard, FinalUserOwnershipGuard) // todos protegidos, salvo create-post
   @Get(':uuid')
-  @ActorTypes('final-user')
   async findByUuid(@Param('uuid') uuid: string, @Req() req: any) {
-    // el logueado solo ve el suyo
-
-    if (req.user.uuid !== uuid) {
-      throw new ForbiddenException('No podés ver un usuario que no seas vos');
-    }
-    const user = await this.userService.getByUuid(uuid);
-    return user;
+    return await this.userService.getByUuid(uuid);
   }
 
-  @Get()
+  // ADMIN - no debería estar esto solo admin ve lista completa
+  /* @Get()
   async findAll() {
     const users = await this.userService.getAllUsers();
     return users;
-  }
-
+  }*/
+  @UseGuards(JwtAuthGuard, FinalUserOwnershipGuard)
   @Patch(':uuid')
   async update(@Param('uuid') uuid: string, @Body() dto: UpdateUserDto) {
-    const user = await this.userService.update(uuid, dto);
-    return user;
+    return await this.userService.update(uuid, dto);
   }
-
+  @UseGuards(JwtAuthGuard, FinalUserOwnershipGuard)
   @Post(':uuid/addresses')
   async postAddress(@Param('uuid') uuid: string, @Body() dto: AddressDto) {
-    const user = await this.userService.postAddress(uuid, dto);
-    return user;
+    return await this.userService.postAddress(uuid, dto);
   }
-
+  @UseGuards(JwtAuthGuard, FinalUserOwnershipGuard)
   @Patch(':uuid/addresses/:addressUuid')
-async updateAddress(@Param('uuid') userUuid: string, @Param('addressUuid') addressUuid: string, @Body() dto: AddressDto) {
-  const user = await this.userService.updateAddress(userUuid, addressUuid, dto);
-  return user;
+  async updateAddress(
+    @Param('uuid') userUuid: string,
+    @Param('addressUuid') addressUuid: string,
+    @Body() dto: AddressDto,
+  ) {
+    return await this.userService.updateAddress(userUuid, addressUuid, dto);
   }
-
+  @UseGuards(JwtAuthGuard, FinalUserOwnershipGuard)
   @Delete(':uuid/addresses/:addressUuid')
-  async deleteAddress(@Param('uuid') userUuid: string, @Param('addressUuid') addressUuid: string) {
-    const result = await this.userService.deleteAddress(userUuid, addressUuid);
-    return result;
+  async deleteAddress(
+    @Param('uuid') userUuid: string,
+    @Param('addressUuid') addressUuid: string,
+  ) {
+    return await this.userService.deleteAddress(userUuid, addressUuid);
   }
-
+  @UseGuards(JwtAuthGuard, FinalUserOwnershipGuard)
   @Delete(':uuid')
   async delete(@Param('uuid') uuid: string) {
-    const result = await this.userService.delete(uuid);
-    return result;
+    return await this.userService.delete(uuid);
   }
 }

@@ -50,13 +50,33 @@ async function nuevoUsuario() {
   console.log('Creando usuario:'+usuario.value)
 
   mapearUser()
-
+  // post público
   const ok = await createUserAPI('/users', usuario.value)
 if (ok) {
     alert('Usuario creado con éxito')
-    router.push('/user/' + usuario.value.uuid)
+    // login auto para obtener tokken y poder manejarse
+     const emailLog = String(email.value).trim()
+     const passwordLog = String(password.value)
+    try{
+      const { access_token, actor } = await axios.post('http://localhost:3000/auth/login', {
+      email: emailLog,
+      password: passwordLog,
+    }).then(r => r.data)
+
+    localStorage.setItem('access_token', access_token)
+    localStorage.setItem('actor_type', actor.type)
+    localStorage.setItem('actor_uuid', actor.uuid)
+
+    router.push(`/user/`+actor.uuid)
+  } catch (e) {
+  console.log('STATUS', e?.response?.status)
+  console.log('DATA', e?.response?.data)
+  console.log('MESSAGE', e?.response?.data?.message)
+  throw e
+}
+
   } else {
-    console.log('Error al cambiar página')
+    console.log('Error al crear usuario')
   }
   console.log('JSON plano:', JSON.stringify(usuario.value))
 }
