@@ -93,8 +93,6 @@ function eliminarProducto(uuid) {
 <template>
   <div class="cart-view-container">
     <nav class="nav-links">
-      <RouterLink to="/">Home</RouterLink>
-      <RouterLink to="/about">About</RouterLink>
       <RouterLink to="/shop">← Volver atrás</RouterLink>
     </nav>
 
@@ -116,7 +114,7 @@ function eliminarProducto(uuid) {
             <p class="address-text">No has seleccionado una dirección actual en tu perfil.</p>
           </div>
         </div>
-        <button @click="router.push('/user/:uuid')" class="btn-change">Cambiar</button>
+        <button @click="router.push('/user/' + uuid)" class="btn-change">Cambiar</button>
       </div>
 
       <div v-if="cartStore.items.length > 0">

@@ -1,44 +1,34 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import axios from 'axios';
-import { userUuid } from '@/stores/user/userUuid'; 
+
+import { userUuid } from '@/stores/user/userUuid';
+
+import { traerUser } from '@/composables/user/traerUser'
+import { editAddress } from '@/composables/user/editAddress';
+const {user,llamarUserAPI} = traerUser()
+const {addressNueva, editarAddressAPI} = editAddress()
 
 const route = useRoute();
 const router = useRouter();
 const storeUserUuid = userUuid();
 
-const addressUuid = route.params.addressUuid; 
-const userUuidValue = storeUserUuid.getUuid(); 
-const formData = ref({
-    street: '',
-    number: 0,
-    apartment: '' 
-});
+const addressUuid = route.params.addressUuid;
+const userUuidValue = storeUserUuid.getUuid();
 
-const cargarDatosDireccion = () => {
-
-    axios.get(`http://localhost:3000/users/${userUuidValue}`)
-        .then(response => {
-            const user = response.data;
-            const address = user.addresses.find(addr => addr.uuid === addressUuid);
-
-            if (address) {
-                formData.value = {
-                    street: address.street,
-                    number: address.number,
-                    apartment: address.apartment || '',
-                };
-            } else {
+async function cargarDatosDireccion (){
+  await llamarUserAPI(`/users/${userUuidValue}`)
+  const address = user.value?.addresses?.find(addr => addr.uuid === addressUuid);
+  if (address) {
+    addressNueva.value = {
+      street: address.street,
+      number: address.number,
+      apartment: address.apartment || '',
+    };
+  } else {
                 alert('Dirección no encontrada.');
-                router.back(); 
+                router.back();
             }
-        })
-        .catch(error => {
-            console.error("Error al cargar datos de usuario:", error);
-            alert("No se pudieron cargar los datos para editar.");
-            router.back();
-        });
 };
 
 onMounted(() => {
@@ -50,21 +40,12 @@ onMounted(() => {
     cargarDatosDireccion();
 });
 
-const handleSubmit = () => {
-    axios.patch(
-        `http://localhost:3000/users/${userUuidValue}/addresses/${addressUuid}`, 
-        formData.value 
-    )
-    .then(() => {
-        alert('Dirección actualizada con éxito!');
-        router.push({ 
-            name: 'user-details',            
-            params: { uuid: userUuidValue }  
-        });
-    })
-    .catch(error => {
-        console.error('Error al actualizar:', error.response.data);
-        alert('Error al guardar los cambios. Revisa la consola.');
+async function handleSubmit () {
+    await editarAddressAPI(`/users/${userUuidValue}/addresses/${addressUuid}`)
+    alert('Dirección actualizada con éxito!');
+    router.push({
+    name: 'user-details',
+    params: { uuid: userUuidValue }
     });
 };
 </script>
@@ -73,16 +54,16 @@ const handleSubmit = () => {
     <div class="edit-address-container">
         <h1>Editar Dirección</h1>
         <form @submit.prevent="handleSubmit">
-            
+
             <label for="street">Calle:</label>
-            <input type="text" id="street" v-model="formData.street" required />
+            <input type="text" id="street" v-model="addressNueva.street" required />
 
             <label for="number">Número:</label>
-            <input type="number" id="number" v-model="formData.number" required />
-            
+            <input type="number" id="number" v-model="addressNueva.number" required />
+
             <label for="apartment">Departamento (Opcional):</label>
-            <input type="text" id="apartment" v-model="formData.apartment" />
-            
+            <input type="text" id="apartment" v-model="addressNueva.apartment" />
+
             <button type="submit">Guardar Cambios</button>
             <button type="button" @click="router.back()">Cancelar</button>
         </form>
@@ -117,7 +98,7 @@ form {
 label {
     font-weight: bold;
     color: #555;
-    margin-bottom: -10px; 
+    margin-bottom: -10px;
 }
 
 input[type="text"],
@@ -131,7 +112,7 @@ input[type="number"] {
 
 input[type="text"]:focus,
 input[type="number"]:focus {
-    border-color: #007bff; 
+    border-color: #007bff;
     outline: none;
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
@@ -147,7 +128,7 @@ button {
 }
 
 button[type="submit"] {
-    background-color: #28a745; 
+    background-color: #28a745;
     color: white;
 }
 
@@ -156,7 +137,7 @@ button[type="submit"]:hover {
 }
 
 button[type="button"] {
-    background-color: #6c757d; 
+    background-color: #6c757d;
     color: white;
     margin-left: 10px;
 }

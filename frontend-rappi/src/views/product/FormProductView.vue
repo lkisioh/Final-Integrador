@@ -1,7 +1,9 @@
 <script setup>
 import { ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router'; 
-import axios from 'axios';
+import { useRoute, useRouter } from 'vue-router';
+import { createProduct } from '@/composables/products/createProduct';
+
+const { createProductAPI } = createProduct();
 const route = useRoute();
 const router = useRouter();
 
@@ -10,12 +12,12 @@ console.log('UUID capturado en Formulario:', vendorUuid);
 const newProduct = ref({
     name: '',
     description: '',
-    price: 0, 
-    photo: '', 
+    price: 0,
+    photo: '',
     available: true
 });
 const creationError = ref(null);
-const creationLoading = ref(false); 
+const creationLoading = ref(false);
 
 const crearProducto = async () => {
     creationLoading.value = true;
@@ -26,12 +28,12 @@ const crearProducto = async () => {
             throw new Error('El precio debe ser mayor a cero.');
         }
 
-        const url = `http://localhost:3000/products/`+vendorUuid; 
-        
-        await axios.post(url, newProduct.value);
-        
+        const url = `/products/`+vendorUuid;
+
+        await createProductAPI(url , newProduct.value);
+
         alert(`¡Producto "${newProduct.value.name}" creado con éxito!`);
-        
+
         router.push({ path: `/vendor/${vendorUuid}` });
 
     } catch (error) {
@@ -46,7 +48,7 @@ const crearProducto = async () => {
 };
 
 const goBack = () => {
-    router.push({ path: `/vendors/${vendorUuid}` });
+    router.push({ path: `/vendor/${vendorUuid}` });
 };
 </script>
 
@@ -54,10 +56,10 @@ const goBack = () => {
   <div class="product-form-view">
     <div class="form-card">
       <button @click="goBack" class="btn-back">← Volver al Perfil</button>
-      
+
       <h2>Agregar Nuevo Producto</h2>
       <p class="subtitle">Completa los datos para tu nuevo artículo</p>
-      
+
       <form @submit.prevent="crearProducto" class="styled-form">
         <div class="input-group">
           <label>Nombre del Producto</label>

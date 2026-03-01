@@ -1,31 +1,19 @@
 import http from '@/services/http'
 import {ref} from 'vue'
-import { userUuid } from '@/stores/user/userUuid'
-
-
-
-
 export const createProduct = () => {
 
-  const {getUuid} = userUuid()
-  const uuid = getUuid()
-  let product= ref({
-    name: "",
-    description: "",
-    price: null,
-    vendorUuid: uuid
-  })
   const error = ref(null)
   const cargando = ref(false)
 
-
-  const createProductAPI = async (url) => {
+  const createProductAPI = async (url, productData) => {
     try {
       cargando.value = true
-      const res = await http.post(url, product.value)
+      const res = await http.post(url, productData)
 
       return res.data
     } catch (error) {
+      console.log('DATA:', error?.response?.data);
+      console.log('MESSAGE:', error?.response?.data?.message);
       console.error(`Error al crear el producto: ${error.message}`)
     } finally {
       cargando.value = false
@@ -33,7 +21,6 @@ export const createProduct = () => {
   }
 
   return {
-    product,
     error,
     cargando,
     createProductAPI

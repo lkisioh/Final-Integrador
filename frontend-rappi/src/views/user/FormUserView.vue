@@ -1,15 +1,18 @@
 <script setup>
-
 import { ref, onMounted } from 'vue'
+import router from '@/router'
 import { RouterLink } from 'vue-router'
 import { createUser } from '@/composables/user/createUser.js'
 import axios from 'axios'
+import { traerUser } from '@/composables/user/traerUser'
+import { editUser } from '@/composables/user/editUser'
 
 const {usuario,cargando,error,createUserAPI} = createUser()
+const {user,llamarUserAPI} = traerUser()
+const {userEditado, editarUserAPI} = editUser()
 
-import router from '@/router'
-const rawUuid = router.currentRoute.value.params.uuid
 
+const rawUuid = localStorage.getItem('actor_uuid')
 const isEdit = rawUuid !== undefined && rawUuid !== null && rawUuid !== '' && rawUuid !== 'undefined'
 
 const name = ref('')
@@ -22,9 +25,10 @@ const password = ref('')
 onMounted(async () => {
   if (isEdit) {
     try {
-      const res = await axios.get(`http://localhost:3000/users/${rawUuid}`)
-      name.value = res.data.name
-      email.value = res.data.email
+      await llamarUserAPI('/users/' + rawUuid)
+      name.value = user.value?.name ?? ''
+      email.value = user.value?.email ?? ''
+      console.log(`${name.value}  ''${email.value}`)
     } catch (e) {
       console.error("Error cargando usuario", e)
     }
@@ -50,13 +54,33 @@ async function nuevoUsuario() {
   console.log('Creando usuario:'+usuario.value)
 
   mapearUser()
-
+  // post público
   const ok = await createUserAPI('/users', usuario.value)
 if (ok) {
     alert('Usuario creado con éxito')
-    router.push('/shop/' + usuario.value.uuid)
+    // login auto para obtener tokken y poder manejarse
+     const emailLog = String(email.value).trim()
+     const passwordLog = String(password.value)
+    try{
+      const { access_token, actor } = await axios.post('http://localhost:3000/auth/login', {
+      email: emailLog,
+      password: passwordLog,
+    }).then(r => r.data)
+
+    localStorage.setItem('access_token', access_token)
+    localStorage.setItem('actor_type', actor.type)
+    localStorage.setItem('actor_uuid', actor.uuid)
+
+    router.push(`/user/`+actor.uuid)
+  } catch (e) {
+  console.log('STATUS', e?.response?.status)
+  console.log('DATA', e?.response?.data)
+  console.log('MESSAGE', e?.response?.data?.message)
+  throw e
+}
+
   } else {
-    console.log('Error al cambiar página')
+    console.log('Error al crear usuario')
   }
   console.log('JSON plano:', JSON.stringify(usuario.value))
 }
@@ -70,7 +94,7 @@ async function editar() {
   if (password.value) datosEdit.password = password.value
 
   try {
-    await axios.patch(`http://localhost:3000/users/${rawUuid}`, datosEdit)
+    await editarUserAPI(`/users/${rawUuid}`, datosEdit)
     alert('Datos de perfil actualizados ✅')
     router.push('/user/' + rawUuid)
   } catch (e) {
@@ -109,9 +133,9 @@ async function editar() {
           <input v-model="email" type="text" />
         </div>
 
-        <div>
+        <div :hidden="isEdit">
           <label>Contraseña:</label>
-          <input v-model="password" type="password" :placeholder="isEdit ? 'Dejar en blanco para no cambiar' : ''" />
+          <input v-model="password" type="password" />
         </div>
 
         <button v-if="isEdit" type="button" @click="editar">Editar perfil</button>

@@ -1,16 +1,14 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import axios from 'axios'
+import { onMounted } from 'vue'
 import NavBar from '@/components/user/NavBar.vue'
+import { traerVendor } from '@/composables/vendor/traerVendor'
+const {vendors,cargando,llamarVendorsAPI} = traerVendor()
 
-const vendors = ref([])
-const cargando = ref(false)
 
 async function fetchVendors() {
   cargando.value = true
   try {
-    const response = await axios.get('http://localhost:3000/vendors')
-    vendors.value = response.data
+    llamarVendorsAPI('/vendors')
   } catch (error) {
     console.error("Error:", error)
   } finally {

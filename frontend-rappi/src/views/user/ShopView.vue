@@ -1,9 +1,8 @@
 <script setup>
-import { ref } from 'vue'
+
 import { userUuid } from '@/stores/user/userUuid'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import NavBar from '@/components/user/NavBar.vue'
-//import { traerProductos } from '@/composables/products/traerProductos'
 import { traerVendor } from '@/composables/vendor/traerVendor'
 import { useCartStore } from '@/stores/user/cartStore'
 
@@ -24,10 +23,10 @@ function agregarCarrito(product,vendorUuid,vendorName) {
   vendorName)
 }
 
-const {vendors,cargando,error, llamarVendorAPI,llamarVendorsAPI} = traerVendor()
+const {vendors,cargando,error,llamarVendorsAPI} = traerVendor()
 llamarVendorsAPI('/vendors')
 
-const router = useRouter()
+
 const route = useRoute()
 
 if (route.params.vendorUuid) {

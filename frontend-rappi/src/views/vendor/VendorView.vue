@@ -1,22 +1,62 @@
 <script setup>
 import { onMounted } from 'vue';
-import { traerProductos } from '@/composables/products/traerProductos'
 import { traerVendor } from '@/composables/vendor/traerVendor'
-import { useRouter } from 'vue-router'
-import { userUuid } from '@/stores/user/userUuid'
-import axios from 'axios';
 import { ref } from 'vue';
+import { useRoute } from 'vue-router'
+import router from '@/router'
+import { deleteProduct } from '@/composables/products/deleteProduct';
+import { editProduct } from '@/composables/products/editProduct';
 
-const router = useRouter();
-const vendorUuid = router.currentRoute.value.params.uuid;
+const route = useRoute()
+const vendorUuid = route.params.uuid
+
 const deleteLoading = ref(false);
 
-const {getUuid} = userUuid();
-const userLoginUuid = getUuid();
-
-const { productos, cargando, error, llamarProductosAPI } = traerProductos();
-
 const {vendor, llamarVendorAPI} = traerVendor();
+const { deleteProductAPI } = deleteProduct();
+const { editarProductAPI } = editProduct();
+function logout() {
+  localStorage.removeItem('access_token')
+  localStorage.removeItem('actor_type')
+  localStorage.removeItem('actor_uuid')
+  router.push('/login')
+}
+
+onMounted(() => {
+  console.log('token:', localStorage.getItem('access_token'))
+  console.log('actor_type:', localStorage.getItem('actor_type'))
+  console.log('actor_uuid:', localStorage.getItem('actor_uuid'))
+  console.log('route uuid:', vendorUuid)
+
+  llamarVendorAPI(`/vendors/${vendorUuid}`)
+
+})
+const goToEditView = (productUuid) => {
+    router.push({
+        name: 'ProductEdit',
+        params: { vendorUuid: vendorUuid, productUuid: productUuid}
+    });
+};
+
+const eliminarProduct = async (productUuid) => {
+    if (!confirm("¿Estás seguro de que quieres eliminar este producto?")) {
+        return;
+    }
+    deleteLoading.value = true;
+    try {
+        const url = `/products/${vendorUuid}/${productUuid}`;
+
+        await deleteProductAPI(url);
+
+        llamarVendorAPI(`/vendors/${vendorUuid}`);
+
+    } catch (e) {
+        console.error("Error al eliminar el producto:", e);
+        alert(`Error al eliminar el producto: ${e.response?.data?.message || 'Error desconocido'}`);
+    } finally {
+        deleteLoading.value = false;
+    }
+};
 
 const toggleAvailability = async (productUuid, currentStatus) => {
     const newStatus = !currentStatus;
@@ -30,14 +70,14 @@ const toggleAvailability = async (productUuid, currentStatus) => {
     }
 
     try {
-        const url = `/vendors/${vendorUuid}/products/${productUuid}`;
+        const url = `/products/${vendorUuid}/${productUuid}`;
 
-        await axios.patch(url, { available: newStatus });
+        await editarProductAPI(url, { available: newStatus });
 
         alert(`Disponibilidad de producto actualizada a: ${newStatus ? 'Disponible' : 'No Disponible'}`);
 
-        const reloadUrl = `/vendors/${vendorUuid}/products`;
-        llamarProductosAPI(reloadUrl);
+        const reloadUrl = `/vendors/${vendorUuid}`;
+        llamarVendorAPI(reloadUrl);
 
     } catch (e) {
         console.error("Error al cambiar disponibilidad:", e);
@@ -45,68 +85,6 @@ const toggleAvailability = async (productUuid, currentStatus) => {
     }
 };
 
-const deleteProduct = async (productUuid) => {
-    if (!confirm("¿Estás seguro de que quieres eliminar este producto?")) {
-        return;
-    }
-    deleteLoading.value = true;
-    try {
-        const url = `http://localhost:3000/vendors/${vendorUuid}/products/${productUuid}`;
-
-        await axios.delete(url);
-
-        alert("Producto eliminado con éxito.");
-
-        const reloadUrl = `/vendors/${vendorUuid}/products`;
-        llamarProductosAPI(reloadUrl);
-
-    } catch (e) {
-        console.error("Error al eliminar el producto:", e);
-        alert(`Error al eliminar el producto: ${e.response?.data?.message || 'Error desconocido'}`);
-    } finally {
-        deleteLoading.value = false;
-    }
-};
-
-const goToEditView = (productUuid) => {
-    router.push({
-        name: 'ProductEdit',
-        params: { vendorUuid: vendorUuid, productUuid: productUuid}
-    });
-};
-
-async function eliminarVendor(uuid) {
-  if (!confirm('⚠️ ¿ESTÁS SEGURO? Se borrarán todos tus datos')) return
-
-  try {
-    await axios.delete(`http://localhost:3000/vendors/${vendorUuid}`);
-
-    alert('Cuenta eliminada');
-    localStorage.clear();
-    router.push('/');
-  } catch (error) {
-    console.error("Error NestJS/TypeORM:", error.response?.data);
-    alert('Error al borrar: ' + (error.response?.data?.message || 'Error de servidor'));
-  }
-}
-
-function logout() {
-  localStorage.removeItem('userUuid')
-  localStorage.removeItem('userName')
-  localStorage.removeItem('userRole')
-
-  router.push('/')
-}
-
-onMounted(() => {
-  console.log('Cargando productos para el Vendedor UUID:', vendorUuid);
-  const productosUrl = `/products/${vendorUuid}`;
-  llamarProductosAPI(productosUrl);
-
-    console.log('Cargando datos del Vendedor:', vendorUuid);
-    const vendorUrl = `/vendors/${vendorUuid}`;
-    llamarVendorAPI(vendorUrl);
-});
 </script>
 
 <template>
@@ -151,7 +129,7 @@ onMounted(() => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="product in productos" :key="product.id">
+              <tr v-for="product in vendor.products" :key="product.id">
                 <td><strong>{{ product.name }}</strong></td>
                 <td>{{ product.description }}</td>
                 <td>${{ product.price }}</td>
@@ -166,7 +144,7 @@ onMounted(() => {
                   </button>
 
                   <button
-                    @click="deleteProduct(product.uuid)"
+                    @click="eliminarProduct(product.uuid)"
                     :disabled="deleteLoading"
                     class="btn-delete"
                   >
@@ -189,7 +167,6 @@ onMounted(() => {
         </div>
 
         <button @click="logout" class="btn-logout">Cerrar Sesión</button>
-        <button @click="eliminarVendor" class="btn-delete-account">Eliminar Cuenta</button>
       </footer>
 
       <h5 v-if="error" class="error-msg">{{ error }}</h5>

@@ -1,8 +1,8 @@
-// auth/actor-types.guard.ts
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ACTOR_TYPES_KEY } from '../types/actor-types.decorator';
 import type { ActorType } from '../types/types';
+import { ForbiddenException } from '@nestjs/common';
 
 @Injectable()
 export class ActorTypesGuard implements CanActivate {
@@ -17,6 +17,9 @@ export class ActorTypesGuard implements CanActivate {
     if (!allowed || allowed.length === 0) return true;
 
     const req = ctx.switchToHttp().getRequest();
-    return req.user?.type && allowed.includes(req.user.type);
+    if (!req.user?.type) throw new ForbiddenException('No autenticado');
+    if (!allowed.includes(req.user.type))
+      throw new ForbiddenException('No autorizado');
+    return true;
   }
 }

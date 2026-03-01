@@ -1,20 +1,20 @@
 import http from '@/services/http'
 import {ref} from 'vue'
 
-export const editUser = ()=> {
+export const editProduct = ()=> {
 
-  let userEditado = ref({})
+  let productEditado = ref({})
   const error = ref(null)
   const cargando = ref(false)
 
-  const editarUserAPI= async(url,datosNuevos)=>{
+  const editarProductAPI= async(url,datosNuevos)=>{
   try{
     cargando.value=true
     const res = await http.patch(url,datosNuevos)
 
-    userEditado.value= res.data
+    productEditado.value= res.data
   }catch (error){
-    console.error(`Error al editar el usuario: ${error.message}`)
+    console.error(`Error al editar el producto: ${error.message}`)
   }finally {
       cargando.value = false
     }
@@ -22,9 +22,9 @@ export const editUser = ()=> {
 
 }
 return{
-    userEditado,
+    productEditado,
     error,
     cargando,
-    editarUserAPI
+    editarProductAPI
 }
 }

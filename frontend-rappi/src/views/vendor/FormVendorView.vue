@@ -5,15 +5,18 @@ import { createVendor } from '@/composables/vendor/createVendor'
 import router from '@/router'
 import { userUuid } from '@/stores/user/userUuid'
 import { onMounted } from 'vue'
-import axios from 'axios'
 
 import { traerVendor } from '@/composables/vendor/traerVendor'
+import { editVendor } from '@/composables/vendor/editVendor'
+
 
 const {setUuid} = userUuid()
 const cargando = ref(false)
 const vendorUuid = router.currentRoute.value.params.uuid
 
 const { llamarVendorAPI} = traerVendor();
+const { editarVendorAPI } = editVendor()
+
 onMounted(async() => {
 if (vendorUuid) {
   console.log('Cargando datos del Vendedor para edición, UUID:', vendorUuid);
@@ -124,17 +127,12 @@ const editar = async () => {
   try {
     cargando.value = true;
 
-    const { password, products, ...datosLimpios } = vendor.value;
-
-    const url = `http://localhost:3000/vendors/${vendorUuid}`;
-
-    const res = await axios.patch(url, datosLimpios);
-
-    if (res.status === 200 || res.status === 204) {
-      alert('Vendedor actualizado con éxito ✅');
-      router.push(`/vendor/${vendorUuid}`);
-    }
-  } catch (error) {
+    const url = `/vendors/${vendorUuid}`;
+    await editarVendorAPI(url, vendor.value);
+    alert('Vendedor actualizado con éxito ✅');
+    router.push(`/vendor/${vendorUuid}`);
+    
+    } catch (error) {
     console.error("Error al editar:", error.response?.data || error);
     alert('No se pudo guardar la edición. Revisá los datos.');
   } finally {
@@ -147,7 +145,7 @@ const editar = async () => {
 <template>
   <div class="form-vendor-container">
     <nav class="nav-links">
-      <RouterLink to="/">Home</RouterLink>
+      <RouterLink to="/login">Home</RouterLink>
       <RouterLink to="/SelectUser">← Volver atrás</RouterLink>
     </nav>
     <div class="form-box">
@@ -224,7 +222,7 @@ const editar = async () => {
           <input v-model="email" type="text" />
         </div>
 
-        <div>
+        <div v-show="!vendorUuid">
           <label>Contraseña:</label>
           <input v-model="password" type="password" />
         </div>

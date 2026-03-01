@@ -10,6 +10,7 @@ http.interceptors.request.use((config) => {
   if (token) config.headers.Authorization = `Bearer ${token}`
   return config
 })
+
 // token vencido
 http.interceptors.response.use(
   (response) => response,
