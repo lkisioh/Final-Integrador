@@ -1,38 +1,40 @@
 <script setup>
 import { useRouter, useRoute } from 'vue-router';
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
 import { userUuid } from '@/stores/user/userUuid';
-
+import { traerOrders } from '@/composables/order/traerOrders';
+import { traerDriver } from '@/composables/driver/traerDriver';
+import { tomarOrden } from '@/composables/order/tomarOrden';
+import { terminarOrden } from '@/composables/order/terminarOrden';
 const router = useRouter();
 const route = useRoute();
 
-const ordenes = ref([])
-const ordenesTomadas = ref([])
+let ordenesSinDriver = ref([])
+let ordenesTomadas = ref([])
+const { ordenes, llamarOrdersAPI } = traerOrders()
+
 const cargando = ref(false)
 const error = ref(null)
 
 const uuidDriver = route.params.uuid;
 const storeDriver = userUuid()
-const driverInfo = ref(null);
-//const uuidDriver = storeDriver.getUuid()
+
+const {driver,llamarDriverAPI} = traerDriver()
+const { tomarOrdenAPI } = tomarOrden()
+const { terminarOrdenAPI } = terminarOrden()
 
 function editar() {
   router.push('/edit/driver/' + uuidDriver);
 }
 
 function logout() {
-  localStorage.removeItem('userUuid')
-  localStorage.removeItem('userName')
-  localStorage.removeItem('userRole')
-
-  router.push('/')
+  localStorage.clear();
+  router.push('/login')
 }
 
 async function cargarDatosDriver() {
   try {
-    const respuesta = await axios.get(`http://localhost:3000/drivers/${uuidDriver}`);
-    driverInfo.value = respuesta.data;
+    await llamarDriverAPI(`/drivers/${uuidDriver}`);
   } catch (e) {
     console.error("Error al cargar datos del perfil", e);
   }
@@ -41,11 +43,10 @@ async function cargarDatosDriver() {
 async function cargarOrdenesSinDriver() {
   cargando.value = true
   try {
-    const respuesta = await axios.get('http://localhost:3000/orders')
-
-    ordenes.value = respuesta.data.filter(o =>!o.driverUuid && o.status === 'ACEPTADO')
+    await llamarOrdersAPI('/orders')
+    ordenesSinDriver.value = ordenes.value.filter(o =>!o.driverUuid && o.status === 'ACEPTADO')
   } catch (e) {
-    error.value = "Error al cargar pedidos"
+    error.value = "Error al cargar pedidos" + e.message
   } finally {
     cargando.value = false
   }
@@ -54,9 +55,8 @@ async function cargarOrdenesSinDriver() {
 async function cargarOrdenesaTomadasDriver() {
   cargando.value = true
   try {
-    const respuesta = await axios.get('http://localhost:3000/orders')
-
-    ordenesTomadas.value = respuesta.data.filter(o => o.driverUuid === uuidDriver && o.status === 'En camino')
+    await llamarOrdersAPI('/orders')
+    ordenesTomadas.value = ordenes.value.filter(o => o.driverUuid === uuidDriver && o.status === 'En camino')
   } catch (e) {
     error.value = e.message + "Error al cargar pedidos"
   } finally {
@@ -64,30 +64,10 @@ async function cargarOrdenesaTomadasDriver() {
   }
 }
 
-async function eliminarCuentaDriver() {
-  if (!uuidDriver) {
-    alert("No se pudo identificar al driver.");
-    return;
-  }
-
-  if (!confirm('⚠️ ¿Estás seguro? Esta acción es irreversible.')) return;
-
-  try {
-    await axios.delete(`http://localhost:3000/drivers/${uuidDriver}`);
-
-    alert('Cuenta eliminada con éxito');
-    localStorage.clear();
-    router.push('/');
-  } catch (err) {
-    console.error("Error al eliminar driver:", err);
-    alert('No se pudo eliminar la cuenta. Verifica que el servidor esté activo.');
-  }
-}
 
 async function tomarPedido(orden) {
   try {
-
-    await axios.patch(`http://localhost:3000/orders/${orden.uuid}/assign-driver`, {
+    await tomarOrdenAPI(`/orders/${orden.uuid}/assign-driver`, {
       status: 'En camino',
       driverUuid: uuidDriver,
     })
@@ -107,7 +87,7 @@ async function cargarOrdenes() {
 async function entregarPedido(orden) {
   try {
     const uuidDriverReal = storeDriver.getUuid()
-    await axios.patch(`http://localhost:3000/orders/${orden.uuid}/finish-delivery`, {
+    await terminarOrdenAPI(`/orders/${orden.uuid}/finish-delivery`, {
       status: 'ENTREGADO',
       driverUuid: uuidDriverReal
     })
@@ -134,14 +114,14 @@ function historial(){
   <div class="driver-view-container">
     <div class="driver-box">
 
-      <div v-if="driverInfo" class="profile-card">
+      <div v-if="driver" class="profile-card">
         <div class="profile-header">
-          <h2>Bienvenido {{ driverInfo.name }}</h2>
+          <h2>Bienvenido {{ driver.name }}</h2>
         </div>
         <div class="profile-details">
-          <p><strong>Vehículo:</strong> {{ driverInfo.vehicle }}</p>
-          <p><strong>Teléfono:</strong> {{ driverInfo.phone }}</p>
-          <p><strong>Email:</strong> {{ driverInfo.email }}</p>
+          <p><strong>Vehículo:</strong> {{ driver.vehicle }}</p>
+          <p><strong>Teléfono:</strong> {{ driver.phone }}</p>
+          <p><strong>Email:</strong> {{ driver.email }}</p>
         </div>
       </div>
       <hr class="separator" />
@@ -236,8 +216,6 @@ function historial(){
         <button @click="historial">Ver historial de PEDIDOS</button>
         <button @click="editar" class="btn-edit-profile">Editar Perfil</button>
         <button @click="logout" class="btn-logout">Cerrar Sesión</button>
-         <button @click="eliminarCuentaDriver" class="btn-delete-account">Eliminar Cuenta</button>
-
       </div>
 
       <h5 v-if="error" style="color: red;">{{ error }}</h5>

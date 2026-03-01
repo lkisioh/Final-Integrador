@@ -9,7 +9,7 @@ import { editUser } from '@/composables/user/editUser'
 
 const {usuario,cargando,error,createUserAPI} = createUser()
 const {user,llamarUserAPI} = traerUser()
-const {userEditado, editarUserAPI} = editUser()
+const { editarUserAPI} = editUser()
 
 
 const rawUuid = localStorage.getItem('actor_uuid')

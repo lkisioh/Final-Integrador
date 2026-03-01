@@ -9,7 +9,7 @@ const uuid = getUuid()
 <template>
   <div class="nan-links">
 
-   <RouterLink to="/mis-pedidos/:uuid"> 🍔 Mis pedidos</RouterLink>
+   <RouterLink :to="`/mis-pedidos/${uuid}`"> 🍔 Mis pedidos</RouterLink>
    <RouterLink to="/vendors"> 🏪 Vendedores</RouterLink>
    <RouterLink to="/cart"> 🛒 Carrito</RouterLink>
    <RouterLink :to="`/user/${uuid}`"> 👤 Mi Cuenta</RouterLink>
@@ -24,11 +24,11 @@ const uuid = getUuid()
   left: 0;
   width: 100%;
   z-index: 1000; /* Prioridad máxima */
-  
+
   /* Estilo visual */
-  background-color: white; 
+  background-color: white;
   display: flex;
-  justify-content: flex-end; 
+  justify-content: flex-end;
   gap: 20px;
   padding: 15px 30px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);

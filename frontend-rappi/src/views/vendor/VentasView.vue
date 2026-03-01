@@ -2,7 +2,6 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { traerOrders } from '@/composables/order/traerOrders'
-import { traerProductos } from '@/composables/products/traerProductos'
 import { traerVendor } from '@/composables/vendor/traerVendor'
 
 import { cambiarEstadoOrders } from '@/composables/order/cambiarEstado'
@@ -11,26 +10,23 @@ const route = useRoute()
 const router = useRouter()
 const vendorUuid = route.params.uuid
 
-const { orders, llamarOrdersAPI } = traerOrders()
-
-const { productos, llamarProductosAPI } = traerProductos();
+const { ordenes, llamarOrdersAPI } = traerOrders()
 
 const { vendor, llamarVendorAPI} = traerVendor();
 
 const { AceptarOrdenAPI, CancelarOrdenAPI} = cambiarEstadoOrders()
 
-
+const productos = computed(() => {
+  console.log('Vendor data:', vendor.value);
+  return vendor.value?.products || []
+})
 
 onMounted(() => {
+  const vendorUrl = `/vendors/${vendorUuid}`;
+  llamarVendorAPI(vendorUrl);
   cargarVentas()
-
-  console.log('Cargando productos para el Vendedor UUID:', vendorUuid);
-  const productosUrl = `/products`;
-  llamarProductosAPI(productosUrl);
-
-    console.log('Cargando datos del Vendedor:', vendorUuid);
-    const vendorUrl = `/vendors/${vendorUuid}`;
-    llamarVendorAPI(vendorUrl);
+  console.log(' pedidos del vendor:', ordenes.value)
+  console.log('Cargando datos del Vendedor:', vendorUuid);
 })
 
 const ventasDelVendor= ref([])
@@ -38,12 +34,12 @@ const ventasFiltradas = ref([])
 
 const cargarVentas = async () => {
   try {
-    await llamarOrdersAPI('/orders/')
+    await llamarOrdersAPI('/orders/vendor/' + vendorUuid)
   } catch (err) {
     console.error('Error al cargar ventas:', err)
   }
 
-  ventasDelVendor.value = orders.value.filter(order => order.vendorUuid === vendorUuid) // Todas las ventas del vendor
+  ventasDelVendor.value = ordenes.value
 
 }
 
@@ -57,9 +53,9 @@ const cambiarLista = (filtro) => {
 }
 
 const totalVentas = computed(() => {
-  if (!orders.value || !Array.isArray(orders.value)) return 0
+  if (!ordenes.value || !Array.isArray(ordenes.value)) return 0
 
-  return orders.value.reduce((acc, orden) => {
+  return ordenes.value.reduce((acc, orden) => {
     return acc + (Number(orden.total) || 0)
   }, 0)
 })
@@ -109,7 +105,7 @@ const cancelarOrden = async (orderUuid) => {
 
       </header>
 
-      <div v-if="!orders || orders.length === 0" class="status-msg">
+      <div v-if="!ordenes || ordenes.length === 0" class="status-msg">
         Aún no hay ventas registradas.
       </div>
 

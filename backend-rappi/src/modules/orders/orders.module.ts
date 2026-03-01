@@ -12,9 +12,7 @@ import { IOrderRepository } from './domain/repositories/order.repository.interfa
 import { OrdersService } from './application/services/orders.service'; // Importa tu servicio
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([OrderOrmEntity, PaymentOrmEntity])
-  ],
+  imports: [TypeOrmModule.forFeature([OrderOrmEntity, PaymentOrmEntity])],
   controllers: [OrderController],
   providers: [
     OrdersService,
@@ -27,9 +25,8 @@ import { OrdersService } from './application/services/orders.service'; // Import
       useFactory: (orderRepo: IOrderRepository) =>
         new CreateOrderUseCase(orderRepo),
       inject: ['IOrderRepository'],
-    }
+    },
   ],
   exports: ['IOrderRepository', CreateOrderUseCase, OrdersService],
 })
-
 export class OrdersModule {}

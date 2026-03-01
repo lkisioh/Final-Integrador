@@ -1,27 +1,18 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import { userUuid } from '@/stores/user/userUuid'
+import { traerOrdenesUser } from '@/composables/user/traerOrdenesUserFinal';
 
-import { traerDriver } from '@/composables/driver/traerDriver'
-
-const { drivers, llamarDriverAPI} = traerDriver();
-
-
-
+const { ordenesUser, llamarOrdenesUserAPI } = traerOrdenesUser()
 const pedidos = ref([])
 const cargando = ref(false)
-const storeUser = userUuid()
-const uuidCliente = storeUser.getUuid()
+
 
 async function cargarMisPedidos() {
-  if (!uuidCliente) return
-  cargando.value = true
   try {
-    const respuesta = await axios.get('http://localhost:3000/orders')
-    console.log("Todas las órdenes del servidor:", respuesta.data)
-    console.log("Mi UUID de cliente es:", uuidCliente)
-    pedidos.value = respuesta.data.filter(o => o.userUuid === uuidCliente)
+    await llamarOrdenesUserAPI('/orders/user/' + localStorage.getItem('userUuid'))
+    console.log("Todas las órdenes user:", ordenesUser.value)
+    //ordenar por fecha
+    pedidos.value = ordenesUser.value.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
   } catch (error) {
     console.error("Error al cargar:", error)
   } finally {
@@ -37,8 +28,6 @@ function formatFecha(fecha) {
 
 onMounted(() => {
   cargarMisPedidos()
-  llamarDriverAPI('/drivers/')
-  setInterval(cargarMisPedidos, 15000)
 })
 </script>
 

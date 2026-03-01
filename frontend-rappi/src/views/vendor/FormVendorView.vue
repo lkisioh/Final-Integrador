@@ -3,14 +3,12 @@ import { RouterLink } from 'vue-router'
 import { ref,watch } from 'vue'
 import { createVendor } from '@/composables/vendor/createVendor'
 import router from '@/router'
-import { userUuid } from '@/stores/user/userUuid'
 import { onMounted } from 'vue'
 
 import { traerVendor } from '@/composables/vendor/traerVendor'
 import { editVendor } from '@/composables/vendor/editVendor'
+import axios from 'axios'
 
-
-const {setUuid} = userUuid()
 const cargando = ref(false)
 const vendorUuid = router.currentRoute.value.params.uuid
 
@@ -89,23 +87,39 @@ function mapearVendor() {
     products: []
   }
 }
-
 async function nuevoVendor() {
   mapearVendor()
 
   console.log('JSON de Vendedor a enviar:', JSON.stringify(vendor.value))
-
   const ok = await createVendorAPI('/vendors', vendor.value)
 
   if (ok && ok.uuid) {
     alert('Vendedor creado con éxito')
-    setUuid(ok.uuid)
-    router.push('/vendor/' + ok.uuid)
-  } else {
-    console.error('Error al crear vendedor o la respuesta es inválida.', ok)
-    alert('Error al registrar. Revisa la consola para detalles.')
-  }
+    // login auto para obtener tokken y poder manejarse
+     const emailLog = String(email.value).trim()
+     const passwordLog = String(password.value)
+    try{
+      const { access_token, actor } = await axios.post('http://localhost:3000/auth/login', {
+      email: emailLog,
+      password: passwordLog,
+    }).then(r => r.data)
+    localStorage.setItem('access_token', access_token)
+    localStorage.setItem('actor_type', actor.type)
+    localStorage.setItem('actor_uuid', actor.uuid)
+    router.push(`/vendor/`+actor.uuid)
+  } catch (e) {
+  console.log('STATUS', e?.response?.status)
+  console.log('DATA', e?.response?.data)
+  console.log('MESSAGE', e?.response?.data?.message)
+  throw e
 }
+
+  } else {
+    console.log('Error al crear vendedor')
+  }
+  console.log('JSON plano:', JSON.stringify(vendor.value))
+}
+
 
 function handleCheckChange(event) {
   const selectedValue = event.target.value;
@@ -131,7 +145,7 @@ const editar = async () => {
     await editarVendorAPI(url, vendor.value);
     alert('Vendedor actualizado con éxito ✅');
     router.push(`/vendor/${vendorUuid}`);
-    
+
     } catch (error) {
     console.error("Error al editar:", error.response?.data || error);
     alert('No se pudo guardar la edición. Revisá los datos.');

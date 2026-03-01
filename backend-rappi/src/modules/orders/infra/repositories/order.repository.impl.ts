@@ -29,6 +29,7 @@ export class OrderRepositoryImpl implements IOrderRepository {
       })),
       status: order.status,
       driverUuid: order.driverUuid ?? null,
+      addressUuid: order.addressUuid ?? undefined,
       total: order.total,
     });
 
@@ -61,6 +62,7 @@ export class OrderRepositoryImpl implements IOrderRepository {
       createdAt: orderWithVendor.createdAt,
       status: orderWithVendor.status,
       driverUuid: orderWithVendor.driverUuid,
+      addressUuid: orderWithVendor.addressUuid,
       total: orderWithVendor.total,
     });
 
@@ -188,69 +190,87 @@ export class OrderRepositoryImpl implements IOrderRepository {
     });
     return domainOrder;
   }
+  async findByDriverUuid(driverUuid: string): Promise<OrderEntity[]> {
+    const entities = await this.orderRepo.find({ where: { driverUuid } });
 
-  
+    return entities.map((entity) => {
+      const order = new OrderEntity();
 
-  /*
-  async findById(id: number): Promise<ProductEntity | null> {
-    const entity = await this.productRepo.findOne({ where: { id } });
-    if (!entity) return null;
-
-    const productFind = new ProductEntity();
-    Object.assign(productFind, {
-      id: entity.id,
-      uuid: entity.uuid,
-      name: entity.name,
-      description: entity.description,
-      price: entity.price,
-      photo: entity.photo,
-      available: entity.available,
-    });
-
-    return productFind;
-  }
-
-  async findByVendorUuid(uuid: string): Promise<ProductEntity[]> {
-    const entities = await this.productRepo.find({ where: { vendorUuid : uuid } });
-    return entities.map(entity => {
-      const product = new ProductEntity();
-      Object.assign(product, {
+      Object.assign(order, {
         id: entity.id,
         uuid: entity.uuid,
-        name: entity.name,
-        description: entity.description,
-        price: entity.price,
-        photo: entity.photo,
-        available: entity.available,
-        vendorUuid : entity.vendorUuid,
+        userUuid: entity.userUuid,
+        userName: entity.userName,
+        userOrderAddress: entity.userOrderAddress,
+        vendorUuid: entity.vendorUuid,
+        vendorName: entity.vendorName,
+        items: entity.items.map((i) => ({
+          productUuid: i.productUuid,
+          quantity: i.quantity,
+          unitPrice: i.unitPrice,
+          subtotal: i.subtotal,
+        })),
+        createdAt: entity.createdAt,
+        status: entity.status,
+        driverUuid: entity.driverUuid,
+        total: entity.total,
       });
-      return product;
+      return order;
     });
   }
-  async delete(productUuid: string): Promise<void> {
-    await this.productRepo.delete({ uuid: productUuid });
-}
-async update(productUuid: string, data: UpdateProductDto): Promise<ProductEntity> {
-    const productOrm = await this.productRepo.findOneBy({ uuid: productUuid });
-    if (!productOrm) {
-        throw new Error('Producto no encontrado'); 
-    }
-    Object.assign(productOrm, data);
-    const updatedOrm = await this.productRepo.save(productOrm);
+  async findByVendorUuid(vendorUuid: string): Promise<OrderEntity[]> {
+    const entities = await this.orderRepo.find({ where: { vendorUuid } });
 
-    const domainProduct = new ProductEntity();
-    Object.assign(domainProduct, updatedOrm);
-    return domainProduct;
-}
-async findByUuid(uuid: string): Promise<ProductEntity | null> {
-    const productOrm = await this.productRepo.findOneBy({ uuid: uuid }); 
-    
-    if (!productOrm) {
-        return null;
-    }
-        const domainProduct = new ProductEntity();
-    Object.assign(domainProduct, productOrm);
-    
-    return domainProduct;
-}*/
+    return entities.map((entity) => {
+      const order = new OrderEntity();
+
+      Object.assign(order, {
+        id: entity.id,
+        uuid: entity.uuid,
+        userUuid: entity.userUuid,
+        userName: entity.userName,
+        userOrderAddress: entity.userOrderAddress,
+        vendorUuid: entity.vendorUuid,
+        vendorName: entity.vendorName,
+        items: entity.items.map((i) => ({
+          productUuid: i.productUuid,
+          quantity: i.quantity,
+          unitPrice: i.unitPrice,
+          subtotal: i.subtotal,
+        })),
+        createdAt: entity.createdAt,
+        status: entity.status,
+        driverUuid: entity.driverUuid,
+        total: entity.total,
+      });
+      return order;
+    });
+  }
+  async findByUserUuid(userUuid: string): Promise<OrderEntity[]> {
+    const entities = await this.orderRepo.find({ where: { userUuid } });
+    return entities.map((entity) => {
+      const order = new OrderEntity();
+
+      Object.assign(order, {
+        id: entity.id,
+        uuid: entity.uuid,
+        userUuid: entity.userUuid,
+        userName: entity.userName,
+        userOrderAddress: entity.userOrderAddress,
+        vendorUuid: entity.vendorUuid,
+        vendorName: entity.vendorName,
+        items: entity.items.map((i) => ({
+          productUuid: i.productUuid,
+          quantity: i.quantity,
+          unitPrice: i.unitPrice,
+          subtotal: i.subtotal,
+        })),
+        createdAt: entity.createdAt,
+        status: entity.status,
+        driverUuid: entity.driverUuid,
+        total: entity.total,
+      });
+      return order;
+    });
+  }
 }

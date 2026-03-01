@@ -1,8 +1,12 @@
 <script setup>
-import { ref,} from 'vue'
+import { onMounted, ref,} from 'vue'
 import { RouterLink } from 'vue-router'
 import { openSesion } from '@/composables/login/openSesion'
 import { useRouter } from 'vue-router'
+
+onMounted(() => {
+  localStorage.clear()
+})
 
 const router = useRouter()
 

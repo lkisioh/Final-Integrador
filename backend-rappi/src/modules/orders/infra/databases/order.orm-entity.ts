@@ -79,6 +79,6 @@ export class OrderOrmEntity {
   @Column({ name: 'payment_id', nullable: true })
   paymentId: string;
 
-  @Column({ name: 'address_Uuid' }) 
+  @Column({ name: 'address_Uuid' })
   addressUuid: string;
 }

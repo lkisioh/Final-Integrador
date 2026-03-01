@@ -16,7 +16,7 @@ export class CreateOrderUseCase {
     newOrder.items = dto.items;
     newOrder.status = dto.status;
     newOrder.driverUuid = dto.driverUuid || null;
-
+    newOrder.addressUuid = dto.addressUuid || undefined;
     newOrder.total = dto.total;
 
     return await this.orderRepo.save(newOrder);

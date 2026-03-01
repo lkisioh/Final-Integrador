@@ -5,12 +5,14 @@ import { RouterLink } from 'vue-router'
 import { useCartStore } from '@/stores/user/cartStore'
 import { userUuid } from '@/stores/user/userUuid';
 import { traerUser } from '@/composables/user/traerUser';
-import axios from 'axios';
+import { crearOrden } from '@/composables/order/crearOrden';
 
 const cartStore = useCartStore()
 const storeUserUuid = userUuid()
 const { user, llamarUserAPI } = traerUser()
 const uuid = storeUserUuid.getUuid()
+
+const { crearOrdenAPI } = crearOrden()
 
 llamarUserAPI('/users/' + uuid)
 
@@ -54,15 +56,15 @@ async function pagarOrden(nombreTienda, productosTienda) {
     subtotal: Number(p.quantity) * Number(p.price),
   })),
   status: 'PENDIENTE',
+  addressUuid: direccionSeleccionada.value?.uuid,
   total: Number(calcularTotalTienda(productosTienda)),
 }
 
 
   try {
     alert(`Procesando tu pedido a ${nombreTienda}...`)
-    alert( ` el json es ${JSON.stringify(nuevaOrden)}`)
-    console.log("Enviando nueva orden al backend:", nuevaOrden);
-    await axios.post('http://localhost:3000/orders', nuevaOrden);
+
+    await crearOrdenAPI('/orders', nuevaOrden);
 
     alert(`✅ Pedido enviado a ${nombreTienda}. Un repartidor lo tomará pronto.`);
 

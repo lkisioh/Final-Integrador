@@ -3,7 +3,7 @@ import {ref} from 'vue'
 
 export const traerOrders= ()=> {
 
-  let orders = ref([])
+  let ordenes = ref([])
   const error = ref(null)
   const cargando = ref(false)
 
@@ -12,7 +12,7 @@ export const traerOrders= ()=> {
     cargando.value=true
     const res = await http.get(url)
 
-    orders.value= res.data
+    ordenes.value= res.data
   }catch (error){
     console.error(`Error al buscar las órdenes: ${error.message}`)
   }finally {
@@ -22,7 +22,7 @@ export const traerOrders= ()=> {
 
 }
 return{
-    orders,
+    ordenes,
     error,
     cargando,
     llamarOrdersAPI

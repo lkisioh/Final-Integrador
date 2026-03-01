@@ -33,6 +33,10 @@ export class CreateOrderDto {
   @IsString()
   driverUuid?: string;
 
+  @IsOptional()
+  @IsString()
+  addressUuid?: string;
+
   @IsNumber()
   @IsNotEmpty()
   total: number;

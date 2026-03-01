@@ -3,9 +3,13 @@ import { ref, onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { createDriver } from '@/composables/driver/createDriver'
 import axios from 'axios'
-const {driver,cargando,error,createDriverAPI} = createDriver()
-
+import { traerDriver } from '@/composables/driver/traerDriver'
+import { editDriver } from '@/composables/driver/editDriver'
 import router from '@/router'
+
+const {driver,cargando,error,createDriverAPI} = createDriver()
+const {llamarDriverAPI} = traerDriver()
+const {editarDriverAPI} = editDriver()
 const uuidDriver = router.currentRoute.value.params.uuid
 
 const name = ref('')
@@ -19,14 +23,13 @@ onMounted(async () => {
   if (uuidDriver) {
     console.log('Cargando datos para editar el Driver:', uuidDriver);
     try {
-      const res = await axios.get(`http://localhost:3000/drivers/${uuidDriver}`);
-      const d = res.data;
-      
-      name.value = d.name;
-      email.value = d.email;
-      phone.value = d.phone;
-      vehicle.value = d.vehicle;
-      location.value = d.location;      
+      const data = await llamarDriverAPI(`/drivers/${uuidDriver}`);
+
+      name.value = data.name;
+      email.value = data.email;
+      phone.value = data.phone;
+      vehicle.value = data.vehicle;
+      location.value = data.location;
       console.log('✅ Datos del driver cargados con éxito');
     } catch (err) {
       console.error("Error cargando driver:", err);
@@ -36,13 +39,10 @@ onMounted(async () => {
 
 const editar = async () => {
   mapearDriver(name, location, phone, vehicle, email, password);
-  
   const datosLimpios = { ...driver.value };
-  if (!datosLimpios.password) delete datosLimpios.password;
-
   try {
     cargando.value = true;
-    await axios.patch(`http://localhost:3000/drivers/${uuidDriver}`, datosLimpios);
+    await editarDriverAPI(`/drivers/${uuidDriver}`, datosLimpios);
     alert('Conductor actualizado ✅');
     router.push('/orders/' + uuidDriver);
   } catch (err) {
@@ -54,16 +54,32 @@ const editar = async () => {
 }
 
 async function nuevoDriver() {
-  console.log('Creando conductor:'+driver.value)
-
   mapearDriver(name,location,phone,vehicle,email,password)
-
-  const data = await createDriverAPI('http://localhost:3000/drivers', driver.value)
-if (data && data.uuid) {
+   console.log('JSON de Conductor a enviar:', JSON.stringify(driver.value))
+  const ok = await createDriverAPI('/drivers', driver.value)
+  if (ok && ok.uuid) {
     alert('Conductor creado con éxito')
-    router.push('/orders/' + data.uuid)
+    // login auto para obtener tokken y poder manejarse
+     const emailLog = String(email.value).trim()
+     const passwordLog = String(password.value)
+    try{
+      const { access_token, actor } = await axios.post('http://localhost:3000/auth/login', {
+      email: emailLog,
+      password: passwordLog,
+    }).then(r => r.data)
+    localStorage.setItem('access_token', access_token)
+    localStorage.setItem('actor_type', actor.type)
+    localStorage.setItem('actor_uuid', actor.uuid)
+    router.push(`/orders/`+actor.uuid)
+  } catch (e) {
+  console.log('STATUS', e?.response?.status)
+  console.log('DATA', e?.response?.data)
+  console.log('MESSAGE', e?.response?.data?.message)
+  throw e
+}
+
   } else {
-    console.log('Error al cambiar página')
+    console.log('Error al crear conductor')
   }
   console.log('JSON plano:', JSON.stringify(driver.value))
 }
@@ -84,7 +100,7 @@ driver.value = {
 <template>
   <div class="form-driver-container">
     <nav class="nav-links">
-      <RouterLink to="/">Home</RouterLink>
+      <RouterLink to="/login">Home</RouterLink>
       <RouterLink to="/SelectUser">← Volver atrás</RouterLink>
     </nav>
     <div class="form-box">
@@ -114,7 +130,7 @@ driver.value = {
           <input v-model="email" type="text" />
         </div>
 
-        <div>
+        <div v-show="!uuidDriver">
           <label>Contraseña:</label>
           <input v-model="password" type="password" />
         </div>
