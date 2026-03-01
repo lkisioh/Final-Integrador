@@ -8,6 +8,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 
+import { PaymentOrmEntity } from '../../../payments/infra/databases/payment.orm-entity';
 import { VendorOrmEntity } from '../../../vendors/infra/databases/vendor.orm-entity';
 import { UserOrmEntity } from '../../../users/infra/databases/user.orm-entity';
 import { DriverOrmEntity } from '../../../drivers/infra/databases/driver.orm-entity';
@@ -70,4 +71,14 @@ export class OrderOrmEntity {
 
   @Column('decimal', { precision: 10, scale: 2 })
   total: number;
+
+  @ManyToOne(() => PaymentOrmEntity, (payment) => payment.orders)
+  @JoinColumn({ name: 'payment_id' })
+  payment: PaymentOrmEntity;
+
+  @Column({ name: 'payment_id', nullable: true })
+  paymentId: string;
+
+  @Column({ name: 'address_Uuid' }) 
+  addressUuid: string;
 }

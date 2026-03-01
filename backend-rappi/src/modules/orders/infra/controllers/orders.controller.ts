@@ -2,10 +2,13 @@ import { Controller, Get, Post, Body, Patch, Param, Query, Inject } from '@nestj
 import { CreateOrderDto } from '../../application/dtos/create-order.dto';
 import type { IOrderRepository } from '../../domain/repositories/order.repository.interface';
 import { CreateOrderUseCase } from '../../application/use-cases/create-order.usecase';
+import { CheckoutDto } from '../../application/dtos/checkout.dto';
+import { OrdersService } from '../../application/services/orders.service';
 
 @Controller('orders')
 export class OrderController {
   constructor(
+    private readonly ordersService: OrdersService,
     private readonly createOrderUseCase: CreateOrderUseCase,
     @Inject('IOrderRepository')
     private readonly orderRepository: IOrderRepository,
@@ -41,6 +44,23 @@ export class OrderController {
   finishDelivery(@Param('uuid') uuid: string, @Body() body: any) {
     return this.orderRepository.finishDelivery(uuid, body.status, body.driverUuid);
   }
+
+  @Post('checkout')
+async checkout(@Body() checkoutDto: CheckoutDto) {
+  try {
+    const result = await this.ordersService.processCheckout(checkoutDto);
+    
+    return {
+      message: '¡Compra finalizada con éxito!',
+      payment: result.payment,
+      ordersGenerated: result.orders.length,
+      orders: result.orders,
+    };
+  } catch (error) {
+    throw new Error('Error al procesar la compra: ' + error.message);
+  }
+}
+
   /*
   @Get() 
  async findAllByVendor(@Param('vendorUuid') vendorUuid: string ) {

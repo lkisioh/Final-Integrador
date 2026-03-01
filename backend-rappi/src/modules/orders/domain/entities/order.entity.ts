@@ -6,7 +6,8 @@ export class OrderEntity {
   userUuid: string;
   userName: string;
   userOrderAddress: string;
-
+  
+  paymentId: string;
   createdAt: Date = new Date();
 
   vendorUuid: string;

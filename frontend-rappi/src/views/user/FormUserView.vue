@@ -54,7 +54,7 @@ async function nuevoUsuario() {
   const ok = await createUserAPI('/users', usuario.value)
 if (ok) {
     alert('Usuario creado con éxito')
-    router.push('/user/' + usuario.value.uuid)
+    router.push('/shop/' + usuario.value.uuid)
   } else {
     console.log('Error al cambiar página')
   }
