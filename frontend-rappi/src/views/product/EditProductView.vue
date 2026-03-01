@@ -1,12 +1,16 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import axios from 'axios';
+
+import { traerProductos } from '@/composables/products/traerProductos';
+import { editProduct } from '@/composables/products/editProduct';
 
 const route = useRoute();
 const router = useRouter();
 
 const { vendorUuid, productUuid } = route.params;
+const { producto, llamarProductoAPI } = traerProductos();
+const { editarProductAPI } = editProduct();
 
 const productData = ref({
     name: '',
@@ -23,11 +27,17 @@ const fetchProductData = async () => {
     loading.value = true;
     error.value = null;
     try {
+      const url = `/products/${productUuid}`;
+      await llamarProductoAPI(url); // ✅ await
 
-        const url = `http://localhost:3000/products/${vendorUuid}/${productUuid}`;
-        const response = await  axios.get(url);
-      
-        productData.value = await response.data;
+      // si tu composable devuelve data, usalo:
+      productData.value = {
+        name: producto.value?.name ?? '',
+        description: producto.value?.description ?? '',
+        price: producto.value?.price ?? 0,
+        photo: producto.value?.photo ?? '',
+        available: producto.value?.available ?? true,
+      };
 
     } catch (e) {
         console.error("Error al cargar producto para edición:", e);
@@ -48,9 +58,9 @@ const updateProduct = async () => {
         delete dataToSend.uuid;
         delete dataToSend.vendorUuid;
 
-        const url = `http://localhost:3000/products/${productUuid}`;
+        const url = `/products/${vendorUuid}/${productUuid}`;
 
-        await axios.patch(url, dataToSend);
+        await editarProductAPI(url, dataToSend);
 
         alert("¡Producto actualizado con éxito!");
 
@@ -77,7 +87,7 @@ const goBack = () => {
     <div class="form-card">
       <button @click="goBack" class="btn-back">← Volver</button>
 
-      <h2>Editar Producto</h2>
+      <h2>Editar Producto </h2>
       <p class="subtitle">{{ productData.name || 'Cargando datos...' }}</p>
 
       <div v-if="loading && !productData.name" class="loading-state">Cargando datos del producto...</div>

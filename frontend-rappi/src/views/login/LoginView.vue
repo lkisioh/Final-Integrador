@@ -15,6 +15,7 @@ const { answer, cargando, openSesionAPI } = openSesion()
 
 const login = async () => {
   try {
+    localStorage.clear()
     const { access_token, actor } =
       await openSesionAPI('/auth/login', {
         email: email.value,

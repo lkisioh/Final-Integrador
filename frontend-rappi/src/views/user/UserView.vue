@@ -62,7 +62,7 @@ async function eliminarDireccion(uuidAddress){
     <router-view></router-view>
   <div class="user-view-container">
     <nav class="nav-links">
-      <RouterLink to="/">Home</RouterLink>
+      <RouterLink to="/login">Home</RouterLink>
 
     </nav>
 

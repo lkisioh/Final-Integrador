@@ -9,7 +9,6 @@ import { JwtStrategy } from './application/strategies/jwt.strategy';
 import { UsersModule } from '../users/user.module';
 import { VendorsModule } from '../vendors/vendor.module';
 import { DriversModule } from '../drivers/driver.module';
-
 import type { StringValue } from 'ms';
 @Module({
   imports: [

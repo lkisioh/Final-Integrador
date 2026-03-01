@@ -189,7 +189,10 @@ export class VendorRepositoryImpl implements IVendorRepository {
     return vendorFind;
   }
   async findByUuid(uuid: string): Promise<VendorEntity | null> {
-    const vendor = await this.vendorRepo.findOne({ where: { uuid } });
+    const vendor = await this.vendorRepo.findOne({
+      where: { uuid },
+      relations: ['products'],
+    });
     if (!vendor) return null;
     const domainVendor = new VendorEntity();
     Object.assign(domainVendor, vendor);
@@ -203,49 +206,46 @@ export class VendorRepositoryImpl implements IVendorRepository {
     await this.vendorRepo.remove(entity);
     return 'vendor eliminado correctamente';
   }
- 
+
   async update(
-  uuid : string,
-  dto: UpdateVendorDto,
-): Promise<VendorEntity | string> {
-  try {
-    const entity = await this.vendorRepo.findOne({ 
-      where: { uuid }, 
-      relations: ['address']
-    });
+    uuid: string,
+    dto: UpdateVendorDto,
+  ): Promise<VendorEntity | string> {
+    try {
+      const entity = await this.vendorRepo.findOne({
+        where: { uuid },
+        relations: ['address'],
+      });
 
-    if (!entity) return `No se encontro Vendor con uuid: ${uuid} para editar`;
+      if (!entity) return `No se encontro Vendor con uuid: ${uuid} para editar`;
 
-    entity.name = dto.name ?? entity.name;
-    entity.category = dto.category ?? entity.category;
-    entity.phone = dto.phone ?? entity.phone;
-    entity.email = dto.email ?? entity.email;
-    entity.daysOpen = dto.daysOpen ?? entity.daysOpen;
-if (dto.time) {
-  entity.time = Array.isArray(dto.time) 
-    ? dto.time.join(', ') 
-    : dto.time;
-}
-    if (dto.address) {
-      if (!entity.address) {
-        entity.address = new AddressVendorOrmEntity();
-        entity.address.vendor = entity;
+      entity.name = dto.name ?? entity.name;
+      entity.category = dto.category ?? entity.category;
+      entity.phone = dto.phone ?? entity.phone;
+      entity.email = dto.email ?? entity.email;
+      entity.daysOpen = dto.daysOpen ?? entity.daysOpen;
+      if (dto.time) {
+        entity.time = Array.isArray(dto.time) ? dto.time.join(', ') : dto.time;
       }
-      entity.address.street = dto.address.street ?? entity.address.street;
-      entity.address.number = dto.address.number ?? entity.address.number;
+      if (dto.address) {
+        if (!entity.address) {
+          entity.address = new AddressVendorOrmEntity();
+          entity.address.vendor = entity;
+        }
+        entity.address.street = dto.address.street ?? entity.address.street;
+        entity.address.number = dto.address.number ?? entity.address.number;
+      }
+
+      const saved = await this.vendorRepo.save(entity);
+
+      const domainVendor = new VendorEntity();
+      Object.assign(domainVendor, saved);
+      return domainVendor;
+    } catch (err) {
+      console.error(`Error en Repository Update: ${err}`);
+      return `Error al actualizar el vendor: ${err}`;
     }
-
-    const saved = await this.vendorRepo.save(entity);
-
-    const domainVendor = new VendorEntity();
-    Object.assign(domainVendor, saved);
-    return domainVendor;
-    
-  } catch (err) {
-    console.error("Error en Repository Update:", err);
-    return "Error al actualizar el vendor";
   }
-}
   async updatePasswordHash(uuid: string, passwordHash: string): Promise<void> {
     await this.vendorRepo.update({ uuid }, { password: passwordHash });
   }

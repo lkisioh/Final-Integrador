@@ -7,7 +7,6 @@ import {
   Delete,
   Param, //seguridad debajo
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { CreateUserDto } from '../../application/dtos/create-user.dto';
 import { UpdateUserDto } from '../../application/dtos/update-user.dto';
@@ -24,6 +23,13 @@ import { FinalUserOwnershipGuard } from 'src/modules/auth/application/guards/fin
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  // ADMIN - no debería estar esto solo admin ve lista completa
+  /* @Get()
+  async findAll() {
+    const users = await this.userService.getAllUsers();
+    return users;
+  }*/
+
   // crear no necesira restricción, no usa jwt
   @Public()
   @Post()
@@ -32,16 +38,10 @@ export class UserController {
   }
   @UseGuards(JwtAuthGuard, FinalUserOwnershipGuard) // todos protegidos, salvo create-post
   @Get(':uuid')
-  async findByUuid(@Param('uuid') uuid: string, @Req() req: any) {
+  async findByUuid(@Param('uuid') uuid: string) {
     return await this.userService.getByUuid(uuid);
   }
 
-  // ADMIN - no debería estar esto solo admin ve lista completa
-  /* @Get()
-  async findAll() {
-    const users = await this.userService.getAllUsers();
-    return users;
-  }*/
   @UseGuards(JwtAuthGuard, FinalUserOwnershipGuard)
   @Patch(':uuid')
   async update(@Param('uuid') uuid: string, @Body() dto: UpdateUserDto) {

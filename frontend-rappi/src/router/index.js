@@ -21,7 +21,7 @@ import MisPedidosView from '@/views/user/MisPedidosView.vue'
 import VendorsView from '@/views/user/VendorsView.vue'
 
 const routes = [
-  { path: '/', name: 'login', component: LoginView },
+  { path: '/login', name: 'login', component: LoginView },
   {
     path: '/SelectUser',
     name: 'select-user',
@@ -174,16 +174,25 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  const token = localStorage.getItem('token')
-  const auth = JSON.parse(localStorage.getItem('auth') || 'null')
+  const token = localStorage.getItem('access_token')
+  const actorType = localStorage.getItem('actor_type')
+  const actorUuid = localStorage.getItem('actor_uuid')
 
   // requiere login
-  if (to.meta.requiresAuth && !token) return { name: '/' }
+  if (to.meta.requiresAuth && !token) {
+    return { name: 'login' }
+  }
 
   // requiere roles
   if (to.meta.roles?.length) {
-    if (!auth?.role) return { name: '/' }
-    if (!to.meta.roles.includes(auth.role)) return { name: 'forbidden' }
+    if (!actorType) return { name: 'login' }
+    if (!to.meta.roles.includes(actorType)) return { name: 'forbidden' }
+  }
+
+  // opcional: si la ruta tiene :uuid, validá ownership en el front también
+  // (igual el backend ya lo valida, esto es solo UX)
+  if (to.params?.uuid && actorUuid && String(to.params.uuid) !== String(actorUuid)) {
+    return { name: 'forbidden' }
   }
 })
 
