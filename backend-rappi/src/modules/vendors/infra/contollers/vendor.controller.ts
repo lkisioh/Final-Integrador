@@ -22,11 +22,11 @@ import { VendorUserOwnershipGuard } from 'src/modules/auth/application/guards/ve
 export class VendorController {
   constructor(private readonly vendorService: VendorService) {}
 
-  // parte ADMIN
-  /*@Get()
+  @UseGuards(JwtAuthGuard)
+  @Get()
   async findAll() {
     return this.vendorService.findAll();
-  }*/
+  }
 
   @Public()
   @Post()

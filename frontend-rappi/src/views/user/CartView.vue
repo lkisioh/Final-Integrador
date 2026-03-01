@@ -114,7 +114,7 @@ function eliminarProducto(uuid) {
             <p class="address-text">No has seleccionado una dirección actual en tu perfil.</p>
           </div>
         </div>
-        <button @click="router.push('/user/:uuid')" class="btn-change">Cambiar</button>
+        <button @click="router.push('/user/' + uuid)" class="btn-change">Cambiar</button>
       </div>
 
       <div v-if="cartStore.items.length > 0">

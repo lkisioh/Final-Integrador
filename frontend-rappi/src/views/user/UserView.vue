@@ -17,7 +17,7 @@ function logout() {
   localStorage.removeItem('userName')
   localStorage.removeItem('userRole')
 
-  router.push('/')
+  router.push('/login')
 }
 function comprar(){
   router.push('/shop')
