@@ -11,8 +11,11 @@ import { OrderController } from './infra/controllers/orders.controller';
 import { IOrderRepository } from './domain/repositories/order.repository.interface';
 import { OrdersService } from './application/services/orders.service'; // Importa tu servicio
 
+import { VendorOrmEntity } from './../vendors/infra/databases/vendor.orm-entity';
+import { UserOrmEntity } from './../users/infra/databases/user.orm-entity';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([OrderOrmEntity, PaymentOrmEntity])],
+  imports: [TypeOrmModule.forFeature([OrderOrmEntity, PaymentOrmEntity, VendorOrmEntity, UserOrmEntity])],
   controllers: [OrderController],
   providers: [
     OrdersService,

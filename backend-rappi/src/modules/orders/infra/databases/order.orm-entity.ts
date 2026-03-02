@@ -13,6 +13,7 @@ import { VendorOrmEntity } from '../../../vendors/infra/databases/vendor.orm-ent
 import { UserOrmEntity } from '../../../users/infra/databases/user.orm-entity';
 import { DriverOrmEntity } from '../../../drivers/infra/databases/driver.orm-entity';
 import { OrderItemOrmEntity } from './order-item.orm-entity';
+import { Generated } from 'typeorm';
 
 @Entity({ name: 'orders' })
 export class OrderOrmEntity {
@@ -20,6 +21,7 @@ export class OrderOrmEntity {
   id: number;
 
   @Column({ unique: true })
+  @Generated('uuid')
   uuid: string;
 
   @Column({ type: 'varchar', name: 'user_uuid' })

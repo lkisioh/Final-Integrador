@@ -7,6 +7,10 @@ import { CheckoutDto } from '../dtos/checkout.dto';
 import { PaymentOrmEntity } from '../../../payments/infra/databases/payment.orm-entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderEntity } from '../../domain/entities/order.entity';
+import { VendorOrmEntity } from 'src/modules/vendors/infra/databases/vendor.orm-entity';
+import { Repository } from 'typeorm';
+import { UserOrmEntity } from 'src/modules/users/infra/databases/user.orm-entity';
+import { PaymentStatus } from 'src/modules/payments/domain/enums/payment-method.enum';
 @Injectable()
 export class OrdersService {
   constructor(
@@ -15,6 +19,10 @@ export class OrdersService {
     private readonly orderRepository: IOrderRepository,
     @InjectRepository(PaymentOrmEntity)
     private readonly paymentRepository: any,
+    @InjectRepository(VendorOrmEntity) 
+    private readonly vendorRepository: any,
+    @InjectRepository(UserOrmEntity) 
+    private readonly userRepository: any,
   ) {}
 
   async create(createOrderDto: CreateOrderDto) {
@@ -44,46 +52,57 @@ export class OrdersService {
 }
 
   async processCheckout(dto: CheckoutDto) {
-  const subtotal = dto.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const userData = await this.userRepository.findOne({ 
+    where: { uuid: dto.userUuid } 
+  });
 
-  let factor = 1.0; 
-  if (dto.paymentMethod === 'CASH') {
-    factor = 0.90; 
-  } else if (dto.paymentMethod === 'CARD') {
-    factor = 1.10; 
-  }
+  const subtotalGeneral = dto.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  let factor = 1.0;
+  if (dto.paymentMethod === 'CASH') factor = 0.90;
+  else if (dto.paymentMethod === 'CARD') factor = 1.10;
 
-  const totalConAjuste = subtotal * factor;
+  const totalConAjuste = subtotalGeneral * factor;
 
   const nuevoPago = await this.paymentRepository.save({
     totalAmount: totalConAjuste,
     method: dto.paymentMethod,
-    status: 'PAID', 
+    status: PaymentStatus.APPROVED,
     createdAt: new Date()
   });
 
   const itemsByVendor = this.groupByVendor(dto.items);
 
   for (const vendorId in itemsByVendor) {
-  const itemsDeEstaTienda = itemsByVendor[vendorId];
-  const subtotalTienda = itemsDeEstaTienda.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-
-  await this.orderRepository.save({
-    vendorUuid: vendorId, 
-    userUuid: dto.userUuid,
-    addressUuid: dto.addressUuid,
-    total: subtotalTienda * factor, 
-    paymentId: String(nuevoPago.id), 
-    status: 'pendiente', 
+    const itemsDeEstaTienda = itemsByVendor[vendorId];
     
-    items: itemsDeEstaTienda.map(item => ({
-      productUuid: item.productId, 
-      quantity: item.quantity,
-      price: item.price
-    }))
-  });
-}
+    const vendorData = await this.vendorRepository.findOne({ where: { uuid: vendorId } });
 
-  return { message: 'Compra procesada', paymentId: nuevoPago.id, totalFinal: totalConAjuste };
+    const subtotalTienda = itemsDeEstaTienda.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+    await this.orderRepository.save({
+      userUuid: dto.userUuid,
+      userName: userData?.name || 'Usuario', 
+      userOrderAddress: dto.addressUuid, 
+      vendorUuid: vendorId,
+      vendorName: vendorData?.name || 'Tienda', 
+      total: subtotalTienda * factor,
+      paymentId: nuevoPago.uuid,
+      status: 'pendiente',
+      addressUuid: dto.addressUuid,
+      
+      items: itemsDeEstaTienda.map(item => ({
+        productUuid: item.productId,
+        quantity: item.quantity,
+        unitPrice: item.price,
+        subtotal: item.price * item.quantity
+      }))
+    } as any);
+  }
+
+  return { 
+    message: 'Compra finalizada con éxito', 
+    paymentId: nuevoPago.id, 
+    totalFinal: totalConAjuste 
+  };
 }
 }
