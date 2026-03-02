@@ -32,49 +32,58 @@ export class OrdersService {
   //   return this.orderRepository.update(uuid,status,driverUuid,driverNombre);
   // }
 
-  async processCheckout(dto: CheckoutDto) {
-  
-  const totalGeneral = dto.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  
-  const nuevoPago = await this.paymentRepository.save({
-    totalAmount: totalGeneral,
-    method: dto.paymentMethod,
-    status: 'PENDING'
-  });
-
-  const productosPorTienda: any = dto.items.reduce((groups, item) => {
-    const vendorId = item.vendorId;
-    if (!groups[vendorId]) {
-      groups[vendorId] = [];
+  private groupByVendor(items: any[]) {
+  return items.reduce((acc, item) => {
+    const vendorId = item.vendorId || item.vendorUuid; 
+    if (!acc[vendorId]) {
+      acc[vendorId] = [];
     }
-    groups[vendorId].push(item);
-    return groups;
+    acc[vendorId].push(item);
+    return acc;
   }, {});
+}
 
-  const registrosDeOrdenes: OrderEntity[] = [];
+  async processCheckout(dto: CheckoutDto) {
+  const subtotal = dto.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
-  for (const vendorId in productosPorTienda) {
-    const itemsDeEstaTienda = productosPorTienda[vendorId];
-    
-    const totalDeEstaOrden = itemsDeEstaTienda.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-    const nuevaOrden = new OrderEntity();
-    nuevaOrden.userUuid = dto.userUuid;
-    nuevaOrden.userOrderAddress = dto.addressUuid;
-    nuevaOrden.vendorUuid = vendorId;
-    nuevaOrden.total = totalDeEstaOrden;
-    nuevaOrden.paymentId = nuevoPago.uuid;
-    nuevaOrden.items = itemsDeEstaTienda;
-    nuevaOrden.status = 'pendiente';
-
-    const ordenGuardada = await this.orderRepository.save(nuevaOrden);
-    
-    registrosDeOrdenes.push(ordenGuardada);
+  let factor = 1.0; 
+  if (dto.paymentMethod === 'CASH') {
+    factor = 0.90; 
+  } else if (dto.paymentMethod === 'CARD') {
+    factor = 1.10; 
   }
 
-  return {
-    payment: nuevoPago,
-    orders: registrosDeOrdenes
-  };
+  const totalConAjuste = subtotal * factor;
+
+  const nuevoPago = await this.paymentRepository.save({
+    totalAmount: totalConAjuste,
+    method: dto.paymentMethod,
+    status: 'PAID', 
+    createdAt: new Date()
+  });
+
+  const itemsByVendor = this.groupByVendor(dto.items);
+
+  for (const vendorId in itemsByVendor) {
+  const itemsDeEstaTienda = itemsByVendor[vendorId];
+  const subtotalTienda = itemsDeEstaTienda.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+
+  await this.orderRepository.save({
+    vendorUuid: vendorId, 
+    userUuid: dto.userUuid,
+    addressUuid: dto.addressUuid,
+    total: subtotalTienda * factor, 
+    paymentId: String(nuevoPago.id), 
+    status: 'pendiente', 
+    
+    items: itemsDeEstaTienda.map(item => ({
+      productUuid: item.productId, 
+      quantity: item.quantity,
+      price: item.price
+    }))
+  });
+}
+
+  return { message: 'Compra procesada', paymentId: nuevoPago.id, totalFinal: totalConAjuste };
 }
 }

@@ -55,8 +55,8 @@ export class OrderOrmEntity {
   @OneToMany(() => OrderItemOrmEntity, (i) => i.order, { cascade: true, eager: true })
   items: OrderItemOrmEntity[];
 
-  @Column()
-  status: string;
+  @Column({ name: 'current_status', type: 'text', nullable: true, default: 'pendiente' })
+status: string;
 
   @Column({ type: 'varchar', name: 'driver_uuid', nullable: true })
   driverUuid: string | null;

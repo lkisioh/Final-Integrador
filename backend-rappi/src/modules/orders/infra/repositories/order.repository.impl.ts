@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { OrderOrmEntity } from '../databases/order.orm-entity';
 import type { IOrderRepository } from '../../domain/repositories/order.repository.interface';
@@ -12,62 +12,65 @@ export class OrderRepositoryImpl implements IOrderRepository {
     private readonly orderRepo: Repository<OrderOrmEntity>,
   ) {}
 
-  async save(order: OrderEntity): Promise<OrderEntity> {
-    const ormOrder: OrderOrmEntity = this.orderRepo.create({
-      uuid: order.uuid ?? uuidv4(),
-      userUuid: order.userUuid ?? null,
-      userName: order.userName ?? null,
-      userOrderAddress: order.userOrderAddress ?? null,
-      vendorUuid: order.vendorUuid ?? null,
-      vendorName: order.vendorName,
-      items: order.items.map((i) => ({
-        orderUuid: order.uuid,
-        productUuid: i.productUuid,
-        quantity: i.quantity,
-        unitPrice: i.unitPrice,
-        subtotal: i.subtotal,
-      })),
-      status: order.status,
-      driverUuid: order.driverUuid ?? null,
-      addressUuid: order.addressUuid ?? undefined,
-      total: order.total,
-    });
+async save(order: Partial<OrderEntity>): Promise<OrderEntity> {
+  const ormOrder = this.orderRepo.create({
+    uuid: order.uuid ?? uuidv4(),
+    userUuid: order.userUuid ?? null,
+    userName: order.userName ?? null,
+    userOrderAddress: order.userOrderAddress ?? null,
+    vendorUuid: order.vendorUuid ?? null,
+    vendorName: order.vendorName ?? 'Vendor', 
+    items: order.items ? order.items.map((i) => ({
+      orderUuid: order.uuid ?? null,
+      productUuid: i.productUuid,
+      quantity: i.quantity,
+      unitPrice: i.unitPrice,
+      subtotal: i.subtotal ?? (i.unitPrice * i.quantity), 
+    })) : [],
 
-    const saved = await this.orderRepo.save(ormOrder);
+    status: order.status ?? 'PENDING',
+    driverUuid: order.driverUuid ?? null,
+    addressUuid: order.addressUuid ?? null,
+    total: order.total ?? 0,
+    
+    paymentId: (order as any).paymentId ?? null, 
+  }as DeepPartial<OrderOrmEntity>);
 
-    const orderWithVendor = await this.orderRepo.findOne({
-      where: { uuid: saved.uuid },
-      relations: ['vendor'],
-    });
+  const saved = await this.orderRepo.save(ormOrder);
 
-    if (!orderWithVendor) {
-      throw new Error('Order not found after save');
-    }
+  const orderWithVendor = await this.orderRepo.findOne({
+    where: { uuid: saved.uuid },
+    relations: ['vendor'], 
+  });
 
-    const domainOrder = new OrderEntity();
-    Object.assign(domainOrder, {
-      id: orderWithVendor.id ?? null,
-      uuid: orderWithVendor.uuid,
-      userUuid: orderWithVendor.userUuid,
-      userName: orderWithVendor.userName,
-      userOrderAddress: orderWithVendor.userOrderAddress,
-      vendorUuid: orderWithVendor.vendorUuid,
-      vendorName: orderWithVendor.vendor.name,
-      items: orderWithVendor.items.map((i) => ({
-        productUuid: i.productUuid,
-        quantity: i.quantity,
-        unitPrice: i.unitPrice,
-        subtotal: i.subtotal,
-      })),
-      createdAt: orderWithVendor.createdAt,
-      status: orderWithVendor.status,
-      driverUuid: orderWithVendor.driverUuid,
-      addressUuid: orderWithVendor.addressUuid,
-      total: orderWithVendor.total,
-    });
-
-    return domainOrder;
+  if (!orderWithVendor) {
+    throw new Error('Error crítico: No se encontró la orden tras el guardado');
   }
+
+  const domainOrder = new OrderEntity();
+  Object.assign(domainOrder, {
+    id: orderWithVendor.id ?? null,
+    uuid: orderWithVendor.uuid,
+    userUuid: orderWithVendor.userUuid,
+    userName: orderWithVendor.userName,
+    userOrderAddress: orderWithVendor.userOrderAddress,
+    vendorUuid: orderWithVendor.vendorUuid,
+    vendorName: orderWithVendor.vendor?.name || orderWithVendor.vendorName,
+    items: orderWithVendor.items?.map((i) => ({
+      productUuid: i.productUuid,
+      quantity: i.quantity,
+      unitPrice: i.unitPrice,
+      subtotal: i.subtotal,
+    })) || [],
+    createdAt: orderWithVendor.createdAt,
+    status: orderWithVendor.status,
+    driverUuid: orderWithVendor.driverUuid,
+    addressUuid: orderWithVendor.addressUuid,
+    total: orderWithVendor.total,
+  });
+
+  return domainOrder;
+}
 
   async findAll(): Promise<OrderEntity[]> {
     const entities = await this.orderRepo.find();

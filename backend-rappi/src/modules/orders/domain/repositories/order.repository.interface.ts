@@ -20,4 +20,5 @@ export interface IOrderRepository {
   findByVendorUuid(vendorUuid: string): Promise<OrderEntity[]>;
   findByUserUuid(userUuid: string): Promise<OrderEntity[]>;
   findByDriverUuid(driverUuid: string): Promise<OrderEntity[]>;
+  save(order: Partial<OrderEntity>): Promise<OrderEntity>;
 }

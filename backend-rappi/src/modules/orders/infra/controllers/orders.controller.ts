@@ -87,9 +87,9 @@ export class OrderController {
       const result = await this.ordersService.processCheckout(checkoutDto);
       return {
         message: '¡Compra finalizada con éxito!',
-        payment: result.payment,
-        ordersGenerated: result.orders.length,
-        orders: result.orders,
+        payment: result.paymentId,
+        //ordersGenerated: result.orders.length,
+        totalFinal: result.totalFinal
       };
     } catch (error) {
       throw new Error('Error al procesar la compra: ' + error.message);
