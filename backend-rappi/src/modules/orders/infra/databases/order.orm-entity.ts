@@ -83,4 +83,7 @@ status: string;
 
   @Column({ name: 'address_Uuid' })
   addressUuid: string;
+
+  @Column({ name: 'payment_method', nullable: true })
+  paymentMethod: string;
 }

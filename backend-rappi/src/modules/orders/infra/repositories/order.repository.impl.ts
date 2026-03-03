@@ -17,7 +17,7 @@ async save(order: Partial<OrderEntity>): Promise<OrderEntity> {
     uuid: order.uuid ?? uuidv4(),
     userUuid: order.userUuid ?? null,
     userName: order.userName ?? null,
-    userOrderAddress: order.userOrderAddress ?? null,
+    userOrderAddress: order.userOrderAddress ?? null, 
     vendorUuid: order.vendorUuid ?? null,
     vendorName: order.vendorName ?? 'Vendor', 
     items: order.items ? order.items.map((i) => ({
@@ -28,13 +28,14 @@ async save(order: Partial<OrderEntity>): Promise<OrderEntity> {
       subtotal: i.subtotal ?? (i.unitPrice * i.quantity), 
     })) : [],
 
-    status: order.status ?? 'PENDING',
+    status: order.status ?? 'PENDIENTE',
     driverUuid: order.driverUuid ?? null,
     addressUuid: order.addressUuid ?? null,
     total: order.total ?? 0,
     
+    paymentMethod: (order as any).paymentMethod ?? null, 
     paymentId: (order as any).paymentId ?? null, 
-  }as DeepPartial<OrderOrmEntity>);
+  } as DeepPartial<OrderOrmEntity>);
 
   const saved = await this.orderRepo.save(ormOrder);
 
@@ -49,57 +50,42 @@ async save(order: Partial<OrderEntity>): Promise<OrderEntity> {
 
   const domainOrder = new OrderEntity();
   Object.assign(domainOrder, {
-    id: orderWithVendor.id ?? null,
-    uuid: orderWithVendor.uuid,
-    userUuid: orderWithVendor.userUuid,
-    userName: orderWithVendor.userName,
-    userOrderAddress: orderWithVendor.userOrderAddress,
-    vendorUuid: orderWithVendor.vendorUuid,
+    ...orderWithVendor, 
     vendorName: orderWithVendor.vendor?.name || orderWithVendor.vendorName,
-    items: orderWithVendor.items?.map((i) => ({
-      productUuid: i.productUuid,
-      quantity: i.quantity,
-      unitPrice: i.unitPrice,
-      subtotal: i.subtotal,
-    })) || [],
-    createdAt: orderWithVendor.createdAt,
-    status: orderWithVendor.status,
-    driverUuid: orderWithVendor.driverUuid,
-    addressUuid: orderWithVendor.addressUuid,
-    total: orderWithVendor.total,
   });
 
   return domainOrder;
 }
 
   async findAll(): Promise<OrderEntity[]> {
-    const entities = await this.orderRepo.find();
+  const entities = await this.orderRepo.find();
 
-    return entities.map((entity) => {
-      const order = new OrderEntity();
+  return entities.map((entity) => {
+    const order = new OrderEntity();
 
-      Object.assign(order, {
-        id: entity.id,
-        uuid: entity.uuid,
-        userUuid: entity.userUuid,
-        userName: entity.userName,
-        userOrderAddress: entity.userOrderAddress,
-        vendorUuid: entity.vendorUuid,
-        vendorName: entity.vendorName,
-        items: entity.items.map((i) => ({
-          productUuid: i.productUuid,
-          quantity: i.quantity,
-          unitPrice: i.unitPrice,
-          subtotal: i.subtotal,
-        })),
-        createdAt: entity.createdAt,
-        status: entity.status,
-        driverUuid: entity.driverUuid,
-        total: entity.total,
-      });
-      return order;
+    Object.assign(order, {
+      id: entity.id,
+      uuid: entity.uuid,
+      userUuid: entity.userUuid,
+      userName: entity.userName,
+      userOrderAddress: entity.userOrderAddress, 
+      vendorUuid: entity.vendorUuid,
+      vendorName: entity.vendorName,
+      items: entity.items.map((i) => ({
+        productUuid: i.productUuid,
+        quantity: i.quantity,
+        unitPrice: i.unitPrice,
+        subtotal: i.subtotal,
+      })),
+      createdAt: entity.createdAt,
+      status: entity.status,
+      driverUuid: entity.driverUuid,
+      total: entity.total,
+      paymentMethod: entity.paymentMethod, 
     });
-  }
+    return order;
+  });
+}
 
   async assignDriver(uuid: string, status: string, driverUuid: string): Promise<OrderEntity> {
     const orderOrm = await this.orderRepo.findOneBy({ uuid });
@@ -168,8 +154,13 @@ async save(order: Partial<OrderEntity>): Promise<OrderEntity> {
     if (!orderOrm) {
       throw new Error('Order not found');
     }
+
     orderOrm.status = status;
+    orderOrm.driverUuid = driverUuid; 
+
     const updatedOrm = await this.orderRepo.save(orderOrm);
+
+    
     const domainOrder = new OrderEntity();
     Object.assign(domainOrder, {
       id: updatedOrm.id ?? null,
@@ -179,20 +170,20 @@ async save(order: Partial<OrderEntity>): Promise<OrderEntity> {
       userOrderAddress: updatedOrm.userOrderAddress,
       vendorUuid: updatedOrm.vendorUuid,
       vendorName: updatedOrm.vendorName,
-      items: updatedOrm.items.map((i) => ({
+      items: updatedOrm.items?.map((i) => ({ 
         productUuid: i.productUuid,
         quantity: i.quantity,
         unitPrice: i.unitPrice,
         subtotal: i.subtotal,
-      })),
+      })) || [],
       createdAt: updatedOrm.createdAt,
       status: updatedOrm.status,
-      driverUuid: updatedOrm.driverUuid,
+      driverUuid: updatedOrm.driverUuid, 
       driverNombre: updatedOrm.driverName,
       total: updatedOrm.total,
     });
     return domainOrder;
-  }
+}
   async findByDriverUuid(driverUuid: string): Promise<OrderEntity[]> {
     const entities = await this.orderRepo.find({ where: { driverUuid } });
 
@@ -212,6 +203,7 @@ async save(order: Partial<OrderEntity>): Promise<OrderEntity> {
           quantity: i.quantity,
           unitPrice: i.unitPrice,
           subtotal: i.subtotal,
+          paymentMethod: entity.paymentMethod,
         })),
         createdAt: entity.createdAt,
         status: entity.status,
@@ -240,6 +232,7 @@ async save(order: Partial<OrderEntity>): Promise<OrderEntity> {
           quantity: i.quantity,
           unitPrice: i.unitPrice,
           subtotal: i.subtotal,
+          paymentMethod: entity.paymentMethod,
         })),
         createdAt: entity.createdAt,
         status: entity.status,
@@ -267,6 +260,7 @@ async save(order: Partial<OrderEntity>): Promise<OrderEntity> {
           quantity: i.quantity,
           unitPrice: i.unitPrice,
           subtotal: i.subtotal,
+          paymentMethod: entity.paymentMethod,
         })),
         createdAt: entity.createdAt,
         status: entity.status,

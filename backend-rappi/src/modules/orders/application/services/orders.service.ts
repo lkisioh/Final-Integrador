@@ -53,8 +53,17 @@ export class OrdersService {
 
   async processCheckout(dto: CheckoutDto) {
     const userData = await this.userRepository.findOne({ 
-    where: { uuid: dto.userUuid } 
+    where: { uuid: dto.userUuid }, 
+    relations: ['addresses']
   });
+
+const direccionEncontrada = userData?.addresses?.find(addr => addr.uuid === dto.addressUuid);
+
+  const street = direccionEncontrada?.street || 'Calle desconocida';
+  const number = direccionEncontrada?.number || '';
+  const apt = direccionEncontrada?.apartment ? `, Depto: ${direccionEncontrada.apartment}` : '';
+
+  const direccionTexto = `${street} ${number}${apt}`.trim();
 
   const subtotalGeneral = dto.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   let factor = 1.0;
@@ -82,12 +91,13 @@ export class OrdersService {
     await this.orderRepository.save({
       userUuid: dto.userUuid,
       userName: userData?.name || 'Usuario', 
-      userOrderAddress: dto.addressUuid, 
+      userOrderAddress: direccionTexto, 
       vendorUuid: vendorId,
       vendorName: vendorData?.name || 'Tienda', 
       total: subtotalTienda * factor,
       paymentId: nuevoPago.uuid,
-      status: 'pendiente',
+      paymentMethod: dto.paymentMethod,
+      status: 'PENDIENTE',
       addressUuid: dto.addressUuid,
       
       items: itemsDeEstaTienda.map(item => ({

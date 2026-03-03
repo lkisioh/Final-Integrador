@@ -15,11 +15,11 @@ const deleteLoading = ref(false);
 const {vendor, llamarVendorAPI} = traerVendor();
 const { deleteProductAPI } = deleteProduct();
 const { editarProductAPI } = editProduct();
+
 function logout() {
-  localStorage.removeItem('access_token')
-  localStorage.removeItem('actor_type')
-  localStorage.removeItem('actor_uuid')
-  router.push('/login')
+  console.log('Cerrando sesión...'); 
+  localStorage.clear(); 
+  router.push('/login');
 }
 
 onMounted(() => {
@@ -162,11 +162,11 @@ const toggleAvailability = async (productUuid, currentStatus) => {
           <RouterLink :to="'/products/' + vendorUuid" class="btn-link add">
             ➕ Agregar producto
           </RouterLink>
+        <button @click="logout" class="btn-logout">Cerrar Sesión</button>
 
 
         </div>
 
-        <button @click="logout" class="btn-logout">Cerrar Sesión</button>
       </footer>
 
       <h5 v-if="error" class="error-msg">{{ error }}</h5>
@@ -293,7 +293,6 @@ hr {
 }
 
 .btn-logout {
-  float: right;
   background-color: #102a43;
   color: white;
   padding: 10px 20px;

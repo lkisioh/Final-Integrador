@@ -8,7 +8,7 @@ export class OrderEntity {
   
   paymentId: string;
   createdAt: Date = new Date();
-
+  paymentMethod?: string;
   vendorUuid: string;
   vendorName: string;
   items: OrderItemEntity[];

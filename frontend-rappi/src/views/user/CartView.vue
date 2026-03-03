@@ -1,19 +1,20 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import router from '@/router';
 import { RouterLink } from 'vue-router'
 import { useCartStore } from '@/stores/user/cartStore'
 import { userUuid } from '@/stores/user/userUuid';
 import { traerUser } from '@/composables/user/traerUser';
 import { crearOrden } from '@/composables/order/crearOrden';
-import { ref } from 'vue';
 
 const cartStore = useCartStore()
 const storeUserUuid = userUuid()
 const { user, llamarUserAPI } = traerUser()
 const uuid = storeUserUuid.getUuid()
-
 const { crearOrdenAPI } = crearOrden()
+
+const paymentMethod = ref('')
+const methods = ['CASH', 'CARD']
 
 llamarUserAPI('/users/' + uuid)
 
@@ -33,76 +34,70 @@ const productosAgrupados = computed(() => {
   return grupos
 })
 
+
+const subtotalGeneral = computed(() => {
+  return cartStore.items.reduce((acc, item) => acc + (item.price * item.quantity), 0)
+})
+
+const montoAjuste = computed(() => {
+  return subtotalGeneral.value * 0.10;
+})
+
+const totalFinalConAjuste = computed(() => {
+  if (paymentMethod.value === 'CASH') return subtotalGeneral.value - montoAjuste.value;
+  if (paymentMethod.value === 'CARD') return subtotalGeneral.value + montoAjuste.value;
+  return subtotalGeneral.value;
+})
+
 function calcularTotalTienda(productos) {
   return productos.reduce((acc, item) => acc + (item.price * item.quantity), 0)
 }
 
-async function pagarOrden(nombreTienda, productosTienda) {
+async function finalizarCompraGeneral() {
   if (!direccionSeleccionada.value) {
     alert("⚠️ Por favor selecciona una dirección antes de finalizar la compra.");
     return;
   }
+  if (!paymentMethod.value) {
+    alert("⚠️ Por favor selecciona un método de pago.");
+    return;
+  }
 
- const nuevaOrden = {
-  userUuid: uuid,
-  userName: `${user.value.name}`,
-  userOrderAddress: `${direccionSeleccionada.value.street} ${direccionSeleccionada.value.number}, Depto ${direccionSeleccionada.value.apartment || 'N/A'}`,
-  vendorUuid: String(productosTienda[0].storeId),
-  vendorName: nombreTienda,
-  items: productosTienda.map(p => ({
-    // acá seria el producto uuid, cantidad porque el back deberia sacar el precio del producto, y subtotal que seria cantidad * precio
-    productUuid: p.uuid,
-    quantity: Number(p.quantity),
-    unitPrice: Number(p.price),
-    subtotal: Number(p.quantity) * Number(p.price),
-  })),
-  status: 'PENDIENTE',
-  addressUuid: direccionSeleccionada.value?.uuid,
-  total: Number(calcularTotalTienda(productosTienda)),
-}
-
+  const payload = {
+    paymentMethod: paymentMethod.value,
+    userUuid: uuid,
+    addressUuid: direccionSeleccionada.value.uuid,
+    items: cartStore.items.map(p => ({
+      productId: p.uuid,
+      vendorId: p.storeId,
+      quantity: Number(p.quantity),
+      price: Number(p.price)
+    }))
+  };
 
   try {
-    alert(`Procesando tu pedido a ${nombreTienda}...`)
+    alert(`Procesando compra general por $${totalFinalConAjuste.value.toFixed(2)}...`)
+    
+    
+    await crearOrdenAPI('/orders/checkout', payload);
 
-    await crearOrdenAPI('/orders', nuevaOrden);
-    await crearOrdenAPI('/orders/checkout', { //es el checkout que genera la orden y la manda al repartidor pero use la misma funcion
-      paymentMethod: paymentMethod.value,
-      userUuid: uuid,
-      addressUuid: direccionSeleccionada.value?.uuid,
-      items: productosTienda.map(p => ({
-    productId: p.uuid, //UUid sería
-    vendorId: p.storeId,
-    quantity: Number(p.quantity),
-    price: Number(p.price),
-  }))
-    })
+    alert(`✅ ¡Compra finalizada con éxito! Se han generado las órdenes para cada tienda.`);
 
-    alert(`✅ Pedido enviado a ${nombreTienda}. Un repartidor lo tomará pronto.`);
-
-    const idsAQuitar = productosTienda.map(p => p.uuid);
-    cartStore.items = cartStore.items.filter(item => !idsAQuitar.includes(item.uuid));
+    cartStore.items = []; 
     router.push('/mis-pedidos/' + uuid);
   } catch (error) {
-    console.log('status', error?.response?.status)
-    console.log('data', error?.response?.data)
-    console.error("Error al generar la orden", error);
+    console.error("Error al procesar la compra general", error);
     alert("Hubo un error al procesar tu pedido.");
   }
-}
-const methods = ['CASH', 'CARD', 'MERCADO_PAGO']
-const paymentMethod = ref('')
-function comprar() {
-  router.push('/shop')
 }
 
 function eliminarProducto(uuid) {
   cartStore.items = cartStore.items.filter(i => i.uuid !== uuid)
 }
 
-// const totalGeneral = computed(() => {
-//   return cartStore.items.reduce((acc, item) => acc + (item.price * item.quantity), 0)
-// })
+function irAShop() {
+  router.push('/shop')
+}
 </script>
 
 <template>
@@ -112,7 +107,7 @@ function eliminarProducto(uuid) {
     </nav>
 
     <div class="cart-box">
-      <h1 class="cart-title">CARRITO</h1>
+      <h1 class="cart-title">CARRITO DE COMPRAS</h1>
 
       <div class="global-shipping-header">
         <div class="shipping-content">
@@ -121,12 +116,10 @@ function eliminarProducto(uuid) {
             <p class="label">Entregar en:</p>
             <p class="address-text">
               <strong>{{ direccionSeleccionada.street }} {{ direccionSeleccionada.number }}</strong>
-              <span v-if="direccionSeleccionada.apartment"> - Depto: {{ direccionSeleccionada.apartment }}</span>
             </p>
           </div>
           <div v-else class="address-details error">
-            <p class="label">⚠️ Atención:</p>
-            <p class="address-text">No has seleccionado una dirección actual en tu perfil.</p>
+            <p class="label">⚠️ Atención: No has seleccionado dirección.</p>
           </div>
         </div>
         <button @click="router.push('/user/' + uuid)" class="btn-change">Cambiar</button>
@@ -135,13 +128,11 @@ function eliminarProducto(uuid) {
       <div v-if="cartStore.items.length > 0">
         <div v-for="(productos, tiendaNombre) in productosAgrupados" :key="tiendaNombre" class="store-section">
           <h2 class="store-title">Tienda: {{ tiendaNombre }}</h2>
-
           <table class="cart-table">
             <thead>
               <tr>
                 <th>Producto</th>
                 <th>Cantidad</th>
-                <th>Precio</th>
                 <th>Subtotal</th>
                 <th>Acciones</th>
               </tr>
@@ -156,127 +147,85 @@ function eliminarProducto(uuid) {
                     <button @click="cartStore.incrQuantity(item.uuid)" class="btn-qty">+</button>
                   </div>
                 </td>
-                <td>${{ item.price }}</td>
-                <td>${{ item.price * item.quantity }}</td>
+                <td>${{ (item.price * item.quantity).toFixed(2) }}</td>
                 <td>
                   <button @click="eliminarProducto(item.uuid)" class="secondary">Eliminar</button>
                 </td>
               </tr>
             </tbody>
           </table>
-
-          <div class="store-footer">
-            <div class="store-total">
-              Subtotal: <strong>${{ calcularTotalTienda(productos) }}</strong>
-            </div>
-            <div>
-              <label for="paymentMethod">Método de pago:</label>
-              <select id="paymentMethod" v-model="paymentMethod">
-                <option value="" disabled>Selecciona un método</option>
-                <option v-for="method in methods" :key="method" :value="method">{{ method }}</option>
-              </select>
-            </div>
-            <button
-              @click="pagarOrden(tiendaNombre, productos)"
-              class="primary"
-              :disabled="!direccionSeleccionada"
-            >
-              Finalizar pedido en {{ tiendaNombre }}
-            </button>
-
-
+          <div class="store-subtotal-info">
+            Subtotal tienda: <strong>${{ calcularTotalTienda(productos).toFixed(2) }}</strong>
           </div>
+        </div>
+
+        <div class="final-checkout-card">
+          <div class="payment-selection">
+            <h3>Método de Pago</h3>
+            <select v-model="paymentMethod" class="full-width-select">
+              <option value="" disabled>Selecciona cómo quieres pagar</option>
+              <option v-for="method in methods" :key="method" :value="method">
+                {{ method === 'CASH' ? 'Efectivo (10% Desc.)' : method === 'CARD' ? 'Tarjeta (10% Recargo)' : method }}
+              </option>
+            </select>
+          </div>
+
+          <div class="total-summary">
+            <p>Subtotal General: <strong>${{ subtotalGeneral.toFixed(2) }}</strong></p>
+            <p v-if="paymentMethod === 'CARD'" class="adjustment-text surcharge">
+                Recargo Tarjeta (10%): <span>+${{ montoAjuste.toFixed(2) }}</span>
+            </p>
+            <p v-if="paymentMethod === 'CASH'" class="adjustment-text discount">
+                Descuento Efectivo (10%): <span>-${{ montoAjuste.toFixed(2) }}</span>
+            </p>
+              <h2 class="grand-total">Total Final: ${{ totalFinalConAjuste.toFixed(2) }}</h2>
+          </div>
+
+          <button 
+            @click="finalizarCompraGeneral" 
+            class="primary btn-finalize"
+            :disabled="!direccionSeleccionada || !paymentMethod"
+          >
+            CONFIRMAR Y FINALIZAR COMPRA
+          </button>
         </div>
       </div>
 
       <div v-else class="empty-cart">
         <p>Tu carrito está vacío.</p>
-        <button @click="comprar" class="primary">Ir a la tienda</button>
+        <button @click="irAShop" class="primary">Ir a la tienda</button>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.cart-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
+.cart-view-container { padding: 20px; display: flex; flex-direction: column; align-items: center; }
+.cart-box { width: 100%; max-width: 800px; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+.store-section { margin-bottom: 25px; border: 1px solid #eee; border-radius: 8px; overflow: hidden; }
+.store-title { background: #f4f4f4; padding: 10px; font-size: 1.1rem; border-left: 5px solid #4CAF50; }
+.cart-table { width: 100%; border-collapse: collapse; }
+.cart-table th, .cart-table td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+.store-subtotal-info { text-align: right; padding: 10px; background: #fafafa; }
 
-.cart-table th, .cart-table td {
-  border-bottom: 1px solid #ddd;
-  padding: 10px; text-align: left;
-}
-
-.cart-summary {
+.final-checkout-card {
   margin-top: 30px;
-  text-align: right;
+  padding: 20px;
+  border: 2px solid #4CAF50;
+  border-radius: 12px;
+  background-color: #f9fff9;
 }
-
-.primary {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  cursor: pointer;
-}
-
-.secondary {
-  background-color: #f44336;
-  color: white;
-  padding: 5px 10px;
-  border: none;
-  cursor: pointer;
-  margin-left: 5px;
-
-}
-
-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-
-}
-
-.quantity-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.btn-qty {
-  background-color: #eee;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.btn-qty:hover {
-  background-color: #ddd;
-}
-
-.qty-number {
-  font-weight: bold;
-  min-width: 20px;
-}
-
-.store-section {
-  margin-bottom: 40px;
-  border: 1px solid #eee;
-  padding: 15px;
-  border-radius: 8px;
-}
-
-.store-title {
-  background-color: #f8f9fa;
-  padding: 10px;
-  margin: 0;
-  font-size: 1.2rem;
-  color: #333;
-  border-left: 4px solid #4CAF50;
-}
+.payment-selection { margin-bottom: 20px; }
+.full-width-select { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #ccc; font-size: 1rem; }
+.total-summary { text-align: right; margin-bottom: 20px; }
+.grand-total { font-size: 1.8rem; color: #2e7d32; margin-top: 5px; }
+.adjustment-text { font-size: 0.9rem; color: #666; font-style: italic; }
+.btn-finalize { width: 100%; font-size: 1.2rem; font-weight: bold; padding: 15px; border-radius: 8px; }
+.discount span { color: #2e7d32; font-weight: bold;}
+.surcharge span {color: #d32f2f; font-weight: bold;}
+.primary { background-color: #4CAF50; color: white; cursor: pointer; border: none; }
+.primary:hover { background-color: #45a049; }
+.secondary { background-color: #ffeded; color: #d32f2f; border: 1px solid #ffcdd2; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+.quantity-controls { display: flex; align-items: center; gap: 8px; }
+.btn-qty { width: 25px; height: 25px; border: 1px solid #ccc; background: white; cursor: pointer; border-radius: 4px; }
 </style>

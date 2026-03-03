@@ -11,16 +11,34 @@ const cargando = ref(false)
 const uuidDriver = route.params.uuid
 
 async function cargarHistorial() {
-  cargando.value = true
+  cargando.value = true;
   try {
-    const respuesta = await axios.get('http://localhost:3000/orders')
+    
+    const token = localStorage.getItem('access_token'); 
+
+    const respuesta = await axios.get('http://localhost:3000/orders', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    
+    console.log("Datos recibidos:", respuesta.data);
+
     pedidos.value = respuesta.data.filter(o =>
-      o.status === 'ENTREGADO' && o.driverUuid === uuidDriver
-    )
+      o.driverUuid === uuidDriver && 
+      o.status?.toString().toUpperCase() === 'ENTREGADO'
+    );
+    
+    pedidos.value.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
   } catch (error) {
-    console.error("Error al cargar el historial", error)
+    console.error("Error al cargar el historial:", error.response?.data || error.message);
+    if (error.response?.status === 401) {
+       alert("Sesión expirada. Por favor, vuelve a entrar.");
+       router.push('/login');
+    }
   } finally {
-    cargando.value = false
+    cargando.value = false;
   }
 }
 
@@ -38,10 +56,13 @@ onMounted(() => {
     <div class="historial-box">
       <header class="header-historial">
         <button @click="volver" class="btn-back">← Volver a pedidos activos</button>
-        <h1 class="hist-title">Historial de Entregas</h1>
-        </header>
+        <h1 class="hist-title">Historial de Entregas ✅</h1>
+      </header>
 
-      <div v-if="cargando" class="status-msg">Cargando historial...</div>
+      <div v-if="cargando" class="status-msg">
+        <div class="spinner"></div>
+        <p>Buscando tus entregas...</p>
+      </div>
 
       <div v-else-if="pedidos.length === 0" class="no-data">
         <div class="empty-icon">📦</div>
@@ -55,31 +76,32 @@ onMounted(() => {
               <th>Fecha</th>
               <th>Local</th>
               <th>Productos</th>
-              <th>Monto</th>
+              <th>Monto Total</th>
               <th style="text-align: center;">Estado</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="pedido in pedidos" :key="pedido.uuid">
               <td class="date-cell">
-                {{ new Date(pedido.createdAt).toLocaleDateString() }}
+                <span class="date-text">{{ new Date(pedido.createdAt).toLocaleDateString() }}</span>
+                <small class="time-text">{{ new Date(pedido.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }}</small>
               </td>
               <td>
-                <strong>{{ pedido.vendorName }}</strong>
+                <strong class="vendor-name">{{ pedido.vendorName }}</strong>
               </td>
 
               <td>
-                <ul class="items-list">
-                  <li v-for="item in pedido.items" :key="item.productUuid">
-                    {{ item.quantity }} x producto: {{ item.productName }}
-                  </li>
-                </ul>
+                <div class="items-container">
+                  <div v-for="item in pedido.items" :key="item.productUuid" class="item-pill">
+                    {{ item.quantity }}x {{ item.productName || 'Producto' }}
+                  </div>
+                </div>
               </td>
               <td class="amount-cell">
-                ${{ pedido.total }}
+                ${{ Number(pedido.total).toFixed(2) }}
               </td>
               <td style="text-align: center;">
-                <span class="badge-success">Entregado</span>
+                <span class="badge-success">ENTREGADO</span>
               </td>
             </tr>
           </tbody>
@@ -106,90 +128,58 @@ onMounted(() => {
 .historial-box {
   background-color: #ffffff;
   width: 100%;
-  max-width: 1000px; /* Un poco más ancho para la nueva columna */
+  max-width: 1100px;
   border-radius: 20px;
   padding: 35px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
   border: 1px solid #d9e2ec;
 }
 
-.header-historial {
-  margin-bottom: 30px;
+.date-cell {
+  display: flex;
+  flex-direction: column;
 }
 
-.hist-title {
-  color: #102a43;
-  font-size: 24px;
-  margin: 10px 0 0 0;
+.date-text { font-weight: 600; color: #334e68; }
+.time-text { color: #829ab1; font-size: 11px; }
+
+.vendor-name { color: #102a43; }
+
+.items-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
 }
 
-.btn-back {
-  background: none;
-  border: none;
+.item-pill {
+  background: #f0f4f8;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
   color: #486581;
-  font-weight: 600;
-  cursor: pointer;
-  padding: 0;
-  font-size: 14px;
-}
-
-.address-text {
-  color: #486581;
-  font-size: 13px;
-  display: block;
-  max-width: 150px; /* Evita que la celda se estire demasiado */
+  border: 1px solid #d9e2ec;
 }
 
 .amount-cell {
-  font-weight: bold;
-  color: #102a43;
-}
-
-.table-container {
-  overflow-x: auto;
-  border-radius: 12px;
-}
-
-.hist-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.hist-table th {
-  background-color: #f8fafc;
-  padding: 15px;
-  color: #627d98;
-  font-size: 11px;
-  text-transform: uppercase;
-  border-bottom: 2px solid #d9e2ec;
-  text-align: left;
-}
-
-.hist-table td {
-  padding: 15px;
-  border-bottom: 1px solid #f0f4f8;
-  font-size: 14px;
+  font-weight: 800;
+  color: #243b55;
+  font-size: 15px;
 }
 
 .badge-success {
   background-color: #d4edda;
   color: #155724;
-  padding: 5px 10px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: bold;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 800;
+  border: 1px solid #c3e6cb;
 }
 
-.items-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  font-size: 13px;
-}
+.hist-table { width: 100%; border-collapse: collapse; }
+.hist-table th { text-align: left; padding: 15px; background: #f8fafc; color: #627d98; font-size: 11px; text-transform: uppercase; border-bottom: 2px solid #d9e2ec; }
+.hist-table td { padding: 15px; border-bottom: 1px solid #f0f4f8; }
 
-.status-msg, .no-data {
-  text-align: center;
-  padding: 50px;
-  color: #627d98;
-}
+.no-data { text-align: center; padding: 60px; color: #829ab1; }
+.empty-icon { font-size: 50px; margin-bottom: 15px; }
 </style>
