@@ -6,6 +6,7 @@ import { useCartStore } from '@/stores/user/cartStore'
 import { userUuid } from '@/stores/user/userUuid';
 import { traerUser } from '@/composables/user/traerUser';
 import { crearOrden } from '@/composables/order/crearOrden';
+import { ref } from 'vue';
 
 const cartStore = useCartStore()
 const storeUserUuid = userUuid()
@@ -65,6 +66,17 @@ async function pagarOrden(nombreTienda, productosTienda) {
     alert(`Procesando tu pedido a ${nombreTienda}...`)
 
     await crearOrdenAPI('/orders', nuevaOrden);
+    await crearOrdenAPI('/orders/checkout', { //es el checkout que genera la orden y la manda al repartidor pero use la misma funcion
+      paymentMethod: paymentMethod.value,
+      userUuid: uuid,
+      addressUuid: direccionSeleccionada.value?.uuid,
+      items: productosTienda.map(p => ({
+    productId: p.uuid, //UUid sería
+    vendorId: p.storeId,
+    quantity: Number(p.quantity),
+    price: Number(p.price),
+  }))
+    })
 
     alert(`✅ Pedido enviado a ${nombreTienda}. Un repartidor lo tomará pronto.`);
 
@@ -78,7 +90,8 @@ async function pagarOrden(nombreTienda, productosTienda) {
     alert("Hubo un error al procesar tu pedido.");
   }
 }
-
+const methods = ['CASH', 'CARD', 'MERCADO_PAGO']
+const paymentMethod = ref('')
 function comprar() {
   router.push('/shop')
 }
@@ -156,6 +169,13 @@ function eliminarProducto(uuid) {
             <div class="store-total">
               Subtotal: <strong>${{ calcularTotalTienda(productos) }}</strong>
             </div>
+            <div>
+              <label for="paymentMethod">Método de pago:</label>
+              <select id="paymentMethod" v-model="paymentMethod">
+                <option value="" disabled>Selecciona un método</option>
+                <option v-for="method in methods" :key="method" :value="method">{{ method }}</option>
+              </select>
+            </div>
             <button
               @click="pagarOrden(tiendaNombre, productos)"
               class="primary"
@@ -163,6 +183,8 @@ function eliminarProducto(uuid) {
             >
               Finalizar pedido en {{ tiendaNombre }}
             </button>
+
+
           </div>
         </div>
       </div>

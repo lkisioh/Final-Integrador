@@ -19,9 +19,9 @@ export class OrdersService {
     private readonly orderRepository: IOrderRepository,
     @InjectRepository(PaymentOrmEntity)
     private readonly paymentRepository: any,
-    @InjectRepository(VendorOrmEntity) 
+    @InjectRepository(VendorOrmEntity)
     private readonly vendorRepository: any,
-    @InjectRepository(UserOrmEntity) 
+    @InjectRepository(UserOrmEntity)
     private readonly userRepository: any,
   ) {}
 
@@ -52,7 +52,7 @@ export class OrdersService {
 }
 
   async processCheckout(dto: CheckoutDto) {
-  const userData = await this.userRepository.findOne({ 
+    const userData = await this.userRepository.findOne({ 
     where: { uuid: dto.userUuid } 
   });
 

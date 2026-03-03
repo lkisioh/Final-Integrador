@@ -77,8 +77,6 @@ export class OrderController {
     return this.orderRepository.finishDelivery(uuid, body.status, body.driverUuid);
   }
 
-
-
   //fede
   @UseGuards(JwtAuthGuard, ActorTypesGuard)
   @Post('checkout')
@@ -89,7 +87,7 @@ export class OrderController {
         message: '¡Compra finalizada con éxito!',
         payment: result.paymentId,
         //ordersGenerated: result.orders.length,
-        totalFinal: result.totalFinal
+        totalFinal: result.totalFinal,
       };
     } catch (error) {
       throw new Error('Error al procesar la compra: ' + error.message);
